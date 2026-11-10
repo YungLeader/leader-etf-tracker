@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>天哥中枢 · 国家队汪汪队ETF实时追踪看板</title>
+<style>
+:root{
+  --paper:#ffffff; --card:#ffffff; --ink:#000000; --ink2:#444444; --ink3:#8a8a8a;
+  --line:#ececec; --line2:#f5f5f5; --orange:#ff4713; --blue:#005eb8;
+  --up:#ff4713; --down:#00875a;
+  --shadow:0 1px 3px rgba(0,0,0,.06);
+  --grad:linear-gradient(135deg,#ff4713 0%,#ff6b35 30%,#e82e5c 60%,#005eb8 100%);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+.wrap{max-width:1240px;margin:0 auto;padding:28px 22px 60px}
+
+/* header */
+header{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:22px}
+.brand h1{margin:0;font-size:27px;letter-spacing:-.6px;font-weight:900;display:flex;align-items:center;gap:11px;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:var(--orange)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--orange);display:inline-block;flex:none}
+.brand .sub{margin-top:7px;color:var(--ink2);font-size:13px}
+.status{display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-top:4px;white-space:nowrap}
+.badge{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#fff;border-radius:100px;padding:6px 13px;font-size:12px;font-weight:600;color:var(--ink2)}
+.badge i{width:7px;height:7px;border-radius:50%;background:var(--ink3);display:block}
+.badge.live{border-color:rgba(0,94,184,.28);color:var(--blue)}
+.badge.live i{background:var(--blue);box-shadow:0 0 0 3px rgba(0,94,184,.13);animation:pulse 2s infinite}
+.badge.warn{border-color:rgba(255,71,19,.35);color:var(--orange)}
+.badge.warn i{background:var(--orange)}
+@keyframes pulse{50%{opacity:.45}}
+.status .stamp{font-size:11px;color:var(--ink3)}
+
+/* verdict */
+.verdict{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:26px 28px 22px;position:relative;overflow:hidden}
+.verdict:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--line)}
+.verdict.hot:before{background:var(--orange)}
+.verdict.mid:before{background:#e8a33c}
+.vhead{display:flex;justify-content:space-between;align-items:flex-start;gap:24px}
+.vlabel{font-size:11px;letter-spacing:1.6px;color:var(--ink3);font-weight:700;text-transform:uppercase}
+.vtitle{margin:9px 0 6px;font-size:31px;font-weight:800;letter-spacing:-.8px;line-height:1.2}
+.vtitle.cool{color:var(--ink2)}
+.vreason{font-size:13px;color:var(--ink2);max-width:760px}
+.vstamp{flex:none;text-align:center;border:1px dashed var(--line);border-radius:8px;padding:12px 16px;min-width:118px;color:var(--ink3)}
+.vstamp b{display:block;font-size:19px;color:var(--ink);font-weight:800;letter-spacing:-.4px}
+.vstamp span{font-size:11px}
+
+.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line2);border:1px solid var(--line2);border-radius:8px;margin-top:22px;overflow:hidden}
+.mgrid>div{background:#fafafa;padding:14px 16px}
+.mgrid .k{font-size:11px;color:var(--ink3);margin-bottom:6px}
+.mgrid .v{font-size:22px;font-weight:800;letter-spacing:-.5px}
+.mgrid .n{font-size:11px;color:var(--ink3);margin-top:3px}
+.hl{color:var(--orange)}
+.up{color:var(--up)} .down{color:var(--down)}
+.bar{height:5px;background:var(--line2);border-radius:3px;margin-top:9px;overflow:hidden}
+.bar>span{display:block;height:100%;background:var(--orange);border-radius:3px;transition:width .4s}
+
+.caveat{margin-top:15px;padding-top:9px;border-top:1px solid var(--line2);font-size:11px;color:var(--ink3)}
+.caveat a{color:var(--blue);text-decoration:none;font-weight:600;margin-left:6px}
+.caveat a:hover{text-decoration:underline}
+
+/* charts */
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0 0}
+.chartcard{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:18px 20px 14px;position:relative;min-width:0}
+.chartcard h3{margin:0;font-size:14px;font-weight:800;letter-spacing:-.2px}
+.chartcard .csub{font-size:11px;color:var(--ink3);font-weight:600;margin-top:3px}
+.chead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.rng{display:flex;flex:none;background:#f4f4f4;border-radius:7px;padding:2px;gap:1px}
+.rng button{padding:4px 9px;font-size:11px;font-weight:700;color:var(--ink3);background:transparent;border:none;border-radius:5px;line-height:1.4}
+.rng button:hover{color:var(--ink);border:none}
+.rng button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.09)}
+.chartbox{position:relative;margin-top:10px}
+.chartbox svg{display:block;width:100%;height:auto}
+.chart-tip{position:absolute;pointer-events:none;background:#fff;border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.10);padding:7px 10px;font-size:11px;line-height:1.6;display:none;z-index:6;white-space:nowrap}
+.chart-tip b{font-size:12px}
+.chart-tip .tu{color:var(--up);font-weight:700}
+.chart-tip .td{color:var(--down);font-weight:700}
+.chart-note{margin-top:9px;padding-top:8px;border-top:1px solid var(--line2);font-size:10.5px;color:var(--ink3);line-height:1.6}
+.chart-note b{color:var(--ink2)}
+.chart-empty{padding:46px 0;text-align:center;color:var(--ink3);font-size:12px;line-height:1.8}
+
+/* controls */
+.controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:24px 0 12px}
+.controls .grp{display:flex;align-items:center;gap:6px}
+select,input[type=text],button{font-family:inherit;font-size:13px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:6px;padding:7px 11px;outline:none}
+select:focus,input:focus{border-color:var(--blue)}
+input[type=text]{width:170px}
+button{cursor:pointer;font-weight:600}
+button:hover{border-color:var(--ink3)}
+button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+button.primary:hover{background:#333}
+.toggle{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--ink2);cursor:pointer;user-select:none}
+.toggle input{accent-color:var(--blue)}
+.meta{margin-left:auto;font-size:11px;color:var(--ink3);text-align:right}
+
+/* table */
+.tablewrap{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:1060px}
+thead th{position:sticky;top:0;background:#fafafa;text-align:right;font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.4px;padding:12px 12px;border-bottom:1px solid var(--line);white-space:nowrap;z-index:2}
+thead th:nth-child(1),thead th:nth-child(2){text-align:left}
+tbody td{padding:11px 12px;border-bottom:1px solid var(--line2);text-align:right;white-space:nowrap;font-size:13px}
+tbody td:nth-child(1),tbody td:nth-child(2){text-align:left}
+tbody tr:hover{background:#fafafa}
+tr.grouphead td{background:#f7f7f7;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--ink2);padding:9px 12px;text-align:left;border-bottom:1px solid var(--line)}
+tr.grouphead td .cnt{font-weight:400;color:var(--ink3);letter-spacing:0;margin-left:8px}
+tr.total td{background:#fafafa;font-weight:700;border-top:1px solid var(--line);border-bottom:none}
+.tnote{margin-top:8px;padding:10px 14px;background:var(--card);border:1px solid var(--line);border-radius:16px;
+  font-size:11px;line-height:1.65;color:var(--ink2)}
+.tnote>div+div{margin-top:6px}
+.tnote b{color:var(--ink)}
+.tnote code{font-size:10.5px;background:#f5f5f5;padding:1px 4px;border-radius:3px}
+th sup{font-size:9px;font-weight:700;color:var(--orange);margin-left:1px;vertical-align:super}
+.name{font-weight:700;font-size:13px}
+.sub{font-size:10px;line-height:1.35;margin-top:2px}
+.code{font-size:11px;color:var(--ink3);margin-top:2px;letter-spacing:.3px}
+.chip{display:inline-block;font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;margin-left:7px;vertical-align:1px}
+.chip.core{background:rgba(255,71,19,.1);color:var(--orange)}
+.chip.watch{background:#f0f0f0;color:var(--ink3)}
+.ratio{font-weight:800;font-size:14px}
+.ratio b{font-size:11px;font-weight:600;color:var(--ink3);margin-left:2px}
+.spark{vertical-align:middle}
+.mini{height:4px;background:var(--line2);border-radius:2px;margin-top:5px;overflow:hidden;width:74px;margin-left:auto}
+.mini>span{display:block;height:100%;background:var(--orange)}
+.muted{color:var(--ink3)}
+
+/* footer */
+footer{margin-top:26px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 26px;font-size:12px;color:var(--ink2);line-height:1.85}
+footer h3{margin:0 0 10px;font-size:13px;color:var(--ink);font-weight:800}
+footer .lead{background:#fff6f2;border:1px solid #ffe0d3;border-radius:10px;padding:17px 19px;margin-bottom:20px;color:#5c4438;line-height:1.8}
+footer .lead h3{color:#c2410c;margin-bottom:8px}
+footer .lead p{margin:0 0 8px}
+footer .lead p:last-child{margin-bottom:0}
+footer .cols{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+footer p{margin:0 0 8px}
+footer code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:11px;color:var(--ink)}
+.disc{margin-top:16px;padding-top:14px;border-top:1px solid var(--line);color:#666;font-size:12px}
+.sign{margin-top:14px;font-size:11px;color:var(--ink3);text-align:right}
+
+@media(max-width:920px){
+  .charts{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+  .chead{flex-direction:column;gap:8px}
+  .rng{align-self:flex-start}
+}
+@media(max-width:760px){
+  .wrap{padding:18px 12px 40px}
+  header{flex-direction:column;gap:12px}
+  .status{align-items:flex-start}
+  .vhead{flex-direction:column}
+  .vtitle{font-size:25px}
+  .mgrid{grid-template-columns:repeat(2,1fr)}
+  .mgrid>div{padding:12px 13px}
+  .mgrid .v{font-size:19px}
+  footer{padding:16px 16px}
+  footer .cols{grid-template-columns:1fr}
+  footer .lead{padding:13px 14px}
+  .verdict{padding:18px 16px 16px}
+  .chartcard{padding:14px 13px 11px}
+  .vstamp{align-self:flex-start}
+  .controls{margin-top:18px}
+  .meta{margin-left:0;width:100%;text-align:left}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="brand">
+    <h1><span class="dot"></span>天哥中枢 · 国家队ETF追踪看板</h1>
+    <div class="sub">中央汇金与类平准资金动向监控 · 纯物理计算 · 0 Token 实时刷新</div>
+  </div>
+  <div class="status">
+    <span class="badge" id="badge"><i></i><span id="badgeText">载入中</span></span>
+    <span class="stamp num" id="stamp">—</span>
+  </div>
+</header>
+
+<section class="verdict" id="verdict">
+  <div class="vhead">
+    <div>
+      <div class="vlabel" id="vlabel">今日结论</div>
+      <div class="vtitle" id="vtitle">正在计算…</div>
+      <div class="vreason" id="vreason">—</div>
+    </div>
+    <div class="vstamp">
+      <b class="num" id="vstampNum">—</b>
+      <span id="vstampLabel">较20日均额</span>
+    </div>
+  </div>
+  
+  <!-- 国家队宏观大底指标 · 头部4只沪深300 ETF 占流通市值比重 (单图同图原版双轴版) -->
+  <div class="card" style="margin-top:20px;margin-bottom:20px;border:1px solid #ff4713;box-shadow:0 4px 14px rgba(255,71,19,0.08);border-radius:12px;padding:24px;background:#fff;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+      <div>
+        <h3 style="margin:0;font-size:19px;font-weight:900;display:flex;align-items:center;gap:8px;">
+          <span style="width:6px;height:20px;background:#ff4713;border-radius:3px;display:inline-block;"></span>
+          国家队宏观大底指标 · 头部4只沪深300 ETF 占全市场流通市值比重
+        </h3>
+        <div style="font-size:13px;color:#666;margin-top:5px;display:flex;align-items:center;gap:18px;">
+          <span><span style="display:inline-block;width:12px;height:3px;background:#005eb8;margin-right:5px;vertical-align:middle;"></span>左轴：沪深300收盘点位 (3,000 ~ 6,000 点)</span>
+          <span><span style="display:inline-block;width:12px;height:3px;background:#ff4713;margin-right:5px;vertical-align:middle;"></span>右轴：头部4只ETF占流通市值比例 (0.00% ~ 3.00%)</span>
+        </div>
+      </div>
+      <div id="macro-badge" style="background:#fff0ec;color:#ff4713;padding:6px 16px;border-radius:20px;font-weight:800;font-size:14px;border:1px solid #ffd8cf;">
+        当前比重: 0.782% (估值大底回升区)
+      </div>
+    </div>
+    
+    <div id="macroChartWrap" style="position:relative;height:400px;width:100%;cursor:crosshair;user-select:none;margin-bottom:12px;">
+      <!-- 悬浮交互 Tooltip -->
+      <div id="macroTooltip" style="display:none;position:absolute;top:15px;pointer-events:none;background:rgba(255,255,255,0.96);border:1px solid #ff4713;box-shadow:0 6px 20px rgba(0,0,0,0.12);border-radius:8px;padding:10px 16px;font-size:13px;z-index:30;line-height:1.6;white-space:nowrap;backdrop-filter:blur(6px);">
+        <div id="ttDate" style="font-weight:800;color:#222;margin-bottom:3px;font-size:14px;border-bottom:1px solid #f0f0f0;padding-bottom:4px;">2024-02-06</div>
+        <div style="display:flex;align-items:center;gap:8px;color:#005eb8;">
+          <span style="width:8px;height:8px;background:#005eb8;border-radius:50%;display:inline-block;"></span>
+          沪深300收盘点位：<b id="ttPt" class="num" style="font-size:14px;">3311.69</b>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;color:#ff4713;">
+          <span style="width:8px;height:8px;background:#ff4713;border-radius:50%;display:inline-block;"></span>
+          头部4只ETF占比：<b id="ttRt" class="num" style="font-size:14px;">2.510%</b>
+        </div>
+      </div>
+      
+      <svg id="macroSvg" viewBox="0 0 1196 400" style="width:100%;height:400px;display:block;"><line x1="60" y1="360.0" x2="1126" y2="360.0" stroke="#f0f0f0" stroke-width="1"/><text x="48" y="364.0" fill="#005eb8" font-size="12" text-anchor="end" font-family="monospace">3,000</text><text x="1138" y="364.0" fill="#ff4713" font-size="12" text-anchor="start" font-family="monospace">0.00%</text><line x1="60" y1="305.0" x2="1126" y2="305.0" stroke="#f0f0f0" stroke-width="1"/><text x="48" y="309.0" fill="#005eb8" font-size="12" text-anchor="end" font-family="monospace">3,500</text><text x="1138" y="309.0" fill="#ff4713" font-size="12" text-anchor="start" font-family="monospace">0.50%</text><line x1="60" y1="250.0" x2="1126" y2="250.0" stroke="#f0f0f0" stroke-width="1"/><text x="48" y="254.0" fill="#005eb8" font-size="12" text-anchor="end" font-family="monospace">4,000</text><text x="1138" y="254.0" fill="#ff4713" font-size="12" text-anchor="start" font-family="monospace">1.00%</text><line x1="60" y1="195.0" x2="1126" y2="195.0" stroke="#f0f0f0" stroke-width="1"/><text x="48" y="199.0" fill="#005eb8" font-size="12" text-anchor="end" font-family="monospace">4,500</text><text x="1138" y="199.0" fill="#ff4713" font-size="12" text-anchor="start" font-family="monospace">1.50%</text><line x1="60" y1="140.0" x2="1126" y2="140.0" stroke="#f0f0f0" stroke-width="1"/><text x="48" y="144.0" fill="#005eb8" font-size="12" text-anchor="end" font-family="monospace">5,000</text><text x="1138" y="144.0" fill="#ff4713" font-size="12" text-anchor="start" font-family="monospace">2.00%</text><line x1="60" y1="85.0" x2="1126" y2="85.0" stroke="#f0f0f0" stroke-width="1"/><text x="48" y="89.0" fill="#005eb8" font-size="12" text-anchor="end" font-family="monospace">5,500</text><text x="1138" y="89.0" fill="#ff4713" font-size="12" text-anchor="start" font-family="monospace">2.50%</text><line x1="60" y1="30.0" x2="1126" y2="30.0" stroke="#f0f0f0" stroke-width="1"/><text x="48" y="34.0" fill="#005eb8" font-size="12" text-anchor="end" font-family="monospace">6,000</text><text x="1138" y="34.0" fill="#ff4713" font-size="12" text-anchor="start" font-family="monospace">3.00%</text><line x1="60.0" y1="360" x2="60.0" y2="366" stroke="#ccc"/><text x="60.0" y="380" fill="#888" font-size="12" text-anchor="middle">2020-01</text><line x1="216.2" y1="360" x2="216.2" y2="366" stroke="#ccc"/><text x="216.2" y="380" fill="#888" font-size="12" text-anchor="middle">2021-01</text><line x1="372.5" y1="360" x2="372.5" y2="366" stroke="#ccc"/><text x="372.5" y="380" fill="#888" font-size="12" text-anchor="middle">2022-01</text><line x1="528.1" y1="360" x2="528.1" y2="366" stroke="#ccc"/><text x="528.1" y="380" fill="#888" font-size="12" text-anchor="middle">2023-01</text><line x1="683.7" y1="360" x2="683.7" y2="366" stroke="#ccc"/><text x="683.7" y="380" fill="#888" font-size="12" text-anchor="middle">2024-01</text><line x1="839.2" y1="360" x2="839.2" y2="366" stroke="#ccc"/><text x="839.2" y="380" fill="#888" font-size="12" text-anchor="middle">2025-01</text><line x1="995.5" y1="360" x2="995.5" y2="366" stroke="#ccc"/><text x="995.5" y="380" fill="#888" font-size="12" text-anchor="middle">2026-01</text><line x1="1126.0" y1="360" x2="1126.0" y2="366" stroke="#ccc"/><text x="1126.0" y="380" fill="#888" font-size="12" text-anchor="middle">2026-11-09</text><path d="M 60.0 233.3 L 60.6 234.1 L 61.3 235.8 L 61.9 232.4 L 62.6 237.6 L 63.2 231.9 L 63.9 232.1 L 64.5 227.6 L 65.1 229.1 L 65.8 231.7 L 66.4 233.6 L 67.1 233.0 L 67.7 229.6 L 68.4 237.4 L 69.0 235.5 L 69.6 249.6 L 70.3 284.3 L 70.9 273.6 L 71.6 268.9 L 72.2 261.0 L 72.9 261.0 L 73.5 259.2 L 74.1 255.2 L 74.8 251.7 L 75.4 254.4 L 76.1 251.3 L 76.7 241.5 L 77.4 243.7 L 78.0 244.4 L 78.6 234.1 L 79.3 233.6 L 79.9 235.4 L 80.6 236.4 L 81.2 242.0 L 81.9 240.7 L 82.5 256.6 L 83.1 242.3 L 83.8 240.0 L 84.4 237.3 L 85.1 227.3 L 85.7 234.8 L 86.4 250.3 L 87.0 240.9 L 87.6 246.9 L 88.3 255.4 L 88.9 261.5 L 89.6 279.9 L 90.2 281.9 L 90.9 290.0 L 91.5 295.2 L 92.1 288.1 L 92.8 301.7 L 93.4 291.2 L 94.1 280.5 L 94.7 283.2 L 95.4 281.9 L 96.0 285.8 L 96.6 284.5 L 97.3 285.7 L 97.9 279.2 L 98.6 281.5 L 99.2 272.2 L 99.9 274.2 L 100.5 272.8 L 101.1 275.4 L 101.8 277.1 L 102.4 269.2 L 103.1 272.3 L 103.7 271.7 L 104.4 267.7 L 105.0 266.1 L 105.6 271.1 L 106.3 267.7 L 106.9 268.7 L 107.6 272.3 L 108.2 269.5 L 108.9 266.6 L 109.5 264.6 L 110.1 259.6 L 110.8 257.0 L 111.4 258.3 L 112.1 254.0 L 112.7 254.4 L 113.4 254.4 L 114.0 253.5 L 114.7 258.2 L 115.3 259.6 L 115.9 258.5 L 116.6 254.8 L 117.2 257.1 L 117.9 259.5 L 118.5 269.4 L 119.2 268.8 L 119.8 264.0 L 120.4 267.0 L 121.1 265.8 L 121.7 264.6 L 122.4 253.2 L 123.0 251.8 L 123.7 251.8 L 124.3 252.0 L 124.9 249.9 L 125.6 247.6 L 126.2 244.8 L 126.9 245.6 L 127.5 250.5 L 128.2 249.7 L 128.8 255.0 L 129.4 248.4 L 130.1 248.1 L 130.7 245.1 L 131.4 239.1 L 132.0 238.8 L 132.7 236.6 L 133.3 234.7 L 133.9 237.9 L 134.6 232.0 L 135.2 222.7 L 135.9 213.1 L 136.5 203.8 L 137.2 176.3 L 137.8 173.2 L 138.4 164.9 L 139.1 157.5 L 139.7 167.2 L 140.4 156.2 L 141.0 161.3 L 141.7 168.1 L 142.3 193.2 L 142.9 190.1 L 143.6 175.2 L 144.2 174.0 L 144.9 171.4 L 145.5 171.6 L 146.2 194.4 L 146.8 191.9 L 147.4 187.5 L 148.1 175.3 L 148.7 177.8 L 149.4 173.5 L 150.0 165.2 L 150.7 164.7 L 151.3 164.5 L 151.9 166.1 L 152.6 172.1 L 153.2 170.3 L 153.9 175.0 L 154.5 178.8 L 155.2 180.1 L 155.8 172.5 L 156.4 160.3 L 157.1 160.6 L 157.7 168.5 L 158.4 175.3 L 159.0 170.9 L 159.7 166.9 L 160.3 166.2 L 160.9 172.3 L 161.6 169.6 L 162.2 157.1 L 162.9 160.2 L 163.5 157.4 L 164.2 157.2 L 164.8 160.1 L 165.4 165.3 L 166.1 176.4 L 166.7 173.6 L 167.4 185.7 L 168.0 186.0 L 168.7 181.0 L 169.3 178.4 L 169.9 174.3 L 170.6 177.7 L 171.2 180.4 L 171.9 168.9 L 172.5 173.9 L 173.2 180.1 L 173.8 178.2 L 174.4 188.1 L 175.1 187.3 L 175.7 186.0 L 176.4 184.9 L 177.0 185.4 L 177.7 175.1 L 178.3 159.5 L 178.9 157.7 L 179.6 161.2 L 180.2 162.1 L 180.9 162.9 L 181.5 166.9 L 182.2 162.7 L 182.8 162.8 L 183.4 164.4 L 184.1 171.0 L 184.7 174.0 L 185.4 173.1 L 186.0 168.9 L 186.7 165.0 L 187.3 173.5 L 187.9 170.7 L 188.6 164.5 L 189.2 160.5 L 189.9 152.6 L 190.5 152.6 L 191.2 142.1 L 191.8 145.1 L 192.4 150.5 L 193.1 150.1 L 193.7 155.7 L 194.4 150.5 L 195.0 151.6 L 195.7 151.9 L 196.3 147.9 L 196.9 146.2 L 197.6 139.4 L 198.2 142.8 L 198.9 149.8 L 199.5 148.8 L 200.2 142.1 L 200.8 144.4 L 201.4 132.6 L 202.1 132.6 L 202.7 133.7 L 203.4 132.7 L 204.0 137.6 L 204.7 138.9 L 205.3 146.3 L 205.9 146.5 L 206.6 152.1 L 207.2 147.2 L 207.9 146.0 L 208.5 145.1 L 209.2 138.1 L 209.8 140.0 L 210.4 134.8 L 211.1 143.9 L 211.7 139.2 L 212.4 140.0 L 213.0 135.4 L 213.7 132.9 L 214.3 135.3 L 214.9 127.5 L 215.6 116.8 L 216.2 110.6 L 216.9 99.5 L 217.5 94.1 L 218.2 83.5 L 218.8 85.5 L 219.4 91.5 L 220.1 74.4 L 220.7 76.4 L 221.4 88.2 L 222.0 89.6 L 222.7 83.0 L 223.3 91.9 L 224.0 87.6 L 224.6 77.9 L 225.2 77.3 L 225.9 71.1 L 226.5 83.6 L 227.2 81.9 L 227.8 98.5 L 228.5 101.3 L 229.1 94.1 L 229.7 84.9 L 230.4 86.6 L 231.0 87.9 L 231.7 86.8 L 232.3 77.9 L 233.0 64.5 L 233.6 51.2 L 234.2 55.5 L 234.9 54.3 L 235.5 74.3 L 236.2 76.2 L 236.8 91.9 L 237.5 88.3 L 238.1 103.0 L 238.7 93.9 L 239.4 101.5 L 240.0 90.3 L 240.7 109.1 L 241.3 111.1 L 242.0 131.2 L 242.6 143.2 L 243.2 139.6 L 243.9 125.9 L 244.5 123.9 L 245.2 136.1 L 245.8 131.3 L 246.5 128.9 L 247.1 124.4 L 247.7 139.2 L 248.4 133.7 L 249.0 139.0 L 249.7 147.8 L 250.3 148.1 L 251.0 135.8 L 251.6 134.8 L 252.2 129.6 L 252.9 134.7 L 253.5 127.8 L 254.2 122.2 L 254.8 124.6 L 255.5 128.6 L 256.1 127.7 L 256.7 136.1 L 257.4 145.7 L 258.0 146.6 L 258.7 142.1 L 259.3 145.6 L 260.0 143.7 L 260.6 130.4 L 261.2 130.8 L 261.9 129.1 L 262.5 130.2 L 263.2 125.1 L 263.8 131.5 L 264.5 130.0 L 265.1 126.9 L 265.7 121.9 L 266.4 126.4 L 267.0 133.3 L 267.7 140.4 L 268.3 140.8 L 269.0 137.5 L 269.6 135.1 L 270.2 140.8 L 270.9 127.8 L 271.5 119.7 L 272.2 119.4 L 272.8 121.1 L 273.5 119.5 L 274.1 125.2 L 274.7 122.9 L 275.4 105.0 L 276.0 104.7 L 276.7 102.8 L 277.3 104.7 L 278.0 103.5 L 278.6 102.4 L 279.2 108.1 L 279.9 111.9 L 280.5 108.9 L 281.2 109.5 L 281.8 114.5 L 282.5 114.0 L 283.1 110.1 L 283.7 115.3 L 284.4 121.7 L 285.0 131.1 L 285.7 128.8 L 286.3 128.7 L 287.0 130.1 L 287.6 126.6 L 288.2 123.8 L 288.9 122.8 L 289.5 113.6 L 290.2 112.3 L 290.8 119.0 L 291.5 115.4 L 292.1 114.7 L 292.7 131.1 L 293.4 130.6 L 294.0 130.9 L 294.7 124.5 L 295.3 130.3 L 296.0 132.4 L 296.6 125.4 L 297.2 124.4 L 297.9 130.9 L 298.5 123.3 L 299.2 129.6 L 299.8 127.5 L 300.5 128.0 L 301.1 124.2 L 301.7 123.3 L 302.4 130.2 L 303.0 148.2 L 303.7 167.4 L 304.3 166.3 L 305.0 156.5 L 305.6 160.8 L 306.2 147.3 L 306.9 147.2 L 307.5 142.3 L 308.2 145.6 L 308.8 148.6 L 309.5 141.6 L 310.1 135.3 L 310.7 138.3 L 311.4 142.9 L 312.0 145.9 L 312.7 146.5 L 313.3 157.9 L 314.0 151.6 L 314.6 155.2 L 315.2 165.4 L 315.9 158.1 L 316.5 152.3 L 317.2 151.2 L 317.8 161.8 L 318.5 159.0 L 319.1 160.5 L 319.7 161.4 L 320.4 154.4 L 321.0 154.4 L 321.7 157.3 L 322.3 147.3 L 323.0 140.8 L 323.6 143.1 L 324.2 143.3 L 324.9 138.5 L 325.5 140.9 L 326.2 149.1 L 326.8 154.6 L 327.5 161.2 L 328.1 155.8 L 328.8 159.6 L 329.4 156.1 L 330.0 156.6 L 330.7 153.5 L 331.3 152.8 L 332.0 158.3 L 332.6 154.7 L 333.3 147.7 L 333.9 147.0 L 334.5 152.8 L 335.2 146.6 L 335.8 149.5 L 336.5 147.5 L 337.1 153.8 L 337.8 148.5 L 338.4 149.9 L 339.0 147.9 L 339.7 144.4 L 340.3 142.3 L 341.0 144.1 L 341.6 151.2 L 342.3 154.9 L 342.9 150.0 L 343.5 152.0 L 344.2 157.6 L 344.8 159.7 L 345.5 154.4 L 346.1 157.3 L 346.8 156.7 L 347.4 156.9 L 348.0 159.7 L 348.7 151.1 L 349.3 152.3 L 350.0 152.9 L 350.6 152.8 L 351.3 152.6 L 351.9 157.9 L 352.5 152.1 L 353.2 149.6 L 353.8 149.5 L 354.5 149.2 L 355.1 151.4 L 355.8 155.4 L 356.4 156.3 L 357.0 158.5 L 357.7 157.2 L 358.3 155.8 L 359.0 150.9 L 359.6 151.8 L 360.3 148.6 L 360.9 140.4 L 361.5 131.3 L 362.2 133.9 L 362.8 130.8 L 363.5 134.5 L 364.1 139.4 L 364.8 136.2 L 365.4 145.0 L 366.0 153.2 L 366.7 149.5 L 367.3 149.4 L 368.0 145.6 L 368.6 148.7 L 369.3 148.9 L 369.9 144.8 L 370.5 152.8 L 371.2 148.6 L 371.8 146.6 L 372.5 149.0 L 373.1 154.5 L 373.8 160.0 L 374.4 159.5 L 375.0 157.2 L 375.7 162.2 L 376.3 157.0 L 377.0 165.7 L 377.6 170.1 L 378.3 165.6 L 378.9 160.5 L 379.5 164.2 L 380.2 159.4 L 380.8 164.3 L 381.5 163.5 L 382.1 175.4 L 382.8 171.6 L 383.4 181.8 L 384.0 188.0 L 384.7 180.3 L 385.3 183.0 L 386.0 178.3 L 386.6 179.6 L 387.3 183.8 L 387.9 189.3 L 388.5 184.0 L 389.2 182.0 L 389.8 180.8 L 390.5 178.4 L 391.1 180.2 L 391.8 186.8 L 392.4 181.5 L 393.0 191.8 L 393.7 186.9 L 394.3 186.0 L 395.0 181.8 L 395.6 186.4 L 396.3 189.3 L 396.9 195.4 L 397.5 211.2 L 398.2 220.8 L 398.8 225.1 L 399.5 217.8 L 400.1 216.3 L 400.8 230.8 L 401.4 251.8 L 402.0 232.8 L 402.7 223.9 L 403.3 220.8 L 404.0 221.5 L 404.6 221.9 L 405.3 219.6 L 405.9 222.4 L 406.5 230.8 L 407.2 233.7 L 407.8 235.2 L 408.5 222.0 L 409.1 225.5 L 409.8 219.6 L 410.4 221.0 L 411.0 227.0 L 411.7 224.6 L 412.3 239.0 L 413.0 230.2 L 413.6 234.6 L 414.3 228.9 L 414.9 229.2 L 415.5 231.7 L 416.2 235.2 L 416.8 242.2 L 417.5 250.5 L 418.1 248.5 L 418.8 270.4 L 419.4 273.7 L 420.0 261.5 L 420.7 258.7 L 421.3 248.2 L 422.0 248.9 L 422.6 260.0 L 423.3 263.5 L 423.9 258.8 L 424.5 252.6 L 425.2 254.5 L 425.8 251.3 L 426.5 254.8 L 427.1 249.4 L 427.8 250.9 L 428.4 250.0 L 429.0 241.5 L 429.7 244.1 L 430.3 254.5 L 431.0 251.9 L 431.6 250.8 L 432.3 249.9 L 432.9 246.8 L 433.6 239.9 L 434.2 240.9 L 434.8 240.1 L 435.5 231.7 L 436.1 230.3 L 436.8 225.8 L 437.4 230.7 L 438.1 223.7 L 438.7 229.2 L 439.3 225.5 L 440.0 219.4 L 440.6 222.5 L 441.3 216.0 L 441.9 213.7 L 442.6 214.2 L 443.2 220.2 L 443.8 212.2 L 444.5 206.6 L 445.1 201.1 L 445.8 196.0 L 446.4 203.7 L 447.1 196.6 L 447.7 198.7 L 448.3 195.4 L 449.0 196.2 L 449.6 203.4 L 450.3 201.2 L 450.9 202.8 L 451.6 211.0 L 452.2 215.5 L 452.8 214.6 L 453.5 214.6 L 454.1 222.7 L 454.8 217.8 L 455.4 220.4 L 456.1 218.8 L 456.7 224.0 L 457.3 223.8 L 458.0 226.6 L 458.6 222.9 L 459.3 225.2 L 459.9 225.2 L 460.6 231.3 L 461.2 229.2 L 461.8 238.2 L 462.5 242.6 L 463.1 238.8 L 463.8 232.7 L 464.4 233.7 L 465.1 232.8 L 465.7 237.9 L 466.3 228.7 L 467.0 229.0 L 467.6 229.6 L 468.3 230.4 L 468.9 226.1 L 469.6 230.2 L 470.2 233.4 L 470.8 230.0 L 471.5 232.3 L 472.1 240.9 L 472.8 237.2 L 473.4 238.2 L 474.1 240.2 L 474.7 241.7 L 475.3 241.3 L 476.0 245.2 L 476.6 247.4 L 477.3 248.3 L 477.9 244.2 L 478.6 244.0 L 479.2 245.9 L 479.8 239.7 L 480.5 237.8 L 481.1 242.8 L 481.8 247.0 L 482.4 257.4 L 483.1 257.9 L 483.7 257.4 L 484.3 260.6 L 485.0 264.4 L 485.6 265.8 L 486.3 268.0 L 486.9 261.8 L 487.6 268.8 L 488.2 269.0 L 488.8 271.5 L 489.5 280.7 L 490.1 280.0 L 490.8 273.7 L 491.4 277.2 L 492.1 267.3 L 492.7 266.9 L 493.3 267.8 L 494.0 274.6 L 494.6 277.0 L 495.3 278.3 L 495.9 290.3 L 496.6 291.0 L 497.2 287.7 L 497.8 290.6 L 498.5 300.5 L 499.1 304.0 L 499.8 290.2 L 500.4 285.4 L 501.1 288.7 L 501.7 275.6 L 502.3 274.7 L 503.0 277.6 L 503.6 281.4 L 504.3 284.6 L 504.9 273.3 L 505.6 272.7 L 506.2 264.7 L 506.8 268.2 L 507.5 269.9 L 508.1 271.8 L 508.8 275.4 L 509.4 275.3 L 510.1 274.9 L 510.7 276.8 L 511.3 274.7 L 512.0 279.3 L 512.6 266.7 L 513.3 266.2 L 513.9 261.6 L 514.6 264.2 L 515.2 255.8 L 515.8 253.5 L 516.5 254.6 L 517.1 254.5 L 517.8 250.2 L 518.4 255.1 L 519.1 256.0 L 519.7 255.0 L 520.3 255.3 L 521.0 255.0 L 521.6 261.7 L 522.3 268.8 L 522.9 268.6 L 523.6 268.0 L 524.2 268.9 L 524.8 267.2 L 525.5 262.3 L 526.1 264.2 L 526.8 265.8 L 527.4 264.1 L 528.1 262.3 L 528.7 261.8 L 529.3 253.5 L 530.0 252.1 L 530.6 248.6 L 531.3 248.1 L 531.9 248.9 L 532.6 248.0 L 533.2 241.8 L 533.8 234.8 L 534.5 234.9 L 535.1 235.7 L 535.8 232.8 L 536.4 230.0 L 537.1 227.9 L 537.7 232.7 L 538.3 228.4 L 539.0 230.1 L 539.6 234.4 L 540.3 240.4 L 540.9 239.6 L 541.6 241.6 L 542.2 235.6 L 542.9 238.3 L 543.5 234.2 L 544.1 234.0 L 544.8 236.4 L 545.4 239.7 L 546.1 246.2 L 546.7 235.3 L 547.4 234.1 L 548.0 238.2 L 548.6 238.6 L 549.3 243.3 L 549.9 245.2 L 550.6 242.4 L 551.2 236.0 L 551.9 237.0 L 552.5 235.6 L 553.1 238.0 L 553.8 244.6 L 554.4 246.2 L 555.1 247.8 L 555.7 253.6 L 556.4 249.0 L 557.0 251.7 L 557.6 251.4 L 558.3 256.7 L 558.9 254.5 L 559.6 256.7 L 560.2 251.9 L 560.9 250.1 L 561.5 245.7 L 562.1 247.0 L 562.8 248.6 L 563.4 250.1 L 564.1 249.3 L 564.7 245.8 L 565.4 244.4 L 566.0 240.0 L 566.6 238.7 L 567.3 239.4 L 567.9 236.4 L 568.6 238.5 L 569.2 239.0 L 569.9 239.3 L 570.5 242.4 L 571.1 239.9 L 571.8 233.6 L 572.4 232.2 L 573.1 236.3 L 573.7 237.6 L 574.4 246.4 L 575.0 251.9 L 575.6 254.1 L 576.3 254.5 L 576.9 251.3 L 577.6 246.8 L 578.2 246.7 L 578.9 248.1 L 579.5 243.1 L 580.1 246.9 L 580.8 250.3 L 581.4 251.0 L 582.1 256.8 L 582.7 250.1 L 583.4 252.4 L 584.0 254.4 L 584.6 254.8 L 585.3 256.1 L 585.9 253.4 L 586.6 259.5 L 587.2 265.5 L 587.9 266.4 L 588.5 266.4 L 589.1 268.3 L 589.8 267.8 L 590.4 272.2 L 591.1 271.2 L 591.7 265.2 L 592.4 267.1 L 593.0 271.1 L 593.6 273.2 L 594.3 269.8 L 594.9 268.0 L 595.6 267.1 L 596.2 264.9 L 596.9 265.0 L 597.5 258.2 L 598.1 254.0 L 598.8 257.6 L 599.4 258.3 L 600.1 265.0 L 600.7 270.9 L 601.4 267.0 L 602.0 267.5 L 602.6 269.6 L 603.3 267.3 L 603.9 261.8 L 604.6 261.1 L 605.2 264.4 L 605.9 267.3 L 606.5 269.2 L 607.1 267.1 L 607.8 264.4 L 608.4 267.2 L 609.1 261.2 L 609.7 261.1 L 610.4 264.6 L 611.0 266.0 L 611.6 266.4 L 612.3 269.4 L 612.9 269.6 L 613.6 271.4 L 614.2 259.3 L 614.9 260.2 L 615.5 260.7 L 616.1 250.8 L 616.8 248.4 L 617.4 250.2 L 618.1 253.3 L 618.7 249.5 L 619.4 247.7 L 620.0 251.1 L 620.6 252.2 L 621.3 253.6 L 621.9 252.7 L 622.6 262.7 L 623.2 265.8 L 623.9 266.9 L 624.5 270.0 L 625.1 268.6 L 625.8 273.8 L 626.4 279.7 L 627.1 276.6 L 627.7 283.4 L 628.4 280.4 L 629.0 282.0 L 629.6 277.2 L 630.3 273.1 L 630.9 273.3 L 631.6 275.8 L 632.2 272.9 L 632.9 266.6 L 633.5 269.8 L 634.1 270.7 L 634.8 276.6 L 635.4 278.6 L 636.1 275.6 L 636.7 276.3 L 637.4 279.0 L 638.0 279.3 L 638.6 282.0 L 639.3 280.0 L 639.9 280.7 L 640.6 282.4 L 641.2 286.0 L 641.9 278.7 L 642.5 281.4 L 643.1 283.8 L 643.8 282.9 L 644.4 284.2 L 645.1 284.7 L 645.7 287.7 L 646.4 286.6 L 647.0 282.7 L 647.7 287.0 L 648.3 291.1 L 648.9 289.7 L 649.6 292.8 L 650.2 301.3 L 650.9 303.8 L 651.5 307.8 L 652.2 306.4 L 652.8 304.5 L 653.4 303.4 L 654.1 298.1 L 654.7 295.8 L 655.4 297.0 L 656.0 297.2 L 656.7 299.0 L 657.3 295.7 L 657.9 290.4 L 658.6 291.8 L 659.2 292.8 L 659.9 292.6 L 660.5 295.5 L 661.2 296.3 L 661.8 296.0 L 662.4 293.2 L 663.1 297.0 L 663.7 297.5 L 664.4 296.6 L 665.0 296.1 L 665.7 300.1 L 666.3 298.2 L 666.9 300.8 L 667.6 303.7 L 668.2 303.0 L 668.9 306.3 L 669.5 305.4 L 670.2 306.9 L 670.8 309.4 L 671.4 316.6 L 672.1 316.0 L 672.7 317.0 L 673.4 316.1 L 674.0 313.9 L 674.7 313.1 L 675.3 319.3 L 675.9 321.3 L 676.6 322.4 L 677.2 323.8 L 677.9 323.3 L 678.5 327.3 L 679.2 323.6 L 679.8 322.9 L 680.4 321.8 L 681.1 324.3 L 681.7 323.0 L 682.4 314.4 L 683.0 312.6 L 683.7 317.5 L 684.3 318.4 L 684.9 321.8 L 685.6 323.8 L 686.2 328.5 L 686.9 327.8 L 687.5 329.5 L 688.2 327.5 L 688.8 328.7 L 689.4 329.1 L 690.1 326.9 L 690.7 334.8 L 691.4 329.8 L 692.0 330.3 L 692.7 335.9 L 693.3 334.5 L 693.9 329.5 L 694.6 322.3 L 695.2 323.3 L 695.9 326.6 L 696.5 333.0 L 697.2 336.3 L 697.8 336.1 L 698.4 340.2 L 699.1 338.0 L 699.7 325.7 L 700.4 322.2 L 701.0 319.9 L 701.7 315.6 L 702.3 314.8 L 702.9 309.7 L 703.6 306.5 L 704.2 306.1 L 704.9 310.1 L 705.5 305.6 L 706.2 310.5 L 706.8 303.2 L 707.4 300.8 L 708.1 300.5 L 708.7 297.8 L 709.4 299.4 L 710.0 301.7 L 710.7 300.1 L 711.3 295.2 L 711.9 294.3 L 712.6 297.0 L 713.2 298.2 L 713.9 297.3 L 714.5 293.6 L 715.2 296.5 L 715.8 295.6 L 716.4 296.1 L 717.1 300.1 L 717.7 302.2 L 718.4 300.2 L 719.0 304.7 L 719.7 302.7 L 720.3 300.9 L 720.9 294.5 L 721.6 296.1 L 722.2 297.5 L 722.9 301.0 L 723.5 301.3 L 724.2 304.5 L 724.8 304.5 L 725.4 307.7 L 726.1 299.6 L 726.7 303.8 L 727.4 297.8 L 728.0 297.3 L 728.7 300.4 L 729.3 301.6 L 729.9 304.3 L 730.6 302.6 L 731.2 301.7 L 731.9 295.7 L 732.5 291.4 L 733.2 293.5 L 733.8 287.6 L 734.4 287.5 L 735.1 290.7 L 735.7 286.9 L 736.4 286.7 L 737.0 286.9 L 737.7 287.7 L 738.3 291.1 L 738.9 289.6 L 739.6 285.4 L 740.2 284.0 L 740.9 285.6 L 741.5 284.7 L 742.2 289.4 L 742.8 293.8 L 743.4 290.1 L 744.1 293.0 L 744.7 292.5 L 745.4 294.6 L 746.0 296.2 L 746.7 295.2 L 747.3 292.3 L 747.9 294.6 L 748.6 294.9 L 749.2 296.8 L 749.9 300.3 L 750.5 300.1 L 751.2 302.1 L 751.8 300.4 L 752.4 301.0 L 753.1 300.0 L 753.7 301.8 L 754.4 304.6 L 755.0 305.5 L 755.7 307.6 L 756.3 309.6 L 757.0 307.2 L 757.6 310.0 L 758.2 309.2 L 758.9 307.4 L 759.5 308.1 L 760.2 309.0 L 760.8 311.0 L 761.5 312.6 L 762.1 315.8 L 762.7 311.6 L 763.4 312.8 L 764.0 308.5 L 764.7 308.0 L 765.3 307.6 L 766.0 305.2 L 766.6 304.8 L 767.2 302.7 L 767.9 300.7 L 768.5 303.4 L 769.2 311.6 L 769.8 314.0 L 770.5 316.1 L 771.1 315.0 L 771.7 317.0 L 772.4 319.4 L 773.0 311.4 L 773.7 313.9 L 774.3 317.7 L 775.0 322.2 L 775.6 322.3 L 776.2 322.4 L 776.9 322.3 L 777.5 323.5 L 778.2 324.2 L 778.8 323.2 L 779.5 326.0 L 780.1 322.4 L 780.7 322.0 L 781.4 320.7 L 782.0 323.4 L 782.7 324.6 L 783.3 325.6 L 784.0 324.0 L 784.6 324.3 L 785.2 326.4 L 785.9 328.5 L 786.5 329.5 L 787.2 324.6 L 787.8 330.8 L 788.5 329.9 L 789.1 332.3 L 789.7 331.6 L 790.4 334.6 L 791.0 338.8 L 791.7 338.5 L 792.3 339.5 L 793.0 341.0 L 793.6 342.5 L 794.2 341.2 L 794.9 338.4 L 795.5 337.9 L 796.2 336.6 L 796.8 321.3 L 797.5 315.8 L 798.1 300.0 L 798.7 282.6 L 799.4 248.0 L 800.0 221.8 L 800.7 254.8 L 801.3 250.2 L 802.0 262.4 L 802.6 254.3 L 803.2 265.8 L 803.9 268.5 L 804.5 273.3 L 805.2 258.2 L 805.8 257.1 L 806.5 254.6 L 807.1 252.9 L 807.7 257.8 L 808.4 254.8 L 809.0 253.9 L 809.7 258.3 L 810.3 262.2 L 811.0 262.0 L 811.6 262.1 L 812.2 256.1 L 812.9 245.1 L 813.5 247.3 L 814.2 234.0 L 814.8 238.6 L 815.5 235.6 L 816.1 240.6 L 816.7 237.8 L 817.4 245.6 L 818.0 253.4 L 818.7 255.5 L 819.3 252.5 L 820.0 251.6 L 820.6 251.2 L 821.2 264.8 L 821.9 266.7 L 822.5 267.6 L 823.2 260.2 L 823.8 264.0 L 824.5 259.2 L 825.1 255.8 L 825.7 255.3 L 826.4 257.6 L 827.0 258.6 L 827.7 253.0 L 828.3 253.7 L 829.0 250.5 L 829.6 251.2 L 830.2 246.9 L 830.9 257.4 L 831.5 259.7 L 832.2 258.6 L 832.8 256.4 L 833.5 256.0 L 834.1 257.9 L 834.7 257.3 L 835.4 251.8 L 836.0 251.6 L 836.7 251.4 L 837.3 252.1 L 838.0 250.1 L 838.6 257.2 L 839.2 269.8 L 839.9 274.7 L 840.5 275.4 L 841.2 272.4 L 841.8 273.2 L 842.5 274.2 L 843.1 279.4 L 843.7 280.5 L 844.4 269.7 L 845.0 272.4 L 845.7 272.0 L 846.3 270.6 L 847.0 268.7 L 847.6 268.4 L 848.2 272.3 L 848.9 271.6 L 849.5 268.4 L 850.2 270.1 L 850.8 272.5 L 851.5 267.3 L 852.1 261.8 L 852.7 260.9 L 853.4 262.9 L 854.0 258.8 L 854.7 260.4 L 855.3 256.7 L 856.0 255.8 L 856.6 259.6 L 857.2 256.6 L 857.9 257.8 L 858.5 252.4 L 859.2 253.3 L 859.8 258.2 L 860.5 254.4 L 861.1 253.5 L 861.8 262.1 L 862.4 262.3 L 863.0 262.6 L 863.7 260.7 L 864.3 254.8 L 865.0 256.2 L 865.6 257.8 L 866.3 256.4 L 866.9 258.0 L 867.5 259.7 L 868.2 249.3 L 868.8 250.4 L 869.5 249.2 L 870.1 248.9 L 870.8 252.8 L 871.4 259.4 L 872.0 257.2 L 872.7 257.4 L 873.3 258.9 L 874.0 257.4 L 874.6 259.3 L 875.3 262.4 L 875.9 262.4 L 876.5 262.7 L 877.2 265.2 L 877.8 295.2 L 878.5 288.4 L 879.1 284.5 L 879.8 279.1 L 880.4 277.4 L 881.0 276.5 L 881.7 276.3 L 882.3 275.0 L 883.0 275.1 L 883.6 275.0 L 884.3 273.7 L 884.9 273.8 L 885.5 273.4 L 886.2 273.7 L 886.8 273.4 L 887.5 274.0 L 888.1 274.7 L 888.8 275.2 L 889.4 271.1 L 890.0 268.5 L 890.7 266.2 L 891.3 266.9 L 892.0 262.0 L 892.6 261.4 L 893.3 256.2 L 893.9 260.2 L 894.5 262.2 L 895.2 263.5 L 895.8 261.2 L 896.5 259.2 L 897.1 259.5 L 897.8 263.0 L 898.4 265.4 L 899.0 267.7 L 899.7 268.0 L 900.3 265.5 L 901.0 267.6 L 901.6 266.3 L 902.3 264.4 L 902.9 263.5 L 903.5 263.9 L 904.2 262.6 L 904.8 264.8 L 905.5 261.6 L 906.1 261.9 L 906.8 264.9 L 907.4 263.9 L 908.0 264.3 L 908.7 263.8 L 909.3 267.3 L 910.0 266.9 L 910.6 265.6 L 911.3 260.6 L 911.9 254.4 L 912.5 255.9 L 913.2 258.6 L 913.8 257.0 L 914.5 256.3 L 915.1 256.2 L 915.8 253.5 L 916.4 252.0 L 917.0 253.8 L 917.7 250.2 L 918.3 250.9 L 919.0 248.9 L 919.6 248.4 L 920.3 248.1 L 920.9 247.9 L 921.5 249.2 L 922.2 246.2 L 922.8 243.6 L 923.5 240.6 L 924.1 236.9 L 924.8 236.8 L 925.4 233.6 L 926.0 236.0 L 926.7 235.1 L 927.3 233.3 L 928.0 233.4 L 928.6 241.7 L 929.3 244.0 L 929.9 242.2 L 930.5 238.6 L 931.2 237.5 L 931.8 237.4 L 932.5 238.5 L 933.1 236.5 L 933.8 234.2 L 934.4 230.6 L 935.0 230.9 L 935.7 227.7 L 936.3 223.7 L 937.0 225.4 L 937.6 220.1 L 938.3 218.3 L 938.9 208.4 L 939.5 198.4 L 940.2 200.2 L 940.8 207.5 L 941.5 199.0 L 942.1 195.4 L 942.8 192.4 L 943.4 196.1 L 944.0 199.4 L 944.7 209.8 L 945.3 199.4 L 946.0 198.6 L 946.6 202.0 L 947.3 201.0 L 947.9 189.7 L 948.5 192.6 L 949.2 191.4 L 949.8 192.4 L 950.5 189.4 L 951.1 195.2 L 951.8 194.8 L 952.4 192.5 L 953.0 192.8 L 953.7 187.7 L 954.3 184.7 L 955.0 189.5 L 955.6 181.8 L 956.3 179.5 L 956.9 172.0 L 957.5 182.1 L 958.2 184.7 L 958.8 190.7 L 959.5 183.3 L 960.1 182.0 L 960.8 193.4 L 961.4 190.8 L 962.0 183.1 L 962.7 184.8 L 963.3 183.3 L 964.0 177.3 L 964.6 171.2 L 965.3 173.9 L 965.9 167.7 L 966.6 171.9 L 967.2 179.5 L 967.8 178.1 L 968.5 181.9 L 969.1 181.0 L 969.8 173.7 L 970.4 175.3 L 971.1 173.5 L 971.7 178.3 L 972.3 178.9 L 973.0 172.8 L 973.6 180.9 L 974.3 184.2 L 974.9 187.5 L 975.6 185.3 L 976.2 187.9 L 976.8 200.1 L 977.5 200.7 L 978.1 196.1 L 978.8 193.1 L 979.4 193.3 L 980.1 192.1 L 980.7 186.6 L 981.3 189.0 L 982.0 191.6 L 982.6 189.9 L 983.3 185.7 L 983.9 181.6 L 984.6 184.2 L 985.2 184.9 L 985.8 189.3 L 986.5 186.1 L 987.1 189.3 L 987.8 195.3 L 988.4 186.2 L 989.1 189.2 L 989.7 187.5 L 990.3 182.7 L 991.0 181.7 L 991.6 180.3 L 992.3 179.3 L 992.9 177.7 L 993.6 179.7 L 994.2 178.4 L 994.8 180.7 L 995.5 171.0 L 996.1 163.0 L 996.8 164.6 L 997.4 168.9 L 998.1 166.5 L 998.7 163.1 L 999.3 166.3 L 1000.0 168.4 L 1000.6 167.3 L 1001.3 169.5 L 1001.9 169.2 L 1002.6 170.9 L 1003.2 170.5 L 1003.8 170.4 L 1004.5 172.7 L 1005.1 172.2 L 1005.8 172.4 L 1006.4 171.0 L 1007.1 167.1 L 1007.7 172.3 L 1008.3 183.3 L 1009.0 177.4 L 1009.6 173.1 L 1010.3 176.3 L 1010.9 179.2 L 1011.6 170.9 L 1012.2 170.3 L 1012.8 171.5 L 1013.5 170.8 L 1014.1 177.4 L 1014.8 172.2 L 1015.4 169.1 L 1016.1 170.0 L 1016.7 171.8 L 1017.3 169.8 L 1018.0 177.9 L 1018.6 183.7 L 1019.3 178.8 L 1019.9 177.4 L 1020.6 182.3 L 1021.2 175.8 L 1021.8 172.5 L 1022.5 174.4 L 1023.1 176.4 L 1023.8 176.1 L 1024.4 179.9 L 1025.1 177.6 L 1025.7 185.8 L 1026.3 187.6 L 1027.0 204.0 L 1027.6 197.8 L 1028.3 190.9 L 1028.9 197.5 L 1029.6 194.7 L 1030.2 195.9 L 1030.8 200.5 L 1031.5 192.1 L 1032.1 197.3 L 1032.8 201.5 L 1033.4 201.5 L 1034.1 184.5 L 1034.7 187.7 L 1035.3 180.0 L 1036.0 178.9 L 1036.6 172.9 L 1037.3 174.6 L 1037.9 169.0 L 1038.6 169.8 L 1039.2 166.7 L 1039.8 165.5 L 1040.5 162.0 L 1041.1 163.5 L 1041.8 165.4 L 1042.4 165.2 L 1043.1 166.6 L 1043.7 160.9 L 1044.3 161.2 L 1045.0 153.5 L 1045.6 150.9 L 1046.3 154.1 L 1046.9 145.3 L 1047.6 145.7 L 1048.2 140.2 L 1048.8 149.4 L 1049.5 155.4 L 1050.1 158.3 L 1050.8 156.2 L 1051.4 156.4 L 1052.1 163.9 L 1052.7 157.0 L 1053.3 148.6 L 1054.0 145.7 L 1054.6 150.1 L 1055.3 149.4 L 1055.9 151.9 L 1056.6 157.1 L 1057.2 149.4 L 1057.8 146.7 L 1058.5 150.5 L 1059.1 160.1 L 1059.8 171.5 L 1060.4 161.8 L 1061.1 167.7 L 1061.7 170.5 L 1062.3 164.5 L 1063.0 151.9 L 1063.6 152.7 L 1064.3 147.5 L 1064.9 146.4 L 1065.6 133.4 L 1066.2 148.9 L 1066.8 146.3 L 1067.5 137.8 L 1068.1 154.5 L 1068.8 148.0 L 1069.4 142.3 L 1070.1 144.5 L 1070.7 160.6 L 1071.3 157.4 L 1072.0 157.4 L 1072.6 162.9 L 1073.3 166.9 L 1073.9 153.6 L 1074.6 164.1 L 1075.2 173.5 L 1075.9 162.4 L 1076.5 163.5 L 1077.1 173.2 L 1077.8 191.8 L 1078.4 184.2 L 1079.1 168.7 L 1079.7 171.1 L 1080.4 169.9 L 1081.0 178.6 L 1081.6 172.7 L 1082.3 187.4 L 1082.9 184.0 L 1083.6 189.5 L 1084.2 185.3 L 1084.9 190.3 L 1085.5 183.9 L 1086.1 177.6 L 1086.8 178.4 L 1087.4 173.6 L 1088.1 172.8 L 1088.7 177.0 L 1089.4 174.0 L 1090.0 177.0 L 1090.6 176.8 L 1091.3 168.5 L 1091.9 170.2 L 1092.6 185.2 L 1093.2 184.8 L 1093.9 181.9 L 1094.5 188.1 L 1095.1 189.3 L 1095.8 185.0 L 1096.4 180.7 L 1097.1 183.0 L 1097.7 181.2 L 1098.4 182.7 L 1099.0 189.7 L 1099.6 189.2 L 1100.3 189.7 L 1100.9 186.7 L 1101.6 188.5 L 1102.2 187.0 L 1102.9 189.7 L 1103.5 193.9 L 1104.1 197.2 L 1104.8 200.5 L 1105.4 197.2 L 1106.1 199.4 L 1106.7 194.2 L 1107.4 190.6 L 1108.0 190.1 L 1108.6 193.1 L 1109.3 201.7 L 1109.9 212.5 L 1110.6 212.0 L 1111.2 210.7 L 1111.9 215.9 L 1112.5 215.1 L 1113.1 218.3 L 1113.8 219.7 L 1114.4 226.1 L 1115.1 231.7 L 1115.7 231.2 L 1116.4 230.8 L 1117.0 233.3 L 1117.6 237.7 L 1118.3 246.0 L 1118.9 238.4 L 1119.6 238.6 L 1120.2 244.5 L 1120.9 240.8 L 1121.5 245.4 L 1122.1 251.6 L 1122.8 248.1 L 1123.4 249.0 L 1124.1 238.9 L 1124.7 237.5 L 1125.4 244.0 L 1126.0 243.8" fill="none" stroke="#005eb8" stroke-width="2.0" stroke-linejoin="round"/><path d="M 60.0 316.9 L 60.6 316.9 L 61.3 316.9 L 61.9 316.9 L 62.6 316.9 L 63.2 316.7 L 63.9 316.6 L 64.5 316.4 L 65.1 316.3 L 65.8 316.2 L 66.4 316.1 L 67.1 316.2 L 67.7 316.2 L 68.4 316.2 L 69.0 316.2 L 69.6 316.2 L 70.3 316.1 L 70.9 316.3 L 71.6 316.7 L 72.2 317.0 L 72.9 317.3 L 73.5 317.7 L 74.1 318.0 L 74.8 318.3 L 75.4 318.6 L 76.1 319.0 L 76.7 319.3 L 77.4 319.6 L 78.0 319.8 L 78.6 319.8 L 79.3 319.8 L 79.9 320.0 L 80.6 320.1 L 81.2 320.1 L 81.9 320.1 L 82.5 319.8 L 83.1 319.7 L 83.8 319.3 L 84.4 319.0 L 85.1 318.5 L 85.7 318.2 L 86.4 317.8 L 87.0 317.3 L 87.6 317.0 L 88.3 316.6 L 88.9 316.2 L 89.6 316.3 L 90.2 316.2 L 90.9 316.2 L 91.5 316.1 L 92.1 316.1 L 92.8 316.1 L 93.4 316.1 L 94.1 316.1 L 94.7 316.1 L 95.4 316.1 L 96.0 316.1 L 96.6 316.1 L 97.3 316.1 L 97.9 316.1 L 98.6 316.1 L 99.2 316.1 L 99.9 316.1 L 100.5 316.1 L 101.1 316.1 L 101.8 316.1 L 102.4 316.1 L 103.1 316.1 L 103.7 316.1 L 104.4 316.2 L 105.0 316.2 L 105.6 316.2 L 106.3 316.3 L 106.9 316.7 L 107.6 316.9 L 108.2 316.9 L 108.9 316.9 L 109.5 316.9 L 110.1 317.0 L 110.8 317.1 L 111.4 317.2 L 112.1 317.3 L 112.7 317.5 L 113.4 317.7 L 114.0 317.9 L 114.7 318.1 L 115.3 318.3 L 115.9 318.5 L 116.6 318.8 L 117.2 319.1 L 117.9 319.4 L 118.5 319.7 L 119.2 320.1 L 119.8 320.4 L 120.4 320.8 L 121.1 321.2 L 121.7 321.5 L 122.4 321.8 L 123.0 322.3 L 123.7 322.6 L 124.3 322.9 L 124.9 323.3 L 125.6 323.6 L 126.2 324.0 L 126.9 324.4 L 127.5 324.5 L 128.2 324.6 L 128.8 324.8 L 129.4 324.7 L 130.1 324.6 L 130.7 324.4 L 131.4 324.0 L 132.0 323.9 L 132.7 323.6 L 133.3 323.6 L 133.9 323.7 L 134.6 323.8 L 135.2 324.0 L 135.9 324.2 L 136.5 324.5 L 137.2 324.7 L 137.8 324.9 L 138.4 325.2 L 139.1 325.5 L 139.7 325.7 L 140.4 325.9 L 141.0 326.1 L 141.7 326.3 L 142.3 326.6 L 142.9 326.8 L 143.6 327.1 L 144.2 327.3 L 144.9 327.6 L 145.5 327.8 L 146.2 328.0 L 146.8 328.2 L 147.4 328.2 L 148.1 328.2 L 148.7 328.3 L 149.4 328.2 L 150.0 328.2 L 150.7 328.2 L 151.3 328.2 L 151.9 328.2 L 152.6 328.2 L 153.2 328.2 L 153.9 328.2 L 154.5 328.2 L 155.2 328.2 L 155.8 328.2 L 156.4 328.2 L 157.1 328.2 L 157.7 328.2 L 158.4 328.2 L 159.0 328.2 L 159.7 328.1 L 160.3 328.0 L 160.9 327.8 L 161.6 327.8 L 162.2 327.8 L 162.9 327.8 L 163.5 327.8 L 164.2 327.8 L 164.8 327.8 L 165.4 327.7 L 166.1 327.6 L 166.7 327.4 L 167.4 327.4 L 168.0 327.6 L 168.7 327.6 L 169.3 327.7 L 169.9 327.7 L 170.6 327.8 L 171.2 327.8 L 171.9 327.9 L 172.5 327.9 L 173.2 328.0 L 173.8 328.0 L 174.4 328.1 L 175.1 328.1 L 175.7 328.2 L 176.4 328.1 L 177.0 328.1 L 177.7 328.0 L 178.3 328.0 L 178.9 328.1 L 179.6 328.1 L 180.2 328.2 L 180.9 328.2 L 181.5 328.2 L 182.2 328.2 L 182.8 328.2 L 183.4 328.2 L 184.1 328.2 L 184.7 328.2 L 185.4 328.2 L 186.0 328.1 L 186.7 328.1 L 187.3 328.1 L 187.9 328.0 L 188.6 328.0 L 189.2 328.0 L 189.9 327.9 L 190.5 327.9 L 191.2 327.9 L 191.8 327.8 L 192.4 327.8 L 193.1 327.8 L 193.7 327.7 L 194.4 327.7 L 195.0 327.7 L 195.7 327.6 L 196.3 327.6 L 196.9 327.6 L 197.6 327.4 L 198.2 327.4 L 198.9 327.4 L 199.5 327.4 L 200.2 327.4 L 200.8 327.6 L 201.4 327.7 L 202.1 327.8 L 202.7 327.9 L 203.4 327.9 L 204.0 328.0 L 204.7 328.1 L 205.3 328.2 L 205.9 328.3 L 206.6 328.4 L 207.2 328.5 L 207.9 328.5 L 208.5 328.7 L 209.2 328.8 L 209.8 328.9 L 210.4 328.9 L 211.1 328.8 L 211.7 328.8 L 212.4 328.9 L 213.0 329.0 L 213.7 329.0 L 214.3 329.0 L 214.9 329.1 L 215.6 329.2 L 216.2 329.4 L 216.9 329.6 L 217.5 330.0 L 218.2 330.2 L 218.8 330.4 L 219.4 330.4 L 220.1 330.5 L 220.7 330.8 L 221.4 331.1 L 222.0 331.4 L 222.7 331.6 L 223.3 331.9 L 224.0 331.9 L 224.6 331.9 L 225.2 331.9 L 225.9 331.9 L 226.5 332.1 L 227.2 332.1 L 227.8 332.1 L 228.5 332.1 L 229.1 332.1 L 229.7 332.1 L 230.4 332.1 L 231.0 332.1 L 231.7 332.1 L 232.3 332.1 L 233.0 332.1 L 233.6 332.1 L 234.2 332.1 L 234.9 331.9 L 235.5 331.9 L 236.2 331.9 L 236.8 331.8 L 237.5 331.7 L 238.1 331.8 L 238.7 331.9 L 239.4 331.9 L 240.0 331.9 L 240.7 331.9 L 241.3 331.9 L 242.0 331.9 L 242.6 331.9 L 243.2 331.8 L 243.9 331.8 L 244.5 331.8 L 245.2 331.9 L 245.8 331.9 L 246.5 331.9 L 247.1 331.9 L 247.7 332.1 L 248.4 332.1 L 249.0 332.1 L 249.7 332.1 L 250.3 331.9 L 251.0 331.9 L 251.6 331.8 L 252.2 331.7 L 252.9 331.7 L 253.5 331.7 L 254.2 331.7 L 254.8 331.7 L 255.5 331.9 L 256.1 332.1 L 256.7 332.2 L 257.4 332.2 L 258.0 332.1 L 258.7 331.9 L 259.3 331.8 L 260.0 331.6 L 260.6 331.5 L 261.2 331.3 L 261.9 331.2 L 262.5 331.0 L 263.2 330.8 L 263.8 330.6 L 264.5 330.4 L 265.1 330.3 L 265.7 330.1 L 266.4 330.0 L 267.0 329.8 L 267.7 329.6 L 268.3 329.4 L 269.0 329.3 L 269.6 329.3 L 270.2 329.1 L 270.9 329.0 L 271.5 329.0 L 272.2 329.0 L 272.8 329.0 L 273.5 329.0 L 274.1 329.1 L 274.7 329.1 L 275.4 329.2 L 276.0 329.2 L 276.7 329.2 L 277.3 329.2 L 278.0 329.2 L 278.6 329.6 L 279.2 329.6 L 279.9 329.6 L 280.5 329.6 L 281.2 329.9 L 281.8 330.0 L 282.5 330.1 L 283.1 330.2 L 283.7 330.3 L 284.4 330.4 L 285.0 330.5 L 285.7 330.7 L 286.3 330.8 L 287.0 331.0 L 287.6 331.1 L 288.2 331.2 L 288.9 331.3 L 289.5 331.4 L 290.2 331.6 L 290.8 331.7 L 291.5 331.8 L 292.1 331.9 L 292.7 332.1 L 293.4 332.2 L 294.0 332.4 L 294.7 332.5 L 295.3 332.6 L 296.0 332.7 L 296.6 332.8 L 297.2 332.9 L 297.9 333.1 L 298.5 333.3 L 299.2 333.4 L 299.8 333.5 L 300.5 333.6 L 301.1 333.7 L 301.7 333.8 L 302.4 334.0 L 303.0 334.1 L 303.7 334.3 L 304.3 334.4 L 305.0 334.5 L 305.6 334.6 L 306.2 334.7 L 306.9 334.9 L 307.5 335.0 L 308.2 335.0 L 308.8 335.0 L 309.5 335.0 L 310.1 335.0 L 310.7 335.0 L 311.4 335.0 L 312.0 335.0 L 312.7 334.9 L 313.3 334.8 L 314.0 334.8 L 314.6 334.7 L 315.2 334.6 L 315.9 334.6 L 316.5 334.5 L 317.2 334.4 L 317.8 334.4 L 318.5 334.3 L 319.1 334.1 L 319.7 334.1 L 320.4 334.0 L 321.0 333.9 L 321.7 333.9 L 322.3 333.8 L 323.0 333.7 L 323.6 333.7 L 324.2 333.6 L 324.9 333.5 L 325.5 333.5 L 326.2 333.4 L 326.8 333.3 L 327.5 333.3 L 328.1 333.2 L 328.8 333.1 L 329.4 333.1 L 330.0 332.9 L 330.7 332.9 L 331.3 332.8 L 332.0 332.7 L 332.6 332.7 L 333.3 332.6 L 333.9 332.5 L 334.5 332.5 L 335.2 332.4 L 335.8 332.3 L 336.5 332.3 L 337.1 332.2 L 337.8 332.1 L 338.4 332.1 L 339.0 331.9 L 339.7 331.8 L 340.3 331.8 L 341.0 331.7 L 341.6 331.6 L 342.3 331.6 L 342.9 331.5 L 343.5 331.4 L 344.2 331.4 L 344.8 331.3 L 345.5 331.2 L 346.1 331.2 L 346.8 331.1 L 347.4 331.0 L 348.0 331.0 L 348.7 330.8 L 349.3 330.7 L 350.0 330.7 L 350.6 330.6 L 351.3 330.5 L 351.9 330.5 L 352.5 330.4 L 353.2 330.3 L 353.8 330.3 L 354.5 330.2 L 355.1 330.1 L 355.8 330.1 L 356.4 330.0 L 357.0 330.0 L 357.7 329.9 L 358.3 329.8 L 359.0 329.8 L 359.6 329.6 L 360.3 329.5 L 360.9 329.5 L 361.5 329.3 L 362.2 329.2 L 362.8 329.0 L 363.5 328.8 L 364.1 328.5 L 364.8 328.3 L 365.4 328.2 L 366.0 328.2 L 366.7 328.2 L 367.3 328.2 L 368.0 328.2 L 368.6 328.2 L 369.3 328.2 L 369.9 328.2 L 370.5 328.2 L 371.2 328.2 L 371.8 328.2 L 372.5 328.2 L 373.1 328.2 L 373.8 328.2 L 374.4 328.3 L 375.0 328.4 L 375.7 328.4 L 376.3 328.5 L 377.0 328.5 L 377.6 328.7 L 378.3 328.8 L 378.9 328.8 L 379.5 328.9 L 380.2 329.0 L 380.8 329.0 L 381.5 329.1 L 382.1 329.2 L 382.8 329.2 L 383.4 329.3 L 384.0 329.3 L 384.7 329.4 L 385.3 329.5 L 386.0 329.5 L 386.6 329.6 L 387.3 329.8 L 387.9 329.8 L 388.5 329.9 L 389.2 329.9 L 389.8 330.0 L 390.5 330.1 L 391.1 330.1 L 391.8 330.2 L 392.4 330.3 L 393.0 330.3 L 393.7 330.4 L 394.3 330.4 L 395.0 330.4 L 395.6 330.4 L 396.3 330.4 L 396.9 330.4 L 397.5 330.4 L 398.2 330.4 L 398.8 330.4 L 399.5 330.4 L 400.1 330.4 L 400.8 330.4 L 401.4 330.4 L 402.0 330.4 L 402.7 330.4 L 403.3 330.4 L 404.0 330.4 L 404.6 330.4 L 405.3 330.4 L 405.9 330.4 L 406.5 330.4 L 407.2 330.4 L 407.8 330.4 L 408.5 330.4 L 409.1 330.4 L 409.8 330.2 L 410.4 329.9 L 411.0 329.5 L 411.7 329.2 L 412.3 328.9 L 413.0 328.5 L 413.6 328.2 L 414.3 327.9 L 414.9 327.7 L 415.5 327.6 L 416.2 327.4 L 416.8 327.4 L 417.5 327.6 L 418.1 327.7 L 418.8 327.8 L 419.4 327.9 L 420.0 328.0 L 420.7 328.2 L 421.3 328.3 L 422.0 328.4 L 422.6 328.5 L 423.3 328.8 L 423.9 328.9 L 424.5 329.0 L 425.2 329.0 L 425.8 329.0 L 426.5 329.0 L 427.1 329.1 L 427.8 329.2 L 428.4 329.4 L 429.0 329.8 L 429.7 329.9 L 430.3 330.0 L 431.0 330.1 L 431.6 330.3 L 432.3 330.4 L 432.9 330.5 L 433.6 330.6 L 434.2 330.8 L 434.8 331.0 L 435.5 331.1 L 436.1 331.2 L 436.8 331.2 L 437.4 331.4 L 438.1 331.6 L 438.7 331.6 L 439.3 331.6 L 440.0 331.6 L 440.6 331.7 L 441.3 331.8 L 441.9 331.8 L 442.6 331.9 L 443.2 331.9 L 443.8 331.9 L 444.5 331.8 L 445.1 331.7 L 445.8 331.6 L 446.4 331.5 L 447.1 331.4 L 447.7 331.3 L 448.3 331.2 L 449.0 331.1 L 449.6 331.0 L 450.3 330.8 L 450.9 330.6 L 451.6 330.5 L 452.2 330.4 L 452.8 330.3 L 453.5 330.2 L 454.1 330.1 L 454.8 330.0 L 455.4 329.9 L 456.1 329.8 L 456.7 329.6 L 457.3 329.5 L 458.0 329.3 L 458.6 329.2 L 459.3 329.1 L 459.9 329.0 L 460.6 328.9 L 461.2 328.8 L 461.8 328.7 L 462.5 328.5 L 463.1 328.4 L 463.8 328.3 L 464.4 328.2 L 465.1 328.1 L 465.7 327.9 L 466.3 327.8 L 467.0 327.7 L 467.6 327.6 L 468.3 327.4 L 468.9 327.3 L 469.6 327.2 L 470.2 327.1 L 470.8 327.0 L 471.5 326.9 L 472.1 326.8 L 472.8 326.7 L 473.4 326.4 L 474.1 326.3 L 474.7 326.2 L 475.3 326.1 L 476.0 326.0 L 476.6 325.9 L 477.3 325.8 L 477.9 325.7 L 478.6 325.6 L 479.2 325.5 L 479.8 325.4 L 480.5 325.2 L 481.1 325.0 L 481.8 324.9 L 482.4 324.8 L 483.1 324.7 L 483.7 324.6 L 484.3 324.5 L 485.0 324.4 L 485.6 324.2 L 486.3 324.1 L 486.9 324.0 L 487.6 323.9 L 488.2 323.7 L 488.8 323.6 L 489.5 323.5 L 490.1 323.4 L 490.8 323.3 L 491.4 323.1 L 492.1 323.0 L 492.7 322.9 L 493.3 322.8 L 494.0 322.7 L 494.6 322.6 L 495.3 322.5 L 495.9 322.3 L 496.6 322.2 L 497.2 322.1 L 497.8 321.9 L 498.5 321.8 L 499.1 321.7 L 499.8 321.6 L 500.4 321.5 L 501.1 321.4 L 501.7 321.3 L 502.3 321.2 L 503.0 321.1 L 503.6 320.8 L 504.3 320.7 L 504.9 320.6 L 505.6 320.5 L 506.2 320.4 L 506.8 320.3 L 507.5 320.2 L 508.1 320.1 L 508.8 320.0 L 509.4 319.8 L 510.1 319.7 L 510.7 319.6 L 511.3 319.4 L 512.0 319.3 L 512.6 319.2 L 513.3 319.1 L 513.9 319.0 L 514.6 318.9 L 515.2 318.8 L 515.8 318.6 L 516.5 318.5 L 517.1 318.4 L 517.8 318.3 L 518.4 318.2 L 519.1 318.0 L 519.7 317.9 L 520.3 317.8 L 521.0 317.7 L 521.6 317.7 L 522.3 317.8 L 522.9 317.8 L 523.6 317.8 L 524.2 317.8 L 524.8 317.7 L 525.5 317.5 L 526.1 317.3 L 526.8 317.2 L 527.4 317.0 L 528.1 316.8 L 528.7 316.7 L 529.3 316.4 L 530.0 316.2 L 530.6 316.1 L 531.3 316.1 L 531.9 316.2 L 532.6 316.2 L 533.2 316.2 L 533.8 316.2 L 534.5 316.4 L 535.1 316.8 L 535.8 317.0 L 536.4 317.3 L 537.1 317.7 L 537.7 318.0 L 538.3 318.3 L 539.0 318.6 L 539.6 319.0 L 540.3 319.3 L 540.9 319.6 L 541.6 320.0 L 542.2 320.3 L 542.9 320.6 L 543.5 320.9 L 544.1 321.2 L 544.8 321.4 L 545.4 321.3 L 546.1 321.3 L 546.7 321.3 L 547.4 321.4 L 548.0 321.4 L 548.6 321.5 L 549.3 321.5 L 549.9 321.6 L 550.6 321.7 L 551.2 321.7 L 551.9 321.8 L 552.5 321.8 L 553.1 321.9 L 553.8 322.1 L 554.4 322.1 L 555.1 322.2 L 555.7 322.3 L 556.4 322.3 L 557.0 322.4 L 557.6 322.5 L 558.3 322.5 L 558.9 322.6 L 559.6 322.6 L 560.2 322.7 L 560.9 322.8 L 561.5 322.8 L 562.1 322.9 L 562.8 323.0 L 563.4 323.0 L 564.1 323.1 L 564.7 323.1 L 565.4 323.3 L 566.0 323.4 L 566.6 323.4 L 567.3 323.5 L 567.9 323.6 L 568.6 323.6 L 569.2 323.6 L 569.9 323.6 L 570.5 323.6 L 571.1 323.6 L 571.8 323.3 L 572.4 323.1 L 573.1 323.3 L 573.7 323.3 L 574.4 323.3 L 575.0 323.3 L 575.6 323.3 L 576.3 323.1 L 576.9 323.0 L 577.6 322.9 L 578.2 322.9 L 578.9 322.8 L 579.5 322.6 L 580.1 322.5 L 580.8 322.4 L 581.4 322.2 L 582.1 322.1 L 582.7 321.8 L 583.4 321.7 L 584.0 321.5 L 584.6 321.4 L 585.3 321.3 L 585.9 321.1 L 586.6 320.9 L 587.2 320.7 L 587.9 320.6 L 588.5 320.4 L 589.1 320.3 L 589.8 320.2 L 590.4 320.0 L 591.1 319.8 L 591.7 319.6 L 592.4 319.5 L 593.0 319.3 L 593.6 319.2 L 594.3 319.0 L 594.9 318.9 L 595.6 318.8 L 596.2 318.5 L 596.9 318.4 L 597.5 318.2 L 598.1 318.1 L 598.8 317.9 L 599.4 317.8 L 600.1 317.7 L 600.7 317.4 L 601.4 317.3 L 602.0 317.1 L 602.6 317.0 L 603.3 316.8 L 603.9 316.7 L 604.6 316.6 L 605.2 316.3 L 605.9 316.2 L 606.5 316.0 L 607.1 315.9 L 607.8 315.7 L 608.4 315.6 L 609.1 315.4 L 609.7 314.9 L 610.4 314.2 L 611.0 313.5 L 611.6 312.7 L 612.3 311.9 L 612.9 311.2 L 613.6 310.4 L 614.2 309.6 L 614.9 308.8 L 615.5 308.1 L 616.1 307.3 L 616.8 306.5 L 617.4 305.8 L 618.1 305.0 L 618.7 304.2 L 619.4 303.5 L 620.0 302.7 L 620.6 301.9 L 621.3 301.1 L 621.9 300.4 L 622.6 299.6 L 623.2 298.8 L 623.9 298.1 L 624.5 297.3 L 625.1 296.5 L 625.8 296.4 L 626.4 296.4 L 627.1 296.4 L 627.7 296.4 L 628.4 296.4 L 629.0 296.4 L 629.6 296.4 L 630.3 296.4 L 630.9 296.4 L 631.6 296.4 L 632.2 296.4 L 632.9 296.4 L 633.5 296.3 L 634.1 296.1 L 634.8 295.9 L 635.4 295.8 L 636.1 295.5 L 636.7 295.3 L 637.4 295.1 L 638.0 295.0 L 638.6 294.8 L 639.3 294.6 L 639.9 294.4 L 640.6 294.2 L 641.2 294.0 L 641.9 293.9 L 642.5 293.7 L 643.1 293.4 L 643.8 293.4 L 644.4 293.4 L 645.1 293.2 L 645.7 292.8 L 646.4 292.5 L 647.0 292.0 L 647.7 291.6 L 648.3 291.1 L 648.9 290.8 L 649.6 290.4 L 650.2 289.9 L 650.9 289.5 L 651.5 289.2 L 652.2 288.7 L 652.8 288.3 L 653.4 288.1 L 654.1 288.2 L 654.7 288.2 L 655.4 288.3 L 656.0 288.4 L 656.7 288.4 L 657.3 288.5 L 657.9 288.5 L 658.6 288.6 L 659.2 288.7 L 659.9 288.7 L 660.5 288.8 L 661.2 288.8 L 661.8 288.8 L 662.4 288.8 L 663.1 288.8 L 663.7 288.8 L 664.4 288.8 L 665.0 288.8 L 665.7 288.9 L 666.3 288.9 L 666.9 289.1 L 667.6 289.2 L 668.2 289.2 L 668.9 289.2 L 669.5 289.1 L 670.2 288.9 L 670.8 288.2 L 671.4 287.0 L 672.1 285.8 L 672.7 284.5 L 673.4 283.3 L 674.0 282.1 L 674.7 280.9 L 675.3 279.7 L 675.9 278.4 L 676.6 277.4 L 677.2 277.1 L 677.9 277.1 L 678.5 276.8 L 679.2 276.5 L 679.8 276.3 L 680.4 276.2 L 681.1 275.5 L 681.7 273.0 L 682.4 270.4 L 683.0 267.8 L 683.7 265.3 L 684.3 262.8 L 684.9 260.2 L 685.6 257.6 L 686.2 255.1 L 686.9 252.5 L 687.5 250.0 L 688.2 247.5 L 688.8 244.8 L 689.4 242.3 L 690.1 239.8 L 690.7 237.2 L 691.4 234.7 L 692.0 232.1 L 692.7 229.5 L 693.3 227.0 L 693.9 224.5 L 694.6 221.8 L 695.2 219.3 L 695.9 216.8 L 696.5 214.2 L 697.2 211.7 L 697.8 209.1 L 698.4 206.5 L 699.1 205.3 L 699.7 205.2 L 700.4 205.1 L 701.0 205.0 L 701.7 204.7 L 702.3 204.1 L 702.9 203.6 L 703.6 203.2 L 704.2 203.1 L 704.9 202.6 L 705.5 200.8 L 706.2 199.1 L 706.8 197.3 L 707.4 195.6 L 708.1 194.3 L 708.7 194.5 L 709.4 194.5 L 710.0 194.3 L 710.7 194.2 L 711.3 194.2 L 711.9 194.2 L 712.6 194.1 L 713.2 194.2 L 713.9 194.2 L 714.5 194.3 L 715.2 194.3 L 715.8 194.5 L 716.4 194.5 L 717.1 194.6 L 717.7 194.7 L 718.4 194.7 L 719.0 194.8 L 719.7 194.8 L 720.3 194.9 L 720.9 194.9 L 721.6 195.0 L 722.2 195.0 L 722.9 195.0 L 723.5 195.1 L 724.2 195.0 L 724.8 195.0 L 725.4 194.9 L 726.1 194.7 L 726.7 194.5 L 727.4 194.2 L 728.0 193.9 L 728.7 193.9 L 729.3 193.9 L 729.9 193.9 L 730.6 193.9 L 731.2 193.9 L 731.9 194.0 L 732.5 194.3 L 733.2 194.6 L 733.8 194.9 L 734.4 195.2 L 735.1 195.4 L 735.7 195.8 L 736.4 196.1 L 737.0 196.3 L 737.7 196.5 L 738.3 196.6 L 738.9 196.8 L 739.6 197.0 L 740.2 197.1 L 740.9 197.2 L 741.5 197.3 L 742.2 197.2 L 742.8 197.2 L 743.4 197.2 L 744.1 197.3 L 744.7 197.2 L 745.4 196.4 L 746.0 195.8 L 746.7 195.1 L 747.3 194.5 L 747.9 193.7 L 748.6 193.0 L 749.2 192.4 L 749.9 191.7 L 750.5 191.0 L 751.2 190.3 L 751.8 189.6 L 752.4 189.0 L 753.1 188.3 L 753.7 187.5 L 754.4 186.9 L 755.0 186.2 L 755.7 184.8 L 756.3 183.2 L 757.0 181.7 L 757.6 180.1 L 758.2 178.6 L 758.9 177.1 L 759.5 175.4 L 760.2 173.9 L 760.8 172.3 L 761.5 170.8 L 762.1 169.3 L 762.7 167.7 L 763.4 166.2 L 764.0 164.6 L 764.7 163.1 L 765.3 161.4 L 766.0 159.9 L 766.6 158.4 L 767.2 156.8 L 767.9 155.3 L 768.5 153.8 L 769.2 152.2 L 769.8 150.7 L 770.5 149.1 L 771.1 147.5 L 771.7 145.9 L 772.4 144.4 L 773.0 142.9 L 773.7 141.3 L 774.3 139.8 L 775.0 138.2 L 775.6 136.7 L 776.2 135.2 L 776.9 133.5 L 777.5 132.0 L 778.2 130.4 L 778.8 128.9 L 779.5 127.3 L 780.1 125.8 L 780.7 124.3 L 781.4 122.7 L 782.0 121.2 L 782.7 119.5 L 783.3 118.0 L 784.0 116.5 L 784.6 114.9 L 785.2 113.4 L 785.9 111.8 L 786.5 110.3 L 787.2 108.8 L 787.8 107.2 L 788.5 105.6 L 789.1 104.0 L 789.7 102.5 L 790.4 100.9 L 791.0 99.4 L 791.7 97.9 L 792.3 96.3 L 793.0 94.8 L 793.6 93.3 L 794.2 91.6 L 794.9 90.9 L 795.5 90.7 L 796.2 90.7 L 796.8 90.6 L 797.5 90.6 L 798.1 90.6 L 798.7 90.6 L 799.4 90.8 L 800.0 91.2 L 800.7 91.5 L 801.3 92.0 L 802.0 92.8 L 802.6 93.7 L 803.2 94.6 L 803.9 95.5 L 804.5 96.3 L 805.2 97.3 L 805.8 98.2 L 806.5 98.9 L 807.1 99.0 L 807.7 99.3 L 808.4 99.6 L 809.0 99.7 L 809.7 100.0 L 810.3 100.0 L 811.0 100.2 L 811.6 100.5 L 812.2 101.2 L 812.9 101.7 L 813.5 102.3 L 814.2 102.8 L 814.8 103.4 L 815.5 104.0 L 816.1 104.6 L 816.7 105.1 L 817.4 105.7 L 818.0 106.3 L 818.7 106.9 L 819.3 107.4 L 820.0 108.0 L 820.6 108.5 L 821.2 108.6 L 821.9 108.6 L 822.5 108.6 L 823.2 108.5 L 823.8 108.4 L 824.5 108.3 L 825.1 108.2 L 825.7 108.0 L 826.4 107.9 L 827.0 107.8 L 827.7 107.8 L 828.3 107.9 L 829.0 108.0 L 829.6 108.0 L 830.2 108.1 L 830.9 108.2 L 831.5 108.4 L 832.2 108.5 L 832.8 108.5 L 833.5 108.5 L 834.1 108.5 L 834.7 108.3 L 835.4 108.2 L 836.0 107.9 L 836.7 107.7 L 837.3 107.4 L 838.0 107.2 L 838.6 106.9 L 839.2 106.7 L 839.9 106.4 L 840.5 106.4 L 841.2 106.4 L 841.8 106.4 L 842.5 106.4 L 843.1 106.4 L 843.7 106.4 L 844.4 106.9 L 845.0 107.2 L 845.7 107.2 L 846.3 107.2 L 847.0 107.5 L 847.6 107.8 L 848.2 107.9 L 848.9 108.0 L 849.5 108.0 L 850.2 108.0 L 850.8 108.4 L 851.5 108.9 L 852.1 109.4 L 852.7 109.9 L 853.4 110.4 L 854.0 111.0 L 854.7 111.4 L 855.3 112.0 L 856.0 112.4 L 856.6 112.9 L 857.2 113.4 L 857.9 113.9 L 858.5 114.5 L 859.2 114.9 L 859.8 115.5 L 860.5 115.9 L 861.1 116.5 L 861.8 117.0 L 862.4 117.5 L 863.0 118.0 L 863.7 118.4 L 864.3 119.0 L 865.0 119.4 L 865.6 119.5 L 866.3 119.8 L 866.9 120.0 L 867.5 120.3 L 868.2 120.5 L 868.8 120.8 L 869.5 121.0 L 870.1 120.9 L 870.8 121.0 L 871.4 121.1 L 872.0 121.1 L 872.7 121.1 L 873.3 120.5 L 874.0 108.4 L 874.6 96.2 L 875.3 84.1 L 875.9 83.9 L 876.5 84.6 L 877.2 85.2 L 877.8 84.8 L 878.5 84.0 L 879.1 84.0 L 879.8 84.0 L 880.4 83.9 L 881.0 83.9 L 881.7 84.0 L 882.3 83.9 L 883.0 83.9 L 883.6 83.9 L 884.3 84.1 L 884.9 84.1 L 885.5 84.2 L 886.2 84.5 L 886.8 84.7 L 887.5 84.9 L 888.1 85.1 L 888.8 85.3 L 889.4 85.5 L 890.0 85.8 L 890.7 86.0 L 891.3 86.2 L 892.0 86.4 L 892.6 86.7 L 893.3 86.9 L 893.9 87.1 L 894.5 87.3 L 895.2 87.5 L 895.8 87.7 L 896.5 88.0 L 897.1 88.2 L 897.8 88.4 L 898.4 88.6 L 899.0 88.8 L 899.7 89.1 L 900.3 89.3 L 901.0 89.5 L 901.6 89.7 L 902.3 90.1 L 902.9 90.3 L 903.5 90.5 L 904.2 90.7 L 904.8 90.9 L 905.5 91.2 L 906.1 91.4 L 906.8 91.6 L 907.4 91.8 L 908.0 92.0 L 908.7 92.3 L 909.3 92.5 L 910.0 92.7 L 910.6 92.9 L 911.3 93.1 L 911.9 93.4 L 912.5 93.6 L 913.2 93.8 L 913.8 94.0 L 914.5 94.2 L 915.1 94.5 L 915.8 94.7 L 916.4 94.9 L 917.0 95.1 L 917.7 95.3 L 918.3 95.6 L 919.0 95.9 L 919.6 96.1 L 920.3 96.3 L 920.9 96.5 L 921.5 96.8 L 922.2 97.0 L 922.8 97.2 L 923.5 97.4 L 924.1 97.7 L 924.8 97.9 L 925.4 98.1 L 926.0 98.3 L 926.7 98.5 L 927.3 98.8 L 928.0 99.1 L 928.6 99.5 L 929.3 99.4 L 929.9 99.3 L 930.5 99.3 L 931.2 99.3 L 931.8 99.3 L 932.5 99.2 L 933.1 99.2 L 933.8 99.2 L 934.4 99.2 L 935.0 99.2 L 935.7 99.2 L 936.3 99.2 L 937.0 99.2 L 937.6 99.2 L 938.3 99.2 L 938.9 99.4 L 939.5 99.4 L 940.2 99.4 L 940.8 99.5 L 941.5 99.5 L 942.1 99.6 L 942.8 99.7 L 943.4 99.7 L 944.0 99.8 L 944.7 100.3 L 945.3 100.4 L 946.0 100.4 L 946.6 100.4 L 947.3 100.4 L 947.9 100.4 L 948.5 100.4 L 949.2 100.3 L 949.8 100.3 L 950.5 100.3 L 951.1 100.2 L 951.8 100.2 L 952.4 100.1 L 953.0 100.1 L 953.7 100.0 L 954.3 100.0 L 955.0 99.8 L 955.6 99.8 L 956.3 99.8 L 956.9 99.7 L 957.5 99.7 L 958.2 99.6 L 958.8 99.6 L 959.5 99.6 L 960.1 99.7 L 960.8 99.7 L 961.4 99.7 L 962.0 99.7 L 962.7 99.6 L 963.3 99.6 L 964.0 99.5 L 964.6 99.5 L 965.3 99.5 L 965.9 99.4 L 966.6 99.8 L 967.2 100.0 L 967.8 100.1 L 968.5 100.1 L 969.1 100.1 L 969.8 100.1 L 970.4 100.1 L 971.1 100.1 L 971.7 100.0 L 972.3 99.8 L 973.0 99.6 L 973.6 99.5 L 974.3 99.4 L 974.9 99.4 L 975.6 99.3 L 976.2 99.3 L 976.8 99.3 L 977.5 99.3 L 978.1 99.4 L 978.8 99.5 L 979.4 99.6 L 980.1 99.6 L 980.7 99.6 L 981.3 99.8 L 982.0 100.0 L 982.6 100.0 L 983.3 100.0 L 983.9 100.0 L 984.6 100.0 L 985.2 100.0 L 985.8 100.0 L 986.5 100.1 L 987.1 100.1 L 987.8 100.2 L 988.4 100.3 L 989.1 100.3 L 989.7 100.4 L 990.3 100.4 L 991.0 100.4 L 991.6 100.4 L 992.3 100.4 L 992.9 100.4 L 993.6 100.4 L 994.2 100.6 L 994.8 100.7 L 995.5 102.4 L 996.1 113.0 L 996.8 123.8 L 997.4 134.5 L 998.1 145.2 L 998.7 156.0 L 999.3 166.6 L 1000.0 177.3 L 1000.6 188.1 L 1001.3 198.7 L 1001.9 209.4 L 1002.6 220.2 L 1003.2 230.9 L 1003.8 232.3 L 1004.5 232.5 L 1005.1 232.8 L 1005.8 233.2 L 1006.4 233.5 L 1007.1 233.8 L 1007.7 234.1 L 1008.3 234.3 L 1009.0 234.5 L 1009.6 234.7 L 1010.3 234.9 L 1010.9 235.1 L 1011.6 235.4 L 1012.2 235.7 L 1012.8 235.9 L 1013.5 236.1 L 1014.1 236.4 L 1014.8 236.6 L 1015.4 236.8 L 1016.1 237.0 L 1016.7 237.2 L 1017.3 237.6 L 1018.0 237.8 L 1018.6 238.0 L 1019.3 238.4 L 1019.9 238.9 L 1020.6 238.8 L 1021.2 238.9 L 1021.8 239.0 L 1022.5 239.0 L 1023.1 239.1 L 1023.8 239.0 L 1024.4 239.0 L 1025.1 239.0 L 1025.7 238.9 L 1026.3 238.9 L 1027.0 238.9 L 1027.6 239.0 L 1028.3 239.8 L 1028.9 240.7 L 1029.6 241.4 L 1030.2 242.3 L 1030.8 243.1 L 1031.5 244.0 L 1032.1 244.7 L 1032.8 245.5 L 1033.4 246.4 L 1034.1 247.1 L 1034.7 248.0 L 1035.3 248.8 L 1036.0 249.7 L 1036.6 250.4 L 1037.3 251.2 L 1037.9 252.1 L 1038.6 252.9 L 1039.2 253.7 L 1039.8 254.5 L 1040.5 255.4 L 1041.1 256.2 L 1041.8 256.9 L 1042.4 257.8 L 1043.1 258.6 L 1043.7 259.5 L 1044.3 260.2 L 1045.0 261.1 L 1045.6 261.9 L 1046.3 262.7 L 1046.9 263.9 L 1047.6 265.2 L 1048.2 266.6 L 1048.8 268.0 L 1049.5 269.5 L 1050.1 270.8 L 1050.8 272.2 L 1051.4 273.6 L 1052.1 275.0 L 1052.7 276.4 L 1053.3 277.8 L 1054.0 279.3 L 1054.6 280.2 L 1055.3 280.2 L 1055.9 280.4 L 1056.6 280.4 L 1057.2 280.5 L 1057.8 280.5 L 1058.5 280.5 L 1059.1 280.7 L 1059.8 280.8 L 1060.4 281.1 L 1061.1 283.9 L 1061.7 286.6 L 1062.3 289.4 L 1063.0 292.1 L 1063.6 294.9 L 1064.3 297.6 L 1064.9 300.4 L 1065.6 303.1 L 1066.2 305.9 L 1066.8 308.6 L 1067.5 311.4 L 1068.1 314.1 L 1068.8 316.9 L 1069.4 317.3 L 1070.1 317.3 L 1070.7 317.2 L 1071.3 317.2 L 1072.0 317.1 L 1072.6 316.9 L 1073.3 316.4 L 1073.9 315.9 L 1074.6 314.9 L 1075.2 313.6 L 1075.9 312.3 L 1076.5 310.9 L 1077.1 309.7 L 1077.8 308.4 L 1078.4 307.5 L 1079.1 307.1 L 1079.7 306.8 L 1080.4 306.3 L 1081.0 306.0 L 1081.6 305.8 L 1082.3 305.8 L 1082.9 306.0 L 1083.6 306.1 L 1084.2 306.2 L 1084.9 306.5 L 1085.5 307.0 L 1086.1 307.3 L 1086.8 307.6 L 1087.4 308.0 L 1088.1 308.3 L 1088.7 308.5 L 1089.4 308.6 L 1090.0 308.6 L 1090.6 308.7 L 1091.3 308.7 L 1091.9 308.7 L 1092.6 308.8 L 1093.2 308.8 L 1093.9 308.8 L 1094.5 308.8 L 1095.1 308.8 L 1095.8 309.0 L 1096.4 309.0 L 1097.1 309.1 L 1097.7 309.3 L 1098.4 308.2 L 1099.0 306.9 L 1099.6 305.6 L 1100.3 304.3 L 1100.9 303.0 L 1101.6 301.8 L 1102.2 300.5 L 1102.9 299.3 L 1103.5 298.0 L 1104.1 296.6 L 1104.8 295.4 L 1105.4 294.1 L 1106.1 292.9 L 1106.7 291.6 L 1107.4 290.4 L 1108.0 289.1 L 1108.6 287.8 L 1109.3 286.5 L 1109.9 285.2 L 1110.6 284.0 L 1111.2 282.7 L 1111.9 281.5 L 1112.5 280.1 L 1113.1 278.9 L 1113.8 277.6 L 1114.4 276.3 L 1115.1 275.1 L 1115.7 274.2 L 1116.4 274.1 L 1117.0 274.2 L 1117.6 274.3 L 1118.3 274.3 L 1118.9 274.2 L 1119.6 274.2 L 1120.2 274.2 L 1120.9 274.2 L 1121.5 274.2 L 1122.1 274.2 L 1122.8 274.3 L 1123.4 274.2 L 1124.1 274.2 L 1124.7 274.3 L 1125.4 274.2 L 1126.0 274.0" fill="none" stroke="#ff4713" stroke-width="2.6" stroke-linejoin="round"/><circle cx="875.9" cy="83.9" r="5" fill="#ff4713"/><rect x="850.9" y="57.9" width="50" height="20" rx="4" fill="#ff4713"/><text x="875.9" y="71.9" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">2.51%</text><circle cx="1126.0" cy="274.0" r="5" fill="#ff4713"/><rect x="1081.0" y="248.0" width="50" height="20" rx="4" fill="#ff4713"/><text x="1106.0" y="262.0" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">0.782%</text></svg>
+    </div>
+    
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:#888;border-top:1px dashed #eee;padding-top:12px;flex-wrap:wrap;gap:8px;">
+      <div>🎯 <b>历史牛熊铁律参考</b>：【2020-2023常态低位】0.30%~0.45% | 【2024年初救市大顶】2.51% | 【当前估值底】0.78%</div>
+      <div>数据来源：上交所/深交所官方流通市值 + 腾讯行情四巨头实时净值</div>
+    </div>
+  </div>
+
+<div class="mgrid" id="mgrid"></div>
+  <div class="caveat" id="caveat">
+    名单为 2025 年报历史标签，非当前持仓；所有结论均为量价推测。<a href="#notes">完整口径与合规说明 ↓</a>
+  </div>
+</section>
+
+<section class="charts">
+  <div class="chartcard">
+    <div class="chead">
+      <div>
+        <h3>汪汪队每日份额变化估算</h3>
+        <div class="csub">单位：亿份 · 正数净申购，负数净赎回 · 参考口径：日度份额变化均视为汪汪队操作</div>
+      </div>
+      <div class="rng" id="rngDelta" data-target="delta">
+        <button data-n="60">近3月</button><button data-n="120">近6月</button><button data-n="242" class="on">近1年</button>
+      </div>
+    </div>
+    <div class="chartbox" id="chartDelta"><div class="chart-tip"></div></div>
+    <div class="chart-note" id="chartDeltaNote"></div>
+  </div>
+  <div class="chartcard">
+    <div class="chead">
+      <div>
+        <h3>汪汪队加仓指数估算</h3>
+        <div class="csub">区间首日 = 100 · 高于 100 为估算净加仓，低于 100 为估算净减仓</div>
+      </div>
+      <div class="rng" id="rngIndex" data-target="index">
+        <button data-n="60">近3月</button><button data-n="120">近6月</button><button data-n="242" class="on">近1年</button>
+      </div>
+    </div>
+    <div class="chartbox" id="chartIndex"><div class="chart-tip"></div></div>
+    <div class="chart-note" id="chartIndexNote"></div>
+  </div>
+</section>
+
+<div class="controls">
+  <div class="grp">
+    <span class="muted" style="font-size:12px">排序</span>
+    <select id="sort">
+      <option value="huijin">汇金历史持仓 → 规模优先</option>
+      <option value="amount">今日成交额</option>
+      <option value="ratio">放量倍数</option>
+      <option value="net">主动净买入</option>
+      <option value="mktcap">最新规模</option>
+    </select>
+  </div>
+  <div class="grp">
+    <span class="muted" style="font-size:12px">范围</span>
+    <select id="scope">
+      <option value="all">全部</option>
+      <option value="core">仅汪汪队重点关注</option>
+      <option value="watch">仅扩展观察</option>
+    </select>
+  </div>
+  <input type="text" id="q" placeholder="搜代码 / 名称 / 指数">
+  <button class="primary" id="refresh">立即刷新</button>
+  <label class="toggle"><input type="checkbox" id="auto" checked>自动刷新</label>
+  <div class="meta" id="meta">—</div>
+</div>
+
+<div class="tablewrap">
+  <table>
+    <thead><tr>
+      <th>ETF</th><th>跟踪指数</th><th>规模(亿)</th><th>成交额(亿)</th>
+      <th id="thRatio">较20日均</th>
+      <th title="外盘−内盘 逐笔主动买卖推算，非资金流向、非申赎、不含大宗">主动净买入<sup>①</sup></th>
+      <th>涨跌</th>
+      <th title="腾讯行情场内份额，下方为与上一份快照的份额变化估值">份额(亿份)<sup>②</sup></th>
+      <th>近30日成交额</th><th>汇金持仓(25年报·亿份)</th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+<div class="tnote">
+  <div><b>① 主动净买入</b> = (外盘 − 内盘) ÷ (外盘 + 内盘) × 成交额。外盘是主动买（成交在卖价）、内盘是主动卖（成交在买价），所以这只是<b>逐笔成交方向的推算</b>：<b>不是资金净流入，不是基金申赎净流入，也不含大宗交易与协议转让</b>。 ETF 有一二级市场套利对冲，同一笔申赎会在二级市场产生反向成交，会稀释该信号；机构调仓、做市双边报价同样会干扰。别把它当「国家队买了多少钱」。</div>
+  <div><b>② 份额 / 申赎</b> = 腾讯行情披露的场内份额；下方申赎 = (本次快照份额 − 上一份快照份额) × 现价，<b>是份额变化的市值估算，不是基金公司公布的申赎数据</b>，需要连续两日各跑一次 <code>update_data.py</code> 才有值。<br>
+  <b>为什么有的是 0：</b>2026-11-03 实测，沪市 15 只 ETF 份额全部与上一快照一模一样，深市 9 只里 8 只有变化——这种「整片市场同时不动」不可能反映真实申赎，是行情商的份额字段对沪市未按日更新。页面因此加了自检：<b>同一市场 ≥70% 标的两日份额完全相同时，该市场一律标「份额源未日更」而不给数字</b>，避免把数据源滞后说成「没有申赎」。只有差异化的市场才显示具体申赎值。任何情况下都以基金公司公告为准。</div>
+</div>
+
+<footer>
+  <div class="lead" id="notes">
+    <h3>重要说明 · 名单与口径</h3>
+    <p><b>名单是绝版数据，不是当前持仓。</b>汇金持仓依据 Wind 统计的 2025 年报前十大持有人口径（2026-03 披露），这是最后一次公开实名披露。证监会 2026-03-13 发布《公开募集证券投资基金信息披露内容与格式准则第2号—定期报告的内容与格式》，2026-05-01 起施行，删除了上市基金列示前十名持有人的强制条款；2026 年中报、三季报均已不再披露，仅保留匿名的「单一投资者≥20%」风险提示，而 2026 上半年汇金大幅减持后，多数宽基 ETF 已跌破该门槛。此后公开渠道无法验证汇金当前持有哪些 ETF、持多少，本页名单只是「历史上买过」的静态标签。</p>
+    <p>本页「主动净买入」是二级市场买卖口径的实时净流入替代指标；基金申赎净流入只有 T+1 份额数据，没有公开实时源。所有结论均为量价推测，不构成对任何机构当日交易的确认。</p>
+  </div>
+  <div class="cols">
+    <div>
+      <h3>数据口径</h3>
+      <p><b>日内成交额分布</b>：新浪 5 分钟 K 线（<code>quotes.sina.cn</code>）近 20 个完整交易日，按日算出「累计成交额占全天比例」曲线，48 个时点取均值。这是把盘中不完整数据对齐到全天基准的关键。</p>
+      <p><b>成交额 / 涨跌 / 规模 / 份额</b>：腾讯行情公开接口 <code>qt.gtimg.cn</code>，交易时段每 20 秒刷新。规模为行情口径的「价格 × 份额」，非基金净值口径。</p>
+      <p><b>20 日均额</b>：新浪日 K 成交量 × 当日均价估算（腾讯日 K 近期频繁 501，作为备用），取快照交易日之前 20 个交易日。已与实时成交额交叉验证，误差小于 0.1%。</p>
+      <p><b>盘中怎么比才可比</b>：上午 11:30 的成交额是「半天」，直接除「全天 20 日均额」得到的倍数没有意义。本页改为<b>同时点对齐</b>：分母 = 20 日均额 × 该标的在此时点历史上平均已走完的比例（如 11:30 约 47%–55%），分子是当前累计成交额，两者都代表「到此刻为止」，可以直接比。表格里的「同时点倍数」是这个可比值，「已达成日均」是原始进度（半天就干了全天均额的多少倍），后者只作参考、不可直接下结论。</p>
+      <p><b>尾盘占比</b>：当日 14:30—15:00 成交额占全天比例，与 20 日均值（同为 14:30—15:00）比较。只有收盘后才计算，盘中不触发。</p>
+      <p><b>主动净买入 / 份额申赎</b>：这两列的逐笔口径、局限与「为什么有的是 0」见表格下方脚注 ①②。信披新规后，份额变化是少数仍公开可验证的资金进出线索，比已停止披露的持有人名单更适合做当下判断。</p>
+      <p><b>每日份额变化 / 加仓指数（图表）</b>：起点为 2026-11-02（份额监测首日），随每日 <code>update_data.py</code> 积累。日度份额变化全部记为汪汪队操作是参考口径，实际申赎可能来自任何投资者；加仓指数用「首日=100」刻画净申赎的方向与幅度，<b>不做持仓比例锚定</b>——期初持仓已不可验证。沪市份额源未日更期间，两张图都会偏低。均为近似推算，非官方披露数据。</p>
+    </div>
+    <div>
+      <h3>名单补充依据</h3>
+      <p><b>汪汪队重点关注</b>：Wind 统计「2025 年报中央汇金投资 / 汇金资管进入前十大持有人」的宽基 ETF，按持仓份额（亿份）排序，数据经国信证券《中国机构配置手册(2026版)之ETF篇》整理、2026 年 3 月披露。财联社、南都湾财社对 510300「735.13 亿份、占 82.76%」的报道可交叉验证。</p>
+      <p><b>新规细节</b>：修订后的准则整合原年报 / 半年报 / 季报三份准则，第三十一条仅要求披露持有人户数、户均份额、机构与个人投资者占比、管理人从业人员持有情况，不再点名。2026 年中报（8 月底）与三季报（10 月底）已全面不再披露前十大持有人。</p>
+      <p><b>关于流传的规模数字</b>：券商与 Wind 口径的 1.3–1.4 万亿均为交叉测算，非官方披露，不可当作当前持仓规模引用。</p>
+      <p><b>扩展观察</b>：规模或成交活跃，但 2025 年报未见汇金前十大持仓，仅作对照，不计入「上班」判断。</p>
+      <h3 style="margin-top:14px">怎么保持最新</h3>
+      <p>收盘后运行 <code>python update_data.py</code>，会重算 20 日均额、日内成交额分布与尾盘占比，并累积每日份额。跑一次约 25 秒（24 只 × 日 K + 5 分钟 K 两份）。日 K 抓取失败时会沿用上一份快照的基准，不会把均额写成 0。页面本身双击即可打开，无需服务器；交易时段会自行向行情接口取实时数据。</p>
+    </div>
+  </div>
+  <div class="disc">
+    「国家队 / 汪汪队」为市场俗称，非官方表述。本页结论基于公开行情的量价特征推测，不能证明任何机构当日是否交易。<b>需要特别说明：ETF 定期报告停止披露前十大持有人的政策导向之一，正是减少把平准类资金进出解读为「救市 / 利好」信号的噪音交易；本页所做的事与该导向相悖，仅适合投顾内部研究，不建议作为对客内容或投资建议对外发布。</b>数据来自第三方公开接口，可能存在延迟、缺失或口径差异，请以基金公司公告与交易所披露为准。投资有风险。
+  </div>
+  <div class="sign" id="footerSign">—</div>
+</footer>
+
+</div>
+
+<script>
+function bootSnapshot(){
+(function(){
+  "use strict";
+  var S = window.SNAPSHOT;
+  if(!S){ document.getElementById('vtitle').textContent='数据快照未加载'; return; }
+
+  var byCode = {};
+  S.items.forEach(function(it){ byCode[it.code] = it; });
+  var tcodes = S.items.map(function(it){ return it.tcode; });
+  var liveOK = false, lastLiveAt = 0, refreshing = false;
+
+  // ---------- 时间 / 交易状态 ----------
+  function bjParts(){
+    var p = new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit',
+      hour:'2-digit',minute:'2-digit',weekday:'short',hourCycle:'h23'}).formatToParts(new Date());
+    var o={}; p.forEach(function(x){o[x.type]=x.value;}); return o;
+  }
+  function marketState(){
+    var b = bjParts(), wd = b.weekday;
+    var weekend = (wd==='Sat'||wd==='Sun');
+    var h = parseInt(b.hour,10), m = parseInt(b.minute,10), t = h*60+m;
+    var lunch   = !weekend && t>=690 && t<780;     // 11:30-13:00 午间休市
+    var trading = !weekend && t>=570 && t<900;
+    var preopen = !weekend && t>=540 && t<570;     // 9:00-9:30
+    var after   = !weekend && t>=900;              // 收盘后
+    var before  = !weekend && t<540;               // 凌晨至 9:00
+    var offhours = weekend || before || preopen;
+    var prog;
+    if(t<570) prog=0;
+    else if(t<=690) prog=(t-570)/240;
+    else if(t<780) prog=120/240;
+    else if(t<900) prog=(120+(t-780))/240;
+    else prog=1;
+    return {weekend:weekend,trading:trading,lunch:lunch,preopen:preopen,after:after,before:before,offhours:offhours,
+            progress:Math.max(0.12,Math.min(1,prog)),
+            date:b.year+b.month+b.day, hhmm:b.hour+':' + b.minute,
+            effHHMM: lunch?'11:30':(b.hour+':'+b.minute), weekday:wd};
+  }
+
+  // ---------- 指标 ----------
+  function calc(it){
+    var base = it.avg20_yi||0, amt = it.amount_yi||0;
+    var oi = (it.outer_lots||0)+(it.inner_lots||0);
+    return {
+      ratio: base>0 ? amt/base : 0,
+      net: oi>0 ? ((it.outer_lots-it.inner_lots)/oi)*amt : 0
+    };
+  }
+
+  // ---------- 同时点对齐 ----------
+  // 盘中成交额只走完部分交易日，不能直接除「全天 20 日均额」。
+  // 用历史日内累计成交额分布，查出「这个时点平均已走完全天的百分之几」，
+  // 把分母同比例缩小，分子分母才可比。整个过程不含线性假设。
+  function hhmm2min(s){
+    if(!s) return 0;
+    var p=String(s).split(':'); return (parseInt(p[0],10)||0)*60+(parseInt(p[1],10)||0);
+  }
+  function shapeAt(shape, hhmm){
+    if(!shape || !shape.length) return null;
+    var n=shape.length, tx=hhmm2min(hhmm);
+    if(tx<=hhmm2min(shape[0][0])) return shape[0][1];
+    if(tx>=hhmm2min(shape[n-1][0])) return shape[n-1][1];
+    for(var i=1;i<n;i++){
+      var t1=hhmm2min(shape[i][0]);
+      if(tx<=t1){
+        var t0=hhmm2min(shape[i-1][0]);
+        if(t1<=t0) return shape[i][1];
+        return shape[i-1][1]+(shape[i][1]-shape[i-1][1])*(tx-t0)/(t1-t0);
+      }
+    }
+    return shape[n-1][1];
+  }
+  // 该标的当前「已走完全天成交额的比例」；收盘/复盘为 1
+  function dayProgress(it, st){
+    if(!st || !st.trading) return 1;
+    var s = shapeAt(it.shape, st.effHHMM);
+    if(s!==null && s>0.02) return Math.min(1,s);
+    return st.progress||0.5;              // 无形状数据时回退线性
+  }
+  function calcAdj(it, st){
+    var base=it.avg20_yi||0, amt=it.amount_yi||0;
+    var p=dayProgress(it, st);
+    var oi=(it.outer_lots||0)+(it.inner_lots||0);
+    return {
+      ratio: (base>0 && p>0) ? amt/(base*p) : 0,   // 同时点对齐后的倍数（可比）
+      raw:   base>0 ? amt/base : 0,                // 已达成日均的倍数（客观但不可比）
+      done:  p,
+      net:   oi>0 ? ((it.outer_lots-it.inner_lots)/oi)*amt : 0
+    };
+  }
+  function fmt(n,d){ d=(d===undefined?2:d); return (n||0).toLocaleString('zh-CN',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+  function signed(n){ return (n>0?'+':'')+fmt(n,2); }
+  function cls(n){ return n>0?'up':(n<0?'down':'muted'); }
+
+  function spark(hist){
+    if(!hist||!hist.length) return '';
+    var vals=hist.map(function(x){return x.amount_yi;});
+    var mx=Math.max.apply(null,vals)||1, w=96, h=26, bw=w/vals.length;
+    var bars=vals.map(function(v,i){
+      var bh=Math.max(1.2,v/mx*h), last=(i===vals.length-1);
+      return '<rect x="'+(i*bw).toFixed(1)+'" y="'+(h-bh).toFixed(1)+'" width="'+Math.max(1.2,bw-1).toFixed(1)+
+             '" height="'+bh.toFixed(1)+'" fill="'+(last?'#ff4713':'#e0e0e0')+'"/>';
+    }).join('');
+    return '<svg class="spark" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" aria-label="近30日成交额">'+bars+'</svg>';
+  }
+
+  // ---------- 份额图表：每日份额变化 + 加仓指数 ----------
+  // 数据源：S.shares_history（每日收盘后 update_data.py 记录，单位亿份，仅 core 20 只）
+  // 加仓指数不用「25年报持仓÷当前份额」的比例口径：信披已停，期初持仓不可验证，
+  // 且 2026 上半年大幅减持后比例锚定会严重失真。改用指数口径：区间首日=100。
+  // 历史序列（2025-11 起）由韭圈 NeoData 场内基金份额接口回填，日期已与基金净值逐日核对。
+  var RANGE={delta:242, index:242};        // 交易日根数：60/120/242（约 3 月 / 6 月 / 1 年）
+
+  function seriesData(n){
+    var H=S.shares_history||{};
+    var dates=Object.keys(H).sort();
+    if(dates.length<2) return null;
+    var core=S.items.filter(function(i){return i.group==='core';}).map(function(i){return i.code;});
+    if(!core.length) core=Object.keys(H[dates[dates.length-1]]||{});
+    n=Math.max(8, Math.min(n||242, dates.length-1));
+    // 窗口多带一天，用来算第一根柱子的差值；指数也从这个点起算 100
+    var wd=dates.slice(Math.max(0, dates.length-1-n));
+    var last={}, tot=[];
+    // forward-fill：某日缺某只就用最近一次已知份额；从未出现过的标的不计入
+    wd.forEach(function(d){
+      var row=H[d]||{};
+      core.forEach(function(c){ if(row[c]!==undefined && row[c]!==null) last[c]=row[c]; });
+      var s=0; core.forEach(function(c){ if(last[c]!==undefined) s+=last[c]; });
+      tot.push(s);
+    });
+    var deltas=[];
+    for(var i=1;i<wd.length;i++) deltas.push({date:wd[i], d:tot[i]-tot[i-1]});
+    var base=tot[0]||1;
+    var idx=wd.map(function(d,i){ return {date:d, v:100*tot[i]/base}; });
+    return {dates:wd, deltas:deltas, idx:idx, bars:deltas.length};
+  }
+  function dShort(d){
+    return d && d.length===8 ? d.slice(4,6)+'-'+d.slice(6,8) : d;
+  }
+  // 跨年时只写 月-日 会分不清年份，超过一年跨度改成 YY/MM
+  function dAxis(d, big){
+    if(!d || d.length!==8) return d;
+    return big ? d.slice(2,4)+'/'+d.slice(4,6) : dShort(d);
+  }
+  function tray(box, tip, html, ev){
+    var rect=box.getBoundingClientRect();
+    var px=(ev.touches&&ev.touches[0]?ev.touches[0].clientX:ev.clientX)-rect.left;
+    var py=(ev.touches&&ev.touches[0]?ev.touches[0].clientY:ev.clientY)-rect.top;
+    tipShow(box, tip, html, px, py);
+  }
+  function tipShow(box, tip, html, x, y){
+    tip.innerHTML=html; tip.style.display='block';
+    var bw=box.clientWidth, tw=tip.offsetWidth;
+    var left=Math.max(4, Math.min(bw-tw-4, x-tw/2));
+    tip.style.left=left+'px';
+    tip.style.top=Math.max(0, y-tip.offsetHeight-10)+'px';
+  }
+  function niceMax(v){
+    if(v<=0) return 1;
+    var p=Math.pow(10,Math.floor(Math.log(v)/Math.LN10));
+    for(var m of [1,2,2.5,5,10]){ if(m*p>=v) return m*p; }
+    return 10*p;
+  }
+  function axisY(v){ if(v===0) return '0'; return v>=1000?fmt(v/1000,1)+'k':fmt(v,Math.abs(v)<1?2:(Math.abs(v)<10?1:0)); }
+
+  function renderBarChart(data){
+    var box=document.getElementById('chartDelta'), tip=box.querySelector('.chart-tip');
+    if(!data){
+      box.innerHTML='<div class="chart-empty">份额快照还在积累<br>需要至少两个交易日的份额数据</div>';
+      return;
+    }
+    var mob=box.clientWidth>0 && box.clientWidth<430;
+    var W=mob?390:560, Hh=mob?200:232, pl=mob?40:48, pr=10, pt=16, pb=26;
+    var fs=mob?11:10, pw=W-pl-pr, ph=Hh-pt-pb;
+    var big=data.deltas[0].date.slice(0,4)!==data.deltas[data.deltas.length-1].date.slice(0,4);
+    var vals=data.deltas.map(function(x){return x.d;});
+    var m=niceMax(Math.max.apply(null, vals.map(Math.abs)) || 1);
+    var y0=pt+ph/2, sx=pw/data.deltas.length;
+    var bw=Math.max(1, Math.min(34, sx*0.62));
+    var g='';
+    // 网格 + 刻度（对称五档）
+    [m, m/2, 0, -m/2, -m].forEach(function(v){
+      var y=y0 - v/m*(ph/2);
+      g+='<line x1="'+pl+'" y1="'+y.toFixed(1)+'" x2="'+(W-pr)+'" y2="'+y.toFixed(1)+
+         '" stroke="'+(v===0?'#d0d0d0':'#efefef')+'" stroke-width="1"/>'+
+         '<text x="'+(pl-6)+'" y="'+(y+3.5).toFixed(1)+'" text-anchor="end" font-size="'+fs+'" fill="#8a8a8a">'+axisY(v)+'</text>';
+    });
+    // x 轴日期（最多 8 个）
+    var n=data.deltas.length, step=Math.ceil(n/(mob?4:7));
+    data.deltas.forEach(function(x,i){
+      if(i%step!==0 && i!==n-1) return;
+      g+='<text x="'+(pl+sx*(i+0.5)).toFixed(1)+'" y="'+(Hh-8)+'" text-anchor="middle" font-size="'+fs+'" fill="#8a8a8a">'+dAxis(x.date,big)+'</text>';
+    });
+    // 柱（一年 240+ 根时退化成细柱直方图，仍能看出大额申购/赎回的尖峰）
+    data.deltas.forEach(function(x,i){
+      var v=x.d, h=Math.max(bw>=3?1.5:0.8, Math.abs(v)/m*(ph/2));
+      var cx=pl+sx*(i+0.5);
+      g+='<rect x="'+(cx-bw/2).toFixed(1)+'" y="'+(v>=0?y0-h:y0).toFixed(1)+
+         '" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'"'+(bw>=3?' rx="1.5"':'')+
+         ' fill="'+(v>=0?'#ff4713':'#00875a')+'"/>';
+    });
+    // 命中区（透明列）
+    data.deltas.forEach(function(x,i){
+      g+='<rect class="hit" data-i="'+i+'" x="'+(pl+sx*i).toFixed(1)+'" y="'+pt+'" width="'+sx.toFixed(1)+'" height="'+ph+
+         '" fill="transparent" style="cursor:crosshair"/>';
+    });
+    var svg='<svg viewBox="0 0 '+W+' '+Hh+'" aria-label="每日份额变化">'+
+      '<text x="6" y="10" font-size="'+fs+'" fill="#8a8a8a">亿份</text>'+g+'</svg>';
+    box.innerHTML=svg; box.appendChild(tip);
+    tip=box.querySelector('.chart-tip');
+    box.querySelectorAll('.hit').forEach(function(r){
+      var i=+r.getAttribute('data-i'), x=data.deltas[i];
+      function show(ev){
+        tray(box, tip, '<b>'+x.date.slice(0,4)+'-'+dShort(x.date)+'</b><br>份额变化 <span class="'+(x.d>=0?'tu':'td')+'">'+signed(x.d)+' 亿份</span>', ev);
+      }
+      r.addEventListener('mousemove',show);
+      r.addEventListener('touchstart',show,{passive:true});
+      r.addEventListener('mouseleave',function(){ tip.style.display='none'; });
+    });
+  }
+
+  function renderLineChart(data){
+    var box=document.getElementById('chartIndex'), tip=box.querySelector('.chart-tip');
+    if(!data){
+      box.innerHTML='<div class="chart-empty">至少需要两个交易日的份额快照</div>';
+      return;
+    }
+    var mob=box.clientWidth>0 && box.clientWidth<430;
+    var W=mob?390:560, Hh=mob?200:232, pl=mob?40:48, pr=mob?10:12, pt=16, pb=26;
+    var fs=mob?11:10, pw=W-pl-pr, ph=Hh-pt-pb;
+    var big=data.idx[0].date.slice(0,4)!==data.idx[data.idx.length-1].date.slice(0,4);
+    var vs=data.idx.map(function(x){return x.v;});
+    var lo=Math.min(100,Math.min.apply(null,vs)), hi=Math.max(100,Math.max.apply(null,vs));
+    var pad=Math.max(0.6,(hi-lo)*0.18); lo-=pad; hi+=pad;
+    function Y(v){ return pt+(hi-v)/(hi-lo)*ph; }
+    function X(i){ return pl+(data.idx.length===1?pw/2:pw*i/(data.idx.length-1)); }
+    var g='';
+    // 网格 4 档
+    for(var k=0;k<=4;k++){
+      var v=lo+(hi-lo)*k/4, y=Y(v);
+      g+='<line x1="'+pl+'" y1="'+y.toFixed(1)+'" x2="'+(W-pr)+'" y2="'+y.toFixed(1)+'" stroke="#efefef"/>'+
+         '<text x="'+(pl-6)+'" y="'+(y+3.5).toFixed(1)+'" text-anchor="end" font-size="'+fs+'" fill="#8a8a8a">'+fmt(v,1)+'</text>';
+    }
+    // 100 基准虚线
+    var yb=Y(100);
+    g+='<line x1="'+pl+'" y1="'+yb.toFixed(1)+'" x2="'+(W-pr)+'" y2="'+yb.toFixed(1)+'" stroke="#b0b0b0" stroke-dasharray="4 4"/>'+
+       '<text x="'+(W-pr)+'" y="'+(yb-5).toFixed(1)+'" text-anchor="end" font-size="'+fs+'" fill="#8a8a8a">基期 100</text>';
+    // x 轴日期
+    var n=data.idx.length, step=Math.ceil(n/(mob?4:7));
+    data.idx.forEach(function(x,i){
+      if(i%step!==0 && i!==n-1) return;
+      g+='<text x="'+X(i).toFixed(1)+'" y="'+(Hh-8)+'" text-anchor="middle" font-size="'+fs+'" fill="#8a8a8a">'+dAxis(x.date,big)+'</text>';
+    });
+    // 面积 + 折线
+    var pts=data.idx.map(function(x,i){ return X(i).toFixed(1)+','+Y(x.v).toFixed(1); }).join(' ');
+    var area='M'+pl+','+Y(lo).toFixed(1)+' L'+pts.replace(/ /g,' L')+(' L'+X(n-1).toFixed(1))+','+Y(lo).toFixed(1)+' Z';
+    g+='<path d="'+area+'" fill="rgba(0,94,184,.08)"/>';
+    g+='<polyline points="'+pts+'" fill="none" stroke="#005eb8" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+    // 点：短周期逐个标点，一年期只保留末点避免糊成一条
+    var dots = n<=70 ? data.idx.map(function(x,i){return i;}) : [n-1];
+    dots.forEach(function(i){
+      g+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(data.idx[i].v).toFixed(1)+'" r="3" fill="#005eb8" stroke="#fff" stroke-width="1.5"/>';
+    });
+    // 命中区
+    data.idx.forEach(function(x,i){
+      g+='<rect class="hit" data-i="'+i+'" x="'+(pl+pw*i/n).toFixed(1)+'" y="'+pt+'" width="'+(pw/n).toFixed(1)+'" height="'+ph+'" fill="transparent" style="cursor:crosshair"/>';
+    });
+    var svg='<svg viewBox="0 0 '+W+' '+Hh+'" aria-label="加仓指数">'+
+      '<text x="6" y="10" font-size="'+fs+'" fill="#8a8a8a">指数</text>'+g+'</svg>';
+    box.innerHTML=svg; box.appendChild(tip);
+    tip=box.querySelector('.chart-tip');
+    box.querySelectorAll('.hit').forEach(function(r){
+      var i=+r.getAttribute('data-i'), x=data.idx[i];
+      var prev=i>0?data.idx[i-1].v:null;
+      var diff=prev===null?'':((x.v-prev>=0?' +':' ')+fmt(x.v-prev,2));
+      function show(ev){
+        tray(box, tip,
+          '<b>'+x.date.slice(0,4)+'-'+dShort(x.date)+'</b><br>加仓指数 <b style="color:#005eb8">'+fmt(x.v,2)+'</b>'+
+          (diff?'<br>较前日 <span class="'+(x.v-prev>=0?'tu':'td')+'">'+diff+'</span>':''), ev);
+      }
+      r.addEventListener('mousemove',show);
+      r.addEventListener('touchstart',show,{passive:true});
+      r.addEventListener('mouseleave',function(){ tip.style.display='none'; });
+    });
+  }
+
+  function renderCharts(){
+    var bd=seriesData(RANGE.delta), ld=seriesData(RANGE.index);
+    var dn=document.getElementById('chartDeltaNote'), en=document.getElementById('chartIndexNote');
+    renderBarChart(bd);
+    renderLineChart(ld);
+    if(!bd){
+      dn.innerHTML=''; en.innerHTML='';
+      return;
+    }
+    var b0=bd.dates[0], b1=bd.dates[bd.dates.length-1];
+    var l0=ld.dates[0], l1=ld.dates[ld.dates.length-1];
+    dn.innerHTML='<b>估算方法：</b>池内 20 只 ETF「当日场内份额 − 上一交易日份额」加总，正数计申购、负数计赎回；'+
+      '区间 '+b0+' ~ '+b1+'（'+bd.bars+' 个交易日）。'+
+      '参考常见口径，日度份额变化均视为汪汪队操作，<b>实际也可能来自其他机构或个人投资者</b>；'+
+      '沪市行情商份额存在未按日更新的情况（见表格脚注②），缺数期间本图偏低。此为近似推算，非官方披露数据。';
+    en.innerHTML='<b>估算方法：</b>加仓指数 = 100 × 当日池内总份额 ÷ 区间首日（'+l0+'）总份额，区间 '+l0+' ~ '+l1+'。'+
+      '高于 100 = 这段区间估算净加仓，低于 100 = 净减仓。<b>不等于真实持仓比例</b>：定期报告已停止披露前十大持有人，'+
+      '期初持仓不可验证，比例锚定会失真，故用指数刻画变化方向与幅度。'+
+      '份额源未日更的交易日按前值顺延（不产生假跳变）。此为近似推算，非官方披露数据。';
+  }
+
+  // 时间范围切换
+  function bindRange(){
+    ['rngDelta','rngIndex'].forEach(function(id){
+      var box=document.getElementById(id);
+      if(!box) return;
+      var key=box.getAttribute('data-target');
+      box.querySelectorAll('button').forEach(function(b){
+        b.addEventListener('click',function(){
+          box.querySelectorAll('button').forEach(function(x){ x.classList.remove('on'); });
+          b.classList.add('on');
+          RANGE[key]=+b.getAttribute('data-n');
+          renderCharts();
+        });
+      });
+    });
+  }
+
+  // ---------- 判断 ----------
+  function verdict(){
+    var st = marketState();
+    // 盘中但数据日期不是今天 = 实时通道没拿到今日数据（快照是上一交易日全天值），
+    // 此时不能按半天基准对齐（会把倍数凭空翻倍），退回全天对全天
+    var stale = st.trading && S.items[0] && S.items[0].date && S.items[0].date !== st.date;
+    var effSt = stale ? {trading:false, lunch:false, offhours:st.offhours} : st;
+    var core = S.items.filter(function(i){return i.group==='core';});
+    var sumAmt=0,sumBase=0,sumBaseAdj=0,sumNet=0,capW=0,pctW=0;
+    var tailCur=0,tailBase=0,tailAmt=0;
+    core.forEach(function(it){
+      var c=calcAdj(it, effSt);
+      sumAmt+=it.amount_yi||0;
+      sumBase+=it.avg20_yi||0;
+      sumBaseAdj+=(it.avg20_yi||0)*c.done;      // 分母按历史同时点成交进度对齐
+      sumNet+=c.net;
+      var w=it.mktcap_yi||0; capW+=w; pctW+=(it.pct||0)*w;
+      if(it.tail_ratio!==null && it.tail_ratio!==undefined &&
+         it.tail_ratio_base!==null && it.tail_ratio_base!==undefined){
+        tailCur+=(it.amount_yi||0)*it.tail_ratio;
+        tailBase+=(it.amount_yi||0)*it.tail_ratio_base;
+        tailAmt+=(it.amount_yi||0);
+      }
+    });
+    var ratio    = sumBaseAdj>0 ? sumAmt/sumBaseAdj : 0;   // 与「历史同时点均值」比，可比
+    var rawRatio = sumBase>0 ? sumAmt/sumBase : 0;         // 已达成全天日均的倍数
+    var done     = sumBase>0 ? sumBaseAdj/sumBase : 1;     // 当前已走完全天的比例
+    var wpct = capW>0 ? pctW/capW : 0;
+    var tail = tailAmt>0 ? tailCur/tailAmt : 0;
+    var tailB= tailAmt>0 ? tailBase/tailAmt : 0;
+
+    var level='cool', title='', reason='';
+    if(ratio>=1.8 && sumNet>0){
+      level='hot'; title='大概率上班了';
+      reason='汪汪队池成交额达到历史同时点均值的 '+fmt(ratio,2)+' 倍，且主动净买入 '+fmt(sumNet,1)+' 亿元。放量 + 净买入同向，是典型的护盘量价特征。';
+    } else if(ratio>=1.3 && sumNet>0){
+      level='mid'; title='有护盘迹象';
+      reason='成交额放大到历史同时点均值的 '+fmt(ratio,2)+' 倍，主动净买入 '+fmt(sumNet,1)+' 亿元，方向偏买，但力度还不构成强信号。';
+    } else if(ratio>=1.8 && sumNet<=0){
+      level='mid'; title='放量了，方向不对';
+      reason='成交额放大到历史同时点均值的 '+fmt(ratio,2)+' 倍，但主动净买入 '+fmt(sumNet,1)+' 亿元。大额成交未必是买盘，更像换手或出货，不能直接算上班。';
+    } else if(ratio>=1.3){
+      level='mid'; title='成交活跃，证据不够';
+      reason='成交额达到历史同时点均值的 '+fmt(ratio,2)+' 倍，但主动净买入 '+fmt(sumNet,1)+' 亿元，方向不清晰。';
+    } else {
+      level='cool'; title='没看出上班迹象';
+      reason='成交额只有历史同时点均值的 '+fmt(ratio,2)+' 倍，主动净买入 '+fmt(sumNet,1)+' 亿元，量价都平静。';
+    }
+    if(tail>0 && tailB>0 && tail>tailB*1.25 && (level==='hot'||level==='mid')){
+      reason += ' 尾盘半小时成交占全天 '+fmt(tail*100,1)+'%，明显高于 20 日均值 '+fmt(tailB*100,1)+'%。';
+    }
+    if(wpct< -0.5 && (level==='hot'||level==='mid')){
+      reason += ' 池内规模加权涨跌 '+fmt(wpct,2)+'%，下跌日放量更符合护盘场景。';
+    }
+    if(stale) reason += '（实时通道未连上，当前显示 '+fmtDate(S.items[0].date)+' 全天收盘数据，与全天基准直接对比；连上后自动切换同时点对齐）';
+    else if(st.lunch) reason += '（午间休市，成交额锁定 11:30；对比基准 = 20 日均额 × 历史同时点进度 '+fmt(done*100,1)+'%）';
+    else if(st.trading) reason += '（'+st.hhmm+' 历史平均已走完全天 '+fmt(done*100,1)+'%，分母已同比例缩小，与昨日同时刻对比）';
+    else if(st.offhours) reason += '（非交易时段，以上为 '+fmtDate(S.trade_date)+' 收盘复盘，开盘后自动切换实时）';
+
+    return {st:st,core:core,sumAmt:sumAmt,sumBase:sumBase,sumBaseAdj:sumBaseAdj,
+            sumNet:sumNet,ratio:ratio,rawRatio:rawRatio,done:done,wpct:wpct,
+            tail:tail,tailB:tailB,level:level,title:title,reason:reason};
+  }
+
+  function fmtDate(d){
+    if(!d||d.length!==8) return d||'—';
+    var wk=['周日','周一','周二','周三','周四','周五','周六'];
+    var dt=new Date(parseInt(d.slice(0,4),10),parseInt(d.slice(4,6),10)-1,parseInt(d.slice(6,8),10));
+    return d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6,8)+' '+wk[dt.getDay()];
+  }
+
+  function renderVerdict(v){
+    var el=document.getElementById('verdict');
+    el.className='verdict '+(v.level==='hot'?'hot':(v.level==='mid'?'mid':''));
+    document.getElementById('vlabel').textContent = v.st.lunch?'今日结论 · 午间半场':
+      (v.st.trading?'今日结论 · 实时跟踪':
+      (v.st.after?'今日收盘复盘':'最近交易日复盘 · '+fmtDate(S.trade_date)));
+    var t=document.getElementById('vtitle'); t.textContent=v.title; t.className='vtitle '+(v.level==='cool'?'cool':'');
+    document.getElementById('vreason').textContent=v.reason;
+    var sn=document.getElementById('vstampNum'); sn.textContent=fmt(v.ratio,2)+'×'; sn.className='num'+(v.ratio>=1.8?' hl':'');
+    document.getElementById('vstampLabel').textContent = v.st.trading?'较同时点历史均值':'较20日均额';
+    var thr=document.getElementById('thRatio');
+    if(thr) thr.textContent = v.st.trading?'同时点倍数':'较20日均';
+
+    var pctCls=cls(v.wpct);
+    var bars = Math.min(100, v.ratio/2.5*100);
+    document.getElementById('mgrid').innerHTML =
+      card('汪汪队合计成交额', fmt(v.sumAmt,1)+' 亿',
+           v.st.trading
+             ? '截至 '+v.st.effHHMM+' · 已达成全天日均 '+fmt(v.rawRatio,2)+'×'
+             : '20日均额 '+fmt(v.sumBase,1)+' 亿', '') +
+      card('成交额放大倍数', fmt(v.ratio,2)+'×',
+           v.st.trading
+             ? '基准 '+fmt(v.sumBaseAdj,1)+' 亿 = 20日均额 × 同时点进度 '+fmt(v.done*100,1)+'%'
+             : '阈值 1.8× 为强信号',
+           '<div class="bar"><span style="width:'+bars.toFixed(1)+'%"></span></div>') +
+      card('合计主动净买入', signed(v.sumNet)+' 亿', '主动买卖口径推算', '') +
+      card('池内加权涨跌', fmt(v.wpct,2)+'%', '规模加权 · '+fmtDate(S.trade_date), '');
+    var g=document.getElementById('mgrid');
+    g.children[1].querySelector('.v').className='v num '+(v.ratio>=1.8?'hl':'');
+    g.children[2].querySelector('.v').className='v num '+cls(v.sumNet);
+    g.children[3].querySelector('.v').className='v num '+cls(v.wpct);
+  }
+  function card(k,v,n,extra){ return '<div><div class="k">'+k+'</div><div class="v num">'+v+'</div><div class="n">'+n+'</div>'+extra+'</div>'; }
+
+  // 份额变化：明确标出对比的是哪一天，0 不写成 +0.00（会被误读成有数据且为零）
+  // 若同一市场绝大多数标的份额与昨日完全相同，判定为数据源未按日更新，不能当「无申赎」
+  var __suspect=null;
+  function sharesSuspect(){
+    if(__suspect) return __suspect;
+    var by={};
+    S.items.forEach(function(it){
+      var m=(it.tcode||'').slice(0,2); (by[m]=by[m]||[]).push(it);
+    });
+    var out={};
+    Object.keys(by).forEach(function(m){
+      var known=by[m].filter(function(x){return x.subscr_net_yi!==null && x.subscr_net_yi!==undefined;});
+      if(known.length<3) return;
+      var same=known.filter(function(x){return Math.abs(x.subscr_net_yi)<0.005;}).length;
+      out[m]= same/known.length>=0.7;
+    });
+    __suspect=out; return out;
+  }
+  function subscrCell(it){
+    var v=it.subscr_net_yi;
+    if(v===null||v===undefined) return '<div class="sub muted">申赎 待积累</div>';
+    var m=(it.tcode||'').slice(0,2);
+    if(sharesSuspect()[m]) return '<div class="sub muted" title="同市场绝大多数标的份额与昨日完全相同，判断为行情商份额字段未按日更新，不代表当日没有申赎">份额源未日更</div>';
+    var pd=S.prev_share_date;
+    var tag = (pd && pd.length===8) ? (pd.slice(4,6)+'-'+pd.slice(6,8)) : '上日';
+    if(Math.abs(v)<0.005) return '<div class="sub muted">较'+tag+' 持平</div>';
+    return '<div class="sub num '+cls(v)+'">较'+tag+' '+signed(v)+'亿</div>';
+  }
+
+  // ---------- 表格 ----------
+  function renderTable(){
+    var st=marketState();
+    var stale = st.trading && S.items[0] && S.items[0].date && S.items[0].date !== st.date;
+    var effSt = stale ? {trading:false} : st;   // 实时未更新时不做同时点对齐
+    var sort=document.getElementById('sort').value, scope=document.getElementById('scope').value;
+    var q=document.getElementById('q').value.trim().toLowerCase();
+    var list=S.items.filter(function(it){
+      if(scope!=='all' && it.group!==scope) return false;
+      if(q && (it.code+it.name+it.index).toLowerCase().indexOf(q)<0) return false;
+      return true;
+    });
+    var cmp={
+      huijin:function(a,b){ return (b.huijin_yi-a.huijin_yi) || (b.mktcap_yi-a.mktcap_yi); },
+      amount:function(a,b){ return b.amount_yi-a.amount_yi; },
+      ratio:function(a,b){ return calcAdj(b,effSt).ratio-calcAdj(a,effSt).ratio; },
+      net:function(a,b){ return calcAdj(b,effSt).net-calcAdj(a,effSt).net; },
+      mktcap:function(a,b){ return b.mktcap_yi-a.mktcap_yi; }
+    }[sort];
+    // 分组固定：汪汪队在前；组内按所选排序
+    list.sort(function(a,b){ if(a.group!==b.group) return a.group==='core'?-1:1; return cmp(a,b); });
+
+    var html='', lastGroup='';
+    list.forEach(function(it){
+      if(it.group!==lastGroup){
+        lastGroup=it.group;
+        var label = it.group==='core'?'汪汪队重点关注 · 2025年报最后一次实名披露（此后停止披露）':'扩展观察 · 2025年报未见汇金持仓（名单已停止更新）';
+        var cnt = list.filter(function(x){return x.group===it.group;}).length;
+        html += '<tr class="grouphead"><td colspan="10">'+label+'<span class="cnt">'+cnt+' 只</span></td></tr>';
+      }
+      var c=calcAdj(it, effSt), pctCls=cls(it.pct), netCls=cls(c.net);
+      var rCls = c.ratio>=1.8?'hl':(c.ratio>=1.3?'':'muted');
+      var hb=Math.min(100,c.ratio/3*100);
+      var amtSub = st.trading ? '<div class="sub muted">截至 '+st.effHHMM+'</div>' : '';
+      var ratioSub = st.trading ? '<div class="sub muted">已达成日均 '+fmt(c.raw,2)+'×</div>' : '';
+      html += '<tr>'+
+        '<td><div class="name">'+it.name+'<span class="chip '+it.group+'">'+(it.group==='core'?'汪汪队':'观察')+'</span></div>'+
+             '<div class="code num">'+it.code+'</div></td>'+
+        '<td class="muted">'+it.index+'</td>'+
+        '<td class="num">'+fmt(it.mktcap_yi,1)+'</td>'+
+        '<td class="num" style="font-weight:700">'+fmt(it.amount_yi,2)+amtSub+'</td>'+
+        '<td><div class="ratio num '+rCls+'">'+fmt(c.ratio,2)+'<b>×</b></div>'+ratioSub+
+             '<div class="mini"><span style="width:'+hb.toFixed(1)+'%"></span></div></td>'+
+        '<td class="num '+netCls+'" style="font-weight:700">'+signed(c.net)+'</td>'+
+        '<td class="num '+pctCls+'" style="font-weight:700">'+signed(it.pct)+'%</td>'+
+        '<td><div class="num">'+fmt(it.shares_yi,1)+'</div>'+subscrCell(it)+'</td>'+
+        '<td>'+spark(it.hist)+'</td>'+
+        '<td class="num '+(it.huijin_yi?'':'muted')+'">'+(it.huijin_yi?fmt(it.huijin_yi,1):'—')+'</td>'+
+      '</tr>';
+    });
+    // 合计行
+    var core = S.items.filter(function(i){return i.group==='core';});
+    var sa=0,sb=0,sn=0; core.forEach(function(it){var c=calcAdj(it,st);sa+=it.amount_yi;sb+=(it.avg20_yi||0)*c.done;sn+=c.net;});
+    html += '<tr class="total"><td>汪汪队合计</td><td class="muted">'+core.length+' 只</td><td class="muted">—</td>'+
+      '<td class="num">'+fmt(sa,2)+(st.trading?'<div class="sub muted">截至 '+st.effHHMM+'</div>':'')+'</td>'+
+      '<td class="num hl">'+fmt(sb>0?sa/sb:0,2)+'×</td>'+
+      '<td class="num '+cls(sn)+'">'+signed(sn)+'</td><td colspan="4" class="muted" style="text-align:right">合计口径与上方判断一致</td></tr>';
+
+    document.getElementById('tbody').innerHTML=html;
+  }
+
+  // ---------- 实时行情（腾讯 JSONP，script 标签无跨域限制） ----------
+  function parseLive(line){
+    if(line.indexOf('="')<0) return null;
+    var body=line.slice(line.indexOf('="')+2).replace(/"\s*;?\s*$/,'');
+    var a=body.split('~');
+    if(a.length<40) return null;
+    function n(i){var v=parseFloat(a[i]);return isNaN(v)?0:v;}
+    return {
+      code:a[2], price:n(3), prev_close:n(4), volume_lots:n(6), outer_lots:n(7), inner_lots:n(8),
+      pct:n(32), amount_wan:n(37), turnover:n(38), mktcap_yi:n(45), shares:a.length>72?n(72):0,
+      ts:a[30]||'', date:(a[30]||'').slice(0,8)
+    };
+  }
+  function applyLive(){
+    var got=0;
+    tcodes.forEach(function(tc){
+      var raw=window['v_'+tc];
+      if(!raw) return;
+      var q=parseLive('v_'+tc+'="'+raw+'"');
+      if(!q) return;
+      var it=byCode[q.code]; if(!it) return;
+      it.price=q.price; it.prev_close=q.prev_close; it.pct=q.pct;
+      it.amount_wan=q.amount_wan; it.amount_yi=q.amount_wan/1e4;
+      it.outer_lots=q.outer_lots; it.inner_lots=q.inner_lots;
+      it.turnover=q.turnover; it.mktcap_yi=q.mktcap_yi; it.shares=q.shares;
+      it.shares_yi=q.shares/1e8;
+      // 盘中份额若刷新，申赎同步重算（分母仍是上一快照日份额）
+      if(it.prev_shares && q.shares && q.price){
+        it.subscr_net_yi = Math.round((q.shares-it.prev_shares)*q.price/1e8*100)/100;
+        __suspect=null;
+      }
+      it.ts=q.ts; if(q.date) it.date=q.date;
+      got++;
+    });
+    return got;
+  }
+  function refresh(){
+    if(refreshing) return;
+    refreshing=true;
+    var btn=document.getElementById('refresh'); btn.textContent='更新中…';
+    var url='https://qt.gtimg.cn/q='+tcodes.join(',')+'&r='+Date.now();
+    var s=document.createElement('script');
+    s.src=url; s.async=true;
+    var done=false;
+    function finish(ok){
+      if(done) return; done=true;
+      clearTimeout(timer);
+      if(ok){ var n=applyLive(); if(n>0){ liveOK=true; lastLiveAt=Date.now(); } }
+      else { liveOK=false; }
+      refreshing=false; btn.textContent='立即刷新';
+      renderAll();
+      try{ s.parentNode && s.parentNode.removeChild(s); }catch(e){}
+    }
+    var timer=setTimeout(function(){finish(false);},7000);
+    s.onload=function(){ finish(true); };
+    s.onerror=function(){ finish(false); };
+    document.head.appendChild(s);
+  }
+
+  // ---------- 状态栏 ----------
+  function renderStatus(){
+    var v=verdict(), st=v.st;
+    var badge=document.getElementById('badge'), txt=document.getElementById('badgeText');
+    if(st.lunch){
+      badge.className='badge'+(liveOK?' live':' warn');
+      txt.textContent = '午间休市 · 数据锁定 11:30';
+    } else if(st.trading){
+      badge.className='badge'+(liveOK?' live':' warn');
+      txt.textContent = liveOK?'实时 · 每20秒':'实时通道不可用 · 显示快照';
+    } else if(st.preopen){
+      badge.className='badge'; txt.textContent='等待开盘 · 9:30';
+    } else if(st.after){
+      badge.className='badge'; txt.textContent='已收盘 · 今日复盘数据';
+    } else {
+      badge.className='badge'; txt.textContent='休市 · 最近交易日收盘数据';
+    }
+    document.getElementById('stamp').textContent = '快照 '+fmtDate(S.trade_date)+' · 生成 '+S.generated_at;
+    var newest = S.items[0] && S.items[0].date ? S.items[0].date : S.trade_date;
+    var stale = newest && newest!==st.date && (st.trading||st.after);
+    document.getElementById('meta').innerHTML =
+      '数据时间 '+(S.items[0]&&S.items[0].ts?S.items[0].ts.replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/,'$1-$2-$3 $4:$5:$6'):'—')+
+      (liveOK?(st.lunch?' · 通道正常，13:00 继续刷新':' · 实时已连接'):'')+
+      (stale?' <span style="color:var(--orange)">· 基准快照非今日，建议收盘后运行 update_data.py</span>':'');
+    document.getElementById('footerSign').textContent =
+      '数据来源：腾讯行情 + 新浪 5 分钟 K 线（日内分布）· 汇金名单：Wind 2025年报前十大持有人口径（2026-05-01 起停止披露，此后不可验证） · 快照生成 '+S.generated_at+' · 仅供内部研究，不构成投资建议';
+  }
+
+  function renderAll(){ renderVerdict(verdict()); renderCharts(); renderTable(); renderStatus(); }
+
+  // ---------- 事件 ----------
+  ['sort','scope','q'].forEach(function(id){
+    document.getElementById(id).addEventListener(id==='q'?'input':'change',renderTable);
+  });
+  document.getElementById('refresh').addEventListener('click',refresh);
+  document.getElementById('auto').addEventListener('change',function(){
+    if(this.checked) schedule(); else clearTimeout(window.__t);
+  });
+  function schedule(){
+    clearTimeout(window.__t);
+    var st=marketState();
+    var ms = st.trading?20000:60000;
+    window.__t=setTimeout(function(){
+      if(document.getElementById('auto').checked && marketState().trading) refresh();
+      schedule();
+    },ms);
+  }
+
+  bindRange();
+  renderAll();
+  refresh();          // 首屏立即尝试实时通道
+  schedule();
+})();
+}
+// 动态加载快照并强制绕过缓存：快照每日更新，浏览器缓存旧文件会导致图表/表格停留在旧数据
+(function(){
+  var s=document.createElement('script');
+  s.src='data/snapshot.js?t='+Date.now();
+  s.onload=bootSnapshot;
+  s.onerror=function(){ document.getElementById('vtitle').textContent='数据快照加载失败，请刷新重试'; };
+  document.head.appendChild(s);
+})();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+(function(){
+  var wrap = document.getElementById('macroChartWrap');
+  var svg = document.getElementById('macroSvg');
+  var tip = document.getElementById('macroTooltip');
+  var ttDate = document.getElementById('ttDate');
+  var ttPt = document.getElementById('ttPt');
+  var ttRt = document.getElementById('ttRt');
+  
+  if (!wrap || !svg || !tip) return;
+  
+  var ns = "http://www.w3.org/2000/svg";
+  var crossLine = document.createElementNS(ns, "line");
+  crossLine.setAttribute("stroke", "#ff4713");
+  crossLine.setAttribute("stroke-width", "1.5");
+  crossLine.setAttribute("stroke-dasharray", "4,4");
+  crossLine.style.display = "none";
+  svg.appendChild(crossLine);
+  
+  var dotPt = document.createElementNS(ns, "circle");
+  dotPt.setAttribute("r", "6");
+  dotPt.setAttribute("fill", "#005eb8");
+  dotPt.setAttribute("stroke", "#ffffff");
+  dotPt.setAttribute("stroke-width", "2.5");
+  dotPt.style.display = "none";
+  svg.appendChild(dotPt);
+  
+  var dotRt = document.createElementNS(ns, "circle");
+  dotRt.setAttribute("r", "6");
+  dotRt.setAttribute("fill", "#ff4713");
+  dotRt.setAttribute("stroke", "#ffffff");
+  dotRt.setAttribute("stroke-width", "2.5");
+  dotRt.style.display = "none";
+  svg.appendChild(dotRt);
+
+  var data = window.MACRO_DAILY;
+  if (!data || !data.dates) return;
+  var dates = data.dates;
+  var pts = data.hs300_points;
+  var rts = data.ratios;
+  var n = dates.length;
+  if (!n) return;
+  
+  var viewW = 1196, viewH = 400;
+  var padL = 60, padR = 70, padT = 30, padB = 40;
+  var chartW = viewW - padL - padR;
+  var chartH = viewH - padT - padB;
+  var minPt = 3000.0, maxPt = 6000.0;
+  var minRt = 0.0, maxRt = 3.0;
+  
+  function getX(idx){ return padL + (idx / (n <= 1 ? 1 : (n - 1))) * chartW; }
+  function getYPt(v){ return padT + (1.0 - (v - minPt) / (maxPt - minPt)) * chartH; }
+  function getYRt(v){ return padT + (1.0 - (v - minRt) / (maxRt - minRt)) * chartH; }
+  
+  function handleMove(clientX, clientY){
+    var pt = svg.createSVGPoint();
+    pt.x = clientX;
+    pt.y = clientY;
+    var ctm = svg.getScreenCTM();
+    if (!ctm) return;
+    var svgPt = pt.matrixTransform(ctm.inverse());
+    
+    var clampedX = Math.max(padL, Math.min(viewW - padR, svgPt.x));
+    var ratio = (clampedX - padL) / chartW;
+    var idx = Math.round(ratio * (n - 1));
+    idx = Math.max(0, Math.min(n - 1, idx));
+    
+    var actualX = getX(idx);
+    var curDate = dates[idx];
+    var curPt = pts[idx];
+    var curRt = rts[idx];
+    
+    var actualYPt = getYPt(curPt);
+    var actualYRt = getYRt(curRt);
+    
+    crossLine.setAttribute("x1", actualX);
+    crossLine.setAttribute("y1", padT);
+    crossLine.setAttribute("x2", actualX);
+    crossLine.setAttribute("y2", viewH - padB);
+    crossLine.style.display = "block";
+    
+    dotPt.setAttribute("cx", actualX);
+    dotPt.setAttribute("cy", actualYPt);
+    dotPt.style.display = "block";
+    
+    dotRt.setAttribute("cx", actualX);
+    dotRt.setAttribute("cy", actualYRt);
+    dotRt.style.display = "block";
+    
+    var screenPt = svg.createSVGPoint();
+    screenPt.x = actualX;
+    screenPt.y = padT;
+    var domPos = screenPt.matrixTransform(ctm);
+    var wrapRect = wrap.getBoundingClientRect();
+    var tipLeft = domPos.x - wrapRect.left + 16;
+    
+    var tipW = tip.offsetWidth || 200;
+    if (tipLeft + tipW > wrapRect.width - 15) {
+      tipLeft = domPos.x - wrapRect.left - tipW - 16;
+    }
+    
+    ttDate.textContent = curDate;
+    ttPt.textContent = curPt.toFixed(2);
+    ttRt.textContent = curRt.toFixed(3) + '%';
+    
+    tip.style.left = tipLeft + 'px';
+    tip.style.display = 'block';
+  }
+  
+  wrap.addEventListener('mousemove', function(e){
+    handleMove(e.clientX, e.clientY);
+  });
+  
+  wrap.addEventListener('touchmove', function(e){
+    if (e.touches && e.touches[0]) {
+      handleMove(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, {passive: true});
+  
+  wrap.addEventListener('mouseleave', function(){
+    crossLine.style.display = 'none';
+    dotPt.style.display = 'none';
+    dotRt.style.display = 'none';
+    tip.style.display = 'none';
+  });
+  
+  wrap.addEventListener('touchend', function(){
+    crossLine.style.display = 'none';
+    dotPt.style.display = 'none';
+    dotRt.style.display = 'none';
+    tip.style.display = 'none';
+  });
+})();
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+window.MACRO_DAILY = {"dates": ["2020-01-02", "2020-01-03", "2020-01-06", "2020-01-07", "2020-01-08", "2020-01-09", "2020-01-10", "2020-01-13", "2020-01-14", "2020-01-15", "2020-01-16", "2020-01-17", "2020-01-20", "2020-01-21", "2020-01-22", "2020-01-23", "2020-02-03", "2020-02-04", "2020-02-05", "2020-02-06", "2020-02-07", "2020-02-10", "2020-02-11", "2020-02-12", "2020-02-13", "2020-02-14", "2020-02-17", "2020-02-18", "2020-02-19", "2020-02-20", "2020-02-21", "2020-02-24", "2020-02-25", "2020-02-26", "2020-02-27", "2020-02-28", "2020-03-02", "2020-03-03", "2020-03-04", "2020-03-05", "2020-03-06", "2020-03-09", "2020-03-10", "2020-03-11", "2020-03-12", "2020-03-13", "2020-03-16", "2020-03-17", "2020-03-18", "2020-03-19", "2020-03-20", "2020-03-23", "2020-03-24", "2020-03-25", "2020-03-26", "2020-03-27", "2020-03-30", "2020-03-31", "2020-04-01", "2020-04-02", "2020-04-03", "2020-04-07", "2020-04-08", "2020-04-09", "2020-04-10", "2020-04-13", "2020-04-14", "2020-04-15", "2020-04-16", "2020-04-17", "2020-04-20", "2020-04-21", "2020-04-22", "2020-04-23", "2020-04-24", "2020-04-27", "2020-04-28", "2020-04-29", "2020-04-30", "2020-05-06", "2020-05-07", "2020-05-08", "2020-05-11", "2020-05-12", "2020-05-13", "2020-05-14", "2020-05-15", "2020-05-18", "2020-05-19", "2020-05-20", "2020-05-21", "2020-05-22", "2020-05-25", "2020-05-26", "2020-05-27", "2020-05-28", "2020-05-29", "2020-06-01", "2020-06-02", "2020-06-03", "2020-06-04", "2020-06-05", "2020-06-08", "2020-06-09", "2020-06-10", "2020-06-11", "2020-06-12", "2020-06-15", "2020-06-16", "2020-06-17", "2020-06-18", "2020-06-19", "2020-06-22", "2020-06-23", "2020-06-24", "2020-06-29", "2020-06-30", "2020-07-01", "2020-07-02", "2020-07-03", "2020-07-06", "2020-07-07", "2020-07-08", "2020-07-09", "2020-07-10", "2020-07-13", "2020-07-14", "2020-07-15", "2020-07-16", "2020-07-17", "2020-07-20", "2020-07-21", "2020-07-22", "2020-07-23", "2020-07-24", "2020-07-27", "2020-07-28", "2020-07-29", "2020-07-30", "2020-07-31", "2020-08-03", "2020-08-04", "2020-08-05", "2020-08-06", "2020-08-07", "2020-08-10", "2020-08-11", "2020-08-12", "2020-08-13", "2020-08-14", "2020-08-17", "2020-08-18", "2020-08-19", "2020-08-20", "2020-08-21", "2020-08-24", "2020-08-25", "2020-08-26", "2020-08-27", "2020-08-28", "2020-08-31", "2020-09-01", "2020-09-02", "2020-09-03", "2020-09-04", "2020-09-07", "2020-09-08", "2020-09-09", "2020-09-10", "2020-09-11", "2020-09-14", "2020-09-15", "2020-09-16", "2020-09-17", "2020-09-18", "2020-09-21", "2020-09-22", "2020-09-23", "2020-09-24", "2020-09-25", "2020-09-28", "2020-09-29", "2020-09-30", "2020-10-09", "2020-10-12", "2020-10-13", "2020-10-14", "2020-10-15", "2020-10-16", "2020-10-19", "2020-10-20", "2020-10-21", "2020-10-22", "2020-10-23", "2020-10-26", "2020-10-27", "2020-10-28", "2020-10-29", "2020-10-30", "2020-11-02", "2020-11-03", "2020-11-04", "2020-11-05", "2020-11-06", "2020-11-09", "2020-11-10", "2020-11-11", "2020-11-12", "2020-11-13", "2020-11-16", "2020-11-17", "2020-11-18", "2020-11-19", "2020-11-20", "2020-11-23", "2020-11-24", "2020-11-25", "2020-11-26", "2020-11-27", "2020-11-30", "2020-12-01", "2020-12-02", "2020-12-03", "2020-12-04", "2020-12-07", "2020-12-08", "2020-12-09", "2020-12-10", "2020-12-11", "2020-12-14", "2020-12-15", "2020-12-16", "2020-12-17", "2020-12-18", "2020-12-21", "2020-12-22", "2020-12-23", "2020-12-24", "2020-12-25", "2020-12-28", "2020-12-29", "2020-12-30", "2020-12-31", "2021-01-04", "2021-01-05", "2021-01-06", "2021-01-07", "2021-01-08", "2021-01-11", "2021-01-12", "2021-01-13", "2021-01-14", "2021-01-15", "2021-01-18", "2021-01-19", "2021-01-20", "2021-01-21", "2021-01-22", "2021-01-25", "2021-01-26", "2021-01-27", "2021-01-28", "2021-01-29", "2021-02-01", "2021-02-02", "2021-02-03", "2021-02-04", "2021-02-05", "2021-02-08", "2021-02-09", "2021-02-10", "2021-02-18", "2021-02-19", "2021-02-22", "2021-02-23", "2021-02-24", "2021-02-25", "2021-02-26", "2021-03-01", "2021-03-02", "2021-03-03", "2021-03-04", "2021-03-05", "2021-03-08", "2021-03-09", "2021-03-10", "2021-03-11", "2021-03-12", "2021-03-15", "2021-03-16", "2021-03-17", "2021-03-18", "2021-03-19", "2021-03-22", "2021-03-23", "2021-03-24", "2021-03-25", "2021-03-26", "2021-03-29", "2021-03-30", "2021-03-31", "2021-04-01", "2021-04-02", "2021-04-06", "2021-04-07", "2021-04-08", "2021-04-09", "2021-04-12", "2021-04-13", "2021-04-14", "2021-04-15", "2021-04-16", "2021-04-19", "2021-04-20", "2021-04-21", "2021-04-22", "2021-04-23", "2021-04-26", "2021-04-27", "2021-04-28", "2021-04-29", "2021-04-30", "2021-05-06", "2021-05-07", "2021-05-10", "2021-05-11", "2021-05-12", "2021-05-13", "2021-05-14", "2021-05-17", "2021-05-18", "2021-05-19", "2021-05-20", "2021-05-21", "2021-05-24", "2021-05-25", "2021-05-26", "2021-05-27", "2021-05-28", "2021-05-31", "2021-06-01", "2021-06-02", "2021-06-03", "2021-06-04", "2021-06-07", "2021-06-08", "2021-06-09", "2021-06-10", "2021-06-11", "2021-06-15", "2021-06-16", "2021-06-17", "2021-06-18", "2021-06-21", "2021-06-22", "2021-06-23", "2021-06-24", "2021-06-25", "2021-06-28", "2021-06-29", "2021-06-30", "2021-07-01", "2021-07-02", "2021-07-05", "2021-07-06", "2021-07-07", "2021-07-08", "2021-07-09", "2021-07-12", "2021-07-13", "2021-07-14", "2021-07-15", "2021-07-16", "2021-07-19", "2021-07-20", "2021-07-21", "2021-07-22", "2021-07-23", "2021-07-26", "2021-07-27", "2021-07-28", "2021-07-29", "2021-07-30", "2021-08-02", "2021-08-03", "2021-08-04", "2021-08-05", "2021-08-06", "2021-08-09", "2021-08-10", "2021-08-11", "2021-08-12", "2021-08-13", "2021-08-16", "2021-08-17", "2021-08-18", "2021-08-19", "2021-08-20", "2021-08-23", "2021-08-24", "2021-08-25", "2021-08-26", "2021-08-27", "2021-08-30", "2021-08-31", "2021-09-01", "2021-09-02", "2021-09-03", "2021-09-06", "2021-09-07", "2021-09-08", "2021-09-09", "2021-09-10", "2021-09-13", "2021-09-14", "2021-09-15", "2021-09-16", "2021-09-17", "2021-09-22", "2021-09-23", "2021-09-24", "2021-09-27", "2021-09-28", "2021-09-29", "2021-09-30", "2021-10-08", "2021-10-11", "2021-10-12", "2021-10-13", "2021-10-14", "2021-10-15", "2021-10-18", "2021-10-19", "2021-10-20", "2021-10-21", "2021-10-22", "2021-10-25", "2021-10-26", "2021-10-27", "2021-10-28", "2021-10-29", "2021-11-01", "2021-11-02", "2021-11-03", "2021-11-04", "2021-11-05", "2021-11-08", "2021-11-09", "2021-11-10", "2021-11-11", "2021-11-12", "2021-11-15", "2021-11-16", "2021-11-17", "2021-11-18", "2021-11-19", "2021-11-22", "2021-11-23", "2021-11-24", "2021-11-25", "2021-11-26", "2021-11-29", "2021-11-30", "2021-12-01", "2021-12-02", "2021-12-03", "2021-12-06", "2021-12-07", "2021-12-08", "2021-12-09", "2021-12-10", "2021-12-13", "2021-12-14", "2021-12-15", "2021-12-16", "2021-12-17", "2021-12-20", "2021-12-21", "2021-12-22", "2021-12-23", "2021-12-24", "2021-12-27", "2021-12-28", "2021-12-29", "2021-12-30", "2021-12-31", "2022-01-04", "2022-01-05", "2022-01-06", "2022-01-07", "2022-01-10", "2022-01-11", "2022-01-12", "2022-01-13", "2022-01-14", "2022-01-17", "2022-01-18", "2022-01-19", "2022-01-20", "2022-01-21", "2022-01-24", "2022-01-25", "2022-01-26", "2022-01-27", "2022-01-28", "2022-02-07", "2022-02-08", "2022-02-09", "2022-02-10", "2022-02-11", "2022-02-14", "2022-02-15", "2022-02-16", "2022-02-17", "2022-02-18", "2022-02-21", "2022-02-22", "2022-02-23", "2022-02-24", "2022-02-25", "2022-02-28", "2022-03-01", "2022-03-02", "2022-03-03", "2022-03-04", "2022-03-07", "2022-03-08", "2022-03-09", "2022-03-10", "2022-03-11", "2022-03-14", "2022-03-15", "2022-03-16", "2022-03-17", "2022-03-18", "2022-03-21", "2022-03-22", "2022-03-23", "2022-03-24", "2022-03-25", "2022-03-28", "2022-03-29", "2022-03-30", "2022-03-31", "2022-04-01", "2022-04-06", "2022-04-07", "2022-04-08", "2022-04-11", "2022-04-12", "2022-04-13", "2022-04-14", "2022-04-15", "2022-04-18", "2022-04-19", "2022-04-20", "2022-04-21", "2022-04-22", "2022-04-25", "2022-04-26", "2022-04-27", "2022-04-28", "2022-04-29", "2022-05-05", "2022-05-06", "2022-05-09", "2022-05-10", "2022-05-11", "2022-05-12", "2022-05-13", "2022-05-16", "2022-05-17", "2022-05-18", "2022-05-19", "2022-05-20", "2022-05-23", "2022-05-24", "2022-05-25", "2022-05-26", "2022-05-27", "2022-05-30", "2022-05-31", "2022-06-01", "2022-06-02", "2022-06-06", "2022-06-07", "2022-06-08", "2022-06-09", "2022-06-10", "2022-06-13", "2022-06-14", "2022-06-15", "2022-06-16", "2022-06-17", "2022-06-20", "2022-06-21", "2022-06-22", "2022-06-23", "2022-06-24", "2022-06-27", "2022-06-28", "2022-06-29", "2022-06-30", "2022-07-01", "2022-07-04", "2022-07-05", "2022-07-06", "2022-07-07", "2022-07-08", "2022-07-11", "2022-07-12", "2022-07-13", "2022-07-14", "2022-07-15", "2022-07-18", "2022-07-19", "2022-07-20", "2022-07-21", "2022-07-22", "2022-07-25", "2022-07-26", "2022-07-27", "2022-07-28", "2022-07-29", "2022-08-01", "2022-08-02", "2022-08-03", "2022-08-04", "2022-08-05", "2022-08-08", "2022-08-09", "2022-08-10", "2022-08-11", "2022-08-12", "2022-08-15", "2022-08-16", "2022-08-17", "2022-08-18", "2022-08-19", "2022-08-22", "2022-08-23", "2022-08-24", "2022-08-25", "2022-08-26", "2022-08-29", "2022-08-30", "2022-08-31", "2022-09-01", "2022-09-02", "2022-09-05", "2022-09-06", "2022-09-07", "2022-09-08", "2022-09-09", "2022-09-13", "2022-09-14", "2022-09-15", "2022-09-16", "2022-09-19", "2022-09-20", "2022-09-21", "2022-09-22", "2022-09-23", "2022-09-26", "2022-09-27", "2022-09-28", "2022-09-29", "2022-09-30", "2022-10-10", "2022-10-11", "2022-10-12", "2022-10-13", "2022-10-14", "2022-10-17", "2022-10-18", "2022-10-19", "2022-10-20", "2022-10-21", "2022-10-24", "2022-10-25", "2022-10-26", "2022-10-27", "2022-10-28", "2022-10-31", "2022-11-01", "2022-11-02", "2022-11-03", "2022-11-04", "2022-11-07", "2022-11-08", "2022-11-09", "2022-11-10", "2022-11-11", "2022-11-14", "2022-11-15", "2022-11-16", "2022-11-17", "2022-11-18", "2022-11-21", "2022-11-22", "2022-11-23", "2022-11-24", "2022-11-25", "2022-11-28", "2022-11-29", "2022-11-30", "2022-12-01", "2022-12-02", "2022-12-05", "2022-12-06", "2022-12-07", "2022-12-08", "2022-12-09", "2022-12-12", "2022-12-13", "2022-12-14", "2022-12-15", "2022-12-16", "2022-12-19", "2022-12-20", "2022-12-21", "2022-12-22", "2022-12-23", "2022-12-26", "2022-12-27", "2022-12-28", "2022-12-29", "2022-12-30", "2023-01-03", "2023-01-04", "2023-01-05", "2023-01-06", "2023-01-09", "2023-01-10", "2023-01-11", "2023-01-12", "2023-01-13", "2023-01-16", "2023-01-17", "2023-01-18", "2023-01-19", "2023-01-20", "2023-01-30", "2023-01-31", "2023-02-01", "2023-02-02", "2023-02-03", "2023-02-06", "2023-02-07", "2023-02-08", "2023-02-09", "2023-02-10", "2023-02-13", "2023-02-14", "2023-02-15", "2023-02-16", "2023-02-17", "2023-02-20", "2023-02-21", "2023-02-22", "2023-02-23", "2023-02-24", "2023-02-27", "2023-02-28", "2023-03-01", "2023-03-02", "2023-03-03", "2023-03-06", "2023-03-07", "2023-03-08", "2023-03-09", "2023-03-10", "2023-03-13", "2023-03-14", "2023-03-15", "2023-03-16", "2023-03-17", "2023-03-20", "2023-03-21", "2023-03-22", "2023-03-23", "2023-03-24", "2023-03-27", "2023-03-28", "2023-03-29", "2023-03-30", "2023-03-31", "2023-04-03", "2023-04-04", "2023-04-06", "2023-04-07", "2023-04-10", "2023-04-11", "2023-04-12", "2023-04-13", "2023-04-14", "2023-04-17", "2023-04-18", "2023-04-19", "2023-04-20", "2023-04-21", "2023-04-24", "2023-04-25", "2023-04-26", "2023-04-27", "2023-04-28", "2023-05-04", "2023-05-05", "2023-05-08", "2023-05-09", "2023-05-10", "2023-05-11", "2023-05-12", "2023-05-15", "2023-05-16", "2023-05-17", "2023-05-18", "2023-05-19", "2023-05-22", "2023-05-23", "2023-05-24", "2023-05-25", "2023-05-26", "2023-05-29", "2023-05-30", "2023-05-31", "2023-06-01", "2023-06-02", "2023-06-05", "2023-06-06", "2023-06-07", "2023-06-08", "2023-06-09", "2023-06-12", "2023-06-13", "2023-06-14", "2023-06-15", "2023-06-16", "2023-06-19", "2023-06-20", "2023-06-21", "2023-06-26", "2023-06-27", "2023-06-28", "2023-06-29", "2023-06-30", "2023-07-03", "2023-07-04", "2023-07-05", "2023-07-06", "2023-07-07", "2023-07-10", "2023-07-11", "2023-07-12", "2023-07-13", "2023-07-14", "2023-07-17", "2023-07-18", "2023-07-19", "2023-07-20", "2023-07-21", "2023-07-24", "2023-07-25", "2023-07-26", "2023-07-27", "2023-07-28", "2023-07-31", "2023-08-01", "2023-08-02", "2023-08-03", "2023-08-04", "2023-08-07", "2023-08-08", "2023-08-09", "2023-08-10", "2023-08-11", "2023-08-14", "2023-08-15", "2023-08-16", "2023-08-17", "2023-08-18", "2023-08-21", "2023-08-22", "2023-08-23", "2023-08-24", "2023-08-25", "2023-08-28", "2023-08-29", "2023-08-30", "2023-08-31", "2023-09-01", "2023-09-04", "2023-09-05", "2023-09-06", "2023-09-07", "2023-09-08", "2023-09-11", "2023-09-12", "2023-09-13", "2023-09-14", "2023-09-15", "2023-09-18", "2023-09-19", "2023-09-20", "2023-09-21", "2023-09-22", "2023-09-25", "2023-09-26", "2023-09-27", "2023-09-28", "2023-10-09", "2023-10-10", "2023-10-11", "2023-10-12", "2023-10-13", "2023-10-16", "2023-10-17", "2023-10-18", "2023-10-19", "2023-10-20", "2023-10-23", "2023-10-24", "2023-10-25", "2023-10-26", "2023-10-27", "2023-10-30", "2023-10-31", "2023-11-01", "2023-11-02", "2023-11-03", "2023-11-06", "2023-11-07", "2023-11-08", "2023-11-09", "2023-11-10", "2023-11-13", "2023-11-14", "2023-11-15", "2023-11-16", "2023-11-17", "2023-11-20", "2023-11-21", "2023-11-22", "2023-11-23", "2023-11-24", "2023-11-27", "2023-11-28", "2023-11-29", "2023-11-30", "2023-12-01", "2023-12-04", "2023-12-05", "2023-12-06", "2023-12-07", "2023-12-08", "2023-12-11", "2023-12-12", "2023-12-13", "2023-12-14", "2023-12-15", "2023-12-18", "2023-12-19", "2023-12-20", "2023-12-21", "2023-12-22", "2023-12-25", "2023-12-26", "2023-12-27", "2023-12-28", "2023-12-29", "2024-01-02", "2024-01-03", "2024-01-04", "2024-01-05", "2024-01-08", "2024-01-09", "2024-01-10", "2024-01-11", "2024-01-12", "2024-01-15", "2024-01-16", "2024-01-17", "2024-01-18", "2024-01-19", "2024-01-22", "2024-01-23", "2024-01-24", "2024-01-25", "2024-01-26", "2024-01-29", "2024-01-30", "2024-01-31", "2024-02-01", "2024-02-02", "2024-02-05", "2024-02-06", "2024-02-07", "2024-02-08", "2024-02-19", "2024-02-20", "2024-02-21", "2024-02-22", "2024-02-23", "2024-02-26", "2024-02-27", "2024-02-28", "2024-02-29", "2024-03-01", "2024-03-04", "2024-03-05", "2024-03-06", "2024-03-07", "2024-03-08", "2024-03-11", "2024-03-12", "2024-03-13", "2024-03-14", "2024-03-15", "2024-03-18", "2024-03-19", "2024-03-20", "2024-03-21", "2024-03-22", "2024-03-25", "2024-03-26", "2024-03-27", "2024-03-28", "2024-03-29", "2024-04-01", "2024-04-02", "2024-04-03", "2024-04-08", "2024-04-09", "2024-04-10", "2024-04-11", "2024-04-12", "2024-04-15", "2024-04-16", "2024-04-17", "2024-04-18", "2024-04-19", "2024-04-22", "2024-04-23", "2024-04-24", "2024-04-25", "2024-04-26", "2024-04-29", "2024-04-30", "2024-05-06", "2024-05-07", "2024-05-08", "2024-05-09", "2024-05-10", "2024-05-13", "2024-05-14", "2024-05-15", "2024-05-16", "2024-05-17", "2024-05-20", "2024-05-21", "2024-05-22", "2024-05-23", "2024-05-24", "2024-05-27", "2024-05-28", "2024-05-29", "2024-05-30", "2024-05-31", "2024-06-03", "2024-06-04", "2024-06-05", "2024-06-06", "2024-06-07", "2024-06-11", "2024-06-12", "2024-06-13", "2024-06-14", "2024-06-17", "2024-06-18", "2024-06-19", "2024-06-20", "2024-06-21", "2024-06-24", "2024-06-25", "2024-06-26", "2024-06-27", "2024-06-28", "2024-07-01", "2024-07-02", "2024-07-03", "2024-07-04", "2024-07-05", "2024-07-08", "2024-07-09", "2024-07-10", "2024-07-11", "2024-07-12", "2024-07-15", "2024-07-16", "2024-07-17", "2024-07-18", "2024-07-19", "2024-07-22", "2024-07-23", "2024-07-24", "2024-07-25", "2024-07-26", "2024-07-29", "2024-07-30", "2024-07-31", "2024-08-01", "2024-08-02", "2024-08-05", "2024-08-06", "2024-08-07", "2024-08-08", "2024-08-09", "2024-08-12", "2024-08-13", "2024-08-14", "2024-08-15", "2024-08-16", "2024-08-19", "2024-08-20", "2024-08-21", "2024-08-22", "2024-08-23", "2024-08-26", "2024-08-27", "2024-08-28", "2024-08-29", "2024-08-30", "2024-09-02", "2024-09-03", "2024-09-04", "2024-09-05", "2024-09-06", "2024-09-09", "2024-09-10", "2024-09-11", "2024-09-12", "2024-09-13", "2024-09-18", "2024-09-19", "2024-09-20", "2024-09-23", "2024-09-24", "2024-09-25", "2024-09-26", "2024-09-27", "2024-09-30", "2024-10-08", "2024-10-09", "2024-10-10", "2024-10-11", "2024-10-14", "2024-10-15", "2024-10-16", "2024-10-17", "2024-10-18", "2024-10-21", "2024-10-22", "2024-10-23", "2024-10-24", "2024-10-25", "2024-10-28", "2024-10-29", "2024-10-30", "2024-10-31", "2024-11-01", "2024-11-04", "2024-11-05", "2024-11-06", "2024-11-07", "2024-11-08", "2024-11-11", "2024-11-12", "2024-11-13", "2024-11-14", "2024-11-15", "2024-11-18", "2024-11-19", "2024-11-20", "2024-11-21", "2024-11-22", "2024-11-25", "2024-11-26", "2024-11-27", "2024-11-28", "2024-11-29", "2024-12-02", "2024-12-03", "2024-12-04", "2024-12-05", "2024-12-06", "2024-12-09", "2024-12-10", "2024-12-11", "2024-12-12", "2024-12-13", "2024-12-16", "2024-12-17", "2024-12-18", "2024-12-19", "2024-12-20", "2024-12-23", "2024-12-24", "2024-12-25", "2024-12-26", "2024-12-27", "2024-12-30", "2024-12-31", "2025-01-02", "2025-01-03", "2025-01-06", "2025-01-07", "2025-01-08", "2025-01-09", "2025-01-10", "2025-01-13", "2025-01-14", "2025-01-15", "2025-01-16", "2025-01-17", "2025-01-20", "2025-01-21", "2025-01-22", "2025-01-23", "2025-01-24", "2025-01-27", "2025-02-05", "2025-02-06", "2025-02-07", "2025-02-10", "2025-02-11", "2025-02-12", "2025-02-13", "2025-02-14", "2025-02-17", "2025-02-18", "2025-02-19", "2025-02-20", "2025-02-21", "2025-02-24", "2025-02-25", "2025-02-26", "2025-02-27", "2025-02-28", "2025-03-03", "2025-03-04", "2025-03-05", "2025-03-06", "2025-03-07", "2025-03-10", "2025-03-11", "2025-03-12", "2025-03-13", "2025-03-14", "2025-03-17", "2025-03-18", "2025-03-19", "2025-03-20", "2025-03-21", "2025-03-24", "2025-03-25", "2025-03-26", "2025-03-27", "2025-03-28", "2025-03-31", "2025-04-01", "2025-04-02", "2025-04-03", "2025-04-07", "2025-04-08", "2025-04-09", "2025-04-10", "2025-04-11", "2025-04-14", "2025-04-15", "2025-04-16", "2025-04-17", "2025-04-18", "2025-04-21", "2025-04-22", "2025-04-23", "2025-04-24", "2025-04-25", "2025-04-28", "2025-04-29", "2025-04-30", "2025-05-06", "2025-05-07", "2025-05-08", "2025-05-09", "2025-05-12", "2025-05-13", "2025-05-14", "2025-05-15", "2025-05-16", "2025-05-19", "2025-05-20", "2025-05-21", "2025-05-22", "2025-05-23", "2025-05-26", "2025-05-27", "2025-05-28", "2025-05-29", "2025-05-30", "2025-06-03", "2025-06-04", "2025-06-05", "2025-06-06", "2025-06-09", "2025-06-10", "2025-06-11", "2025-06-12", "2025-06-13", "2025-06-16", "2025-06-17", "2025-06-18", "2025-06-19", "2025-06-20", "2025-06-23", "2025-06-24", "2025-06-25", "2025-06-26", "2025-06-27", "2025-06-30", "2025-07-01", "2025-07-02", "2025-07-03", "2025-07-04", "2025-07-07", "2025-07-08", "2025-07-09", "2025-07-10", "2025-07-11", "2025-07-14", "2025-07-15", "2025-07-16", "2025-07-17", "2025-07-18", "2025-07-21", "2025-07-22", "2025-07-23", "2025-07-24", "2025-07-25", "2025-07-28", "2025-07-29", "2025-07-30", "2025-07-31", "2025-08-01", "2025-08-04", "2025-08-05", "2025-08-06", "2025-08-07", "2025-08-08", "2025-08-11", "2025-08-12", "2025-08-13", "2025-08-14", "2025-08-15", "2025-08-18", "2025-08-19", "2025-08-20", "2025-08-21", "2025-08-22", "2025-08-25", "2025-08-26", "2025-08-27", "2025-08-28", "2025-08-29", "2025-09-01", "2025-09-02", "2025-09-03", "2025-09-04", "2025-09-05", "2025-09-08", "2025-09-09", "2025-09-10", "2025-09-11", "2025-09-12", "2025-09-15", "2025-09-16", "2025-09-17", "2025-09-18", "2025-09-19", "2025-09-22", "2025-09-23", "2025-09-24", "2025-09-25", "2025-09-26", "2025-09-29", "2025-09-30", "2025-10-09", "2025-10-10", "2025-10-13", "2025-10-14", "2025-10-15", "2025-10-16", "2025-10-17", "2025-10-20", "2025-10-21", "2025-10-22", "2025-10-23", "2025-10-24", "2025-10-27", "2025-10-28", "2025-10-29", "2025-10-30", "2025-10-31", "2025-11-03", "2025-11-04", "2025-11-05", "2025-11-06", "2025-11-07", "2025-11-10", "2025-11-11", "2025-11-12", "2025-11-13", "2025-11-14", "2025-11-17", "2025-11-18", "2025-11-19", "2025-11-20", "2025-11-21", "2025-11-24", "2025-11-25", "2025-11-26", "2025-11-27", "2025-11-28", "2025-12-01", "2025-12-02", "2025-12-03", "2025-12-04", "2025-12-05", "2025-12-08", "2025-12-09", "2025-12-10", "2025-12-11", "2025-12-12", "2025-12-15", "2025-12-16", "2025-12-17", "2025-12-18", "2025-12-19", "2025-12-22", "2025-12-23", "2025-12-24", "2025-12-25", "2025-12-26", "2025-12-29", "2025-12-30", "2025-12-31", "2026-01-05", "2026-01-06", "2026-01-07", "2026-01-08", "2026-01-09", "2026-01-12", "2026-01-13", "2026-01-14", "2026-01-15", "2026-01-16", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07", "2026-08-10", "2026-08-11", "2026-08-12", "2026-08-13", "2026-08-14", "2026-08-17", "2026-08-18", "2026-08-19", "2026-08-20", "2026-08-21", "2026-08-24", "2026-08-25", "2026-08-26", "2026-08-27", "2026-08-28", "2026-08-31", "2026-09-01", "2026-09-02", "2026-09-03", "2026-09-04", "2026-09-07", "2026-09-08", "2026-09-09", "2026-09-10", "2026-09-11", "2026-09-14", "2026-09-15", "2026-09-16", "2026-09-17", "2026-09-18", "2026-09-21", "2026-09-22", "2026-09-23", "2026-09-24", "2026-09-28", "2026-09-29", "2026-09-30", "2026-10-08", "2026-10-09", "2026-10-12", "2026-10-13", "2026-10-14", "2026-10-15", "2026-10-16", "2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22", "2026-10-23", "2026-10-26", "2026-10-27", "2026-10-28", "2026-10-29", "2026-10-30", "2026-11-02", "2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06", "2026-11-09"], "hs300_points": [4152.24, 4144.96, 4129.3, 4160.23, 4112.32, 4164.37, 4163.18, 4203.99, 4189.89, 4166.73, 4149.04, 4154.85, 4185.83, 4114.31, 4131.93, 4003.9, 3688.36, 3785.64, 3828.53, 3899.78, 3899.87, 3916.01, 3952.46, 3984.43, 3959.92, 3987.73, 4077.42, 4057.51, 4051.31, 4144.66, 4149.49, 4132.84, 4123.85, 4073.02, 4084.88, 3940.05, 4069.67, 4091.36, 4115.05, 4206.73, 4138.51, 3997.13, 4082.73, 4028.43, 3950.91, 3895.31, 3727.84, 3709.68, 3636.26, 3589.09, 3653.22, 3530.31, 3625.11, 3722.52, 3698.05, 3710.06, 3674.11, 3686.16, 3675.08, 3734.53, 3713.22, 3798.02, 3780.34, 3792.81, 3769.18, 3753.26, 3825.7, 3797.36, 3802.38, 3839.49, 3853.46, 3808.05, 3839.38, 3829.75, 3796.97, 3822.77, 3849.15, 3867.03, 3912.58, 3936.25, 3924.89, 3963.62, 3960.18, 3960.24, 3968.25, 3925.22, 3912.82, 3922.91, 3956.25, 3935.22, 3913.79, 3824.06, 3829.32, 3872.77, 3845.61, 3856.63, 3867.02, 3971.34, 3983.57, 3983.65, 3982.19, 4001.25, 4021.95, 4047.03, 4039.71, 3995.88, 4003.08, 3954.99, 4014.57, 4017.59, 4044.38, 4098.71, 4102.05, 4121.79, 4138.99, 4109.72, 4163.96, 4247.78, 4335.84, 4419.6, 4670.09, 4698.13, 4774.0, 4840.77, 4753.13, 4852.96, 4806.69, 4744.47, 4516.25, 4544.7, 4680.3, 4691.04, 4714.45, 4712.44, 4505.59, 4528.45, 4568.26, 4679.01, 4656.15, 4695.05, 4771.31, 4775.8, 4777.11, 4762.76, 4707.93, 4724.87, 4681.78, 4647.64, 4635.71, 4704.63, 4815.23, 4812.76, 4740.68, 4679.15, 4718.84, 4755.85, 4761.95, 4706.13, 4731.35, 4844.27, 4816.22, 4842.12, 4843.89, 4817.1, 4770.22, 4669.37, 4694.39, 4584.59, 4581.98, 4627.28, 4651.05, 4688.48, 4657.36, 4632.71, 4737.09, 4691.43, 4635.76, 4652.33, 4563.07, 4570.02, 4581.91, 4591.8, 4587.4, 4681.14, 4823.16, 4839.2, 4807.1, 4798.74, 4791.68, 4755.49, 4793.47, 4792.83, 4777.98, 4718.49, 4691.24, 4699.28, 4737.27, 4772.92, 4695.33, 4720.83, 4777.56, 4813.66, 4885.11, 4885.72, 4981.35, 4953.88, 4904.9, 4908.46, 4856.85, 4904.17, 4894.79, 4891.67, 4927.99, 4943.29, 5005.03, 4974.29, 4910.7, 4919.59, 4980.77, 4960.25, 5067.1, 5067.14, 5057.06, 5065.92, 5022.24, 5009.88, 4942.7, 4940.52, 4889.63, 4934.84, 4945.1, 4953.87, 5017.48, 4999.97, 5046.84, 4964.77, 5007.12, 5000.02, 5042.01, 5064.41, 5042.94, 5113.71, 5211.29, 5267.72, 5368.5, 5417.67, 5513.66, 5495.43, 5441.16, 5596.35, 5577.97, 5470.46, 5458.08, 5518.52, 5437.52, 5476.43, 5564.97, 5569.78, 5625.92, 5512.97, 5528.0, 5377.14, 5351.96, 5417.65, 5501.09, 5485.2, 5473.95, 5483.41, 5564.56, 5686.25, 5807.72, 5768.38, 5778.84, 5597.33, 5579.67, 5437.57, 5469.56, 5336.76, 5418.78, 5349.63, 5452.21, 5280.71, 5262.8, 5080.02, 4971.0, 5003.61, 5128.22, 5146.38, 5035.54, 5079.36, 5100.86, 5141.77, 5007.09, 5057.15, 5009.25, 4928.69, 4926.35, 5037.99, 5046.88, 5094.73, 5048.36, 5110.78, 5161.56, 5140.34, 5103.74, 5112.21, 5035.34, 4947.75, 4939.64, 4980.63, 4948.97, 4966.18, 5087.02, 5083.37, 5098.74, 5089.24, 5135.45, 5077.24, 5090.52, 5119.24, 5164.17, 5123.49, 5061.12, 4996.05, 4992.42, 5023.06, 5044.55, 4992.97, 5110.59, 5184.99, 5187.6, 5172.27, 5186.41, 5134.15, 5155.59, 5318.48, 5320.59, 5338.23, 5321.09, 5331.57, 5341.68, 5289.97, 5255.29, 5282.28, 5277.63, 5232.12, 5236.45, 5271.47, 5224.7, 5166.56, 5080.49, 5101.89, 5102.47, 5090.39, 5122.16, 5147.39, 5155.97, 5239.97, 5251.76, 5190.54, 5224.04, 5229.66, 5081.12, 5085.79, 5083.1, 5140.49, 5088.26, 5069.44, 5132.71, 5142.1, 5083.08, 5151.46, 5094.77, 5113.49, 5108.99, 5144.04, 5151.75, 5089.23, 4925.3, 4751.31, 4760.48, 4850.27, 4811.17, 4933.74, 4934.46, 4978.85, 4948.67, 4921.56, 4985.56, 5043.15, 5015.34, 4973.35, 4945.98, 4941.07, 4837.4, 4894.24, 4862.14, 4769.27, 4835.88, 4888.39, 4898.16, 4801.61, 4827.04, 4813.27, 4805.61, 4869.46, 4869.41, 4843.06, 4933.73, 4992.83, 4972.13, 4970.01, 5013.52, 4991.66, 4917.16, 4867.32, 4807.7, 4855.94, 4821.77, 4853.2, 4849.43, 4877.37, 4883.83, 4833.93, 4866.38, 4929.94, 4936.19, 4883.84, 4940.11, 4913.61, 4932.11, 4874.78, 4922.72, 4910.18, 4928.02, 4959.73, 4979.52, 4963.1, 4898.16, 4864.14, 4908.77, 4890.69, 4839.85, 4821.11, 4868.74, 4842.35, 4848.18, 4846.74, 4821.19, 4898.65, 4888.37, 4882.38, 4883.32, 4885.75, 4837.62, 4890.06, 4912.4, 4913.35, 4916.66, 4896.44, 4860.13, 4851.42, 4832.03, 4843.85, 4856.16, 4901.02, 4892.62, 4922.1, 4995.93, 5078.69, 5055.12, 5083.8, 5049.7, 5005.9, 5034.73, 4954.76, 4880.42, 4913.49, 4914.45, 4948.74, 4921.34, 4919.32, 4955.96, 4883.48, 4921.51, 4940.37, 4917.77, 4868.12, 4818.23, 4822.37, 4844.05, 4797.77, 4845.58, 4765.92, 4726.73, 4767.28, 4813.35, 4780.38, 4823.51, 4779.31, 4786.74, 4678.45, 4712.31, 4619.88, 4563.77, 4634.09, 4608.77, 4652.06, 4639.86, 4601.4, 4551.69, 4600.1, 4617.99, 4629.16, 4651.24, 4634.31, 4574.15, 4623.05, 4529.32, 4573.42, 4581.65, 4619.69, 4578.6, 4551.63, 4496.43, 4352.78, 4265.39, 4226.35, 4292.84, 4306.52, 4174.76, 3983.81, 4156.08, 4237.7, 4265.9, 4258.75, 4255.3, 4276.52, 4251.31, 4174.57, 4148.47, 4134.14, 4254.1, 4222.6, 4276.16, 4263.84, 4209.1, 4230.77, 4100.07, 4179.97, 4139.74, 4191.57, 4188.75, 4166.38, 4134.9, 4070.79, 3995.83, 4013.25, 3814.91, 3784.12, 3895.54, 3921.11, 4016.24, 4010.21, 3908.82, 3877.44, 3919.87, 3976.42, 3958.74, 3988.6, 3956.54, 4005.89, 3991.91, 3999.6, 4077.6, 4053.98, 3959.15, 3983.18, 3993.04, 4001.3, 4029.02, 4091.52, 4083.18, 4089.57, 4166.09, 4179.13, 4219.81, 4175.67, 4238.99, 4189.35, 4222.31, 4278.22, 4250.06, 4309.04, 4330.43, 4325.57, 4270.62, 4343.88, 4394.77, 4444.26, 4490.52, 4421.36, 4485.01, 4466.72, 4496.03, 4489.54, 4423.97, 4443.47, 4428.78, 4354.62, 4313.62, 4321.46, 4322.07, 4248.53, 4292.59, 4269.34, 4283.8, 4236.06, 4238.23, 4212.64, 4245.98, 4225.04, 4225.67, 4170.1, 4188.68, 4107.02, 4066.98, 4101.54, 4156.91, 4148.07, 4156.29, 4109.74, 4193.54, 4191.15, 4185.68, 4177.84, 4216.96, 4180.1, 4151.07, 4181.4, 4161.08, 4082.42, 4116.24, 4107.55, 4089.52, 4075.79, 4078.84, 4043.74, 4023.61, 4015.43, 4052.28, 4054.98, 4037.68, 4093.79, 4111.11, 4065.36, 4027.12, 3932.68, 3928.0, 3932.84, 3903.73, 3869.34, 3856.02, 3836.68, 3892.3, 3828.71, 3827.14, 3804.89, 3720.94, 3727.69, 3784.31, 3752.67, 3842.47, 3846.41, 3838.27, 3776.53, 3754.93, 3742.89, 3633.37, 3627.45, 3656.9, 3631.14, 3541.33, 3508.7, 3634.17, 3677.81, 3647.9, 3767.17, 3775.3, 3749.33, 3714.27, 3685.69, 3788.44, 3794.02, 3865.97, 3834.39, 3818.66, 3801.57, 3769.13, 3769.57, 3773.53, 3756.81, 3775.78, 3733.24, 3848.42, 3853.04, 3894.77, 3870.95, 3946.88, 3968.2, 3958.44, 3959.18, 3998.24, 3953.44, 3945.68, 3954.89, 3951.99, 3954.23, 3893.22, 3829.02, 3830.54, 3836.03, 3828.22, 3843.49, 3887.85, 3871.26, 3856.7, 3871.63, 3887.9, 3892.95, 3968.58, 3980.89, 4013.12, 4017.47, 4010.03, 4017.87, 4074.38, 4137.96, 4137.24, 4130.31, 4156.01, 4181.53, 4201.35, 4156.86, 4195.93, 4181.15, 4141.63, 4086.88, 4094.23, 4076.14, 4130.86, 4106.31, 4143.57, 4145.29, 4123.69, 4093.49, 4034.51, 4133.49, 4144.35, 4106.95, 4103.65, 4061.05, 4043.84, 4069.46, 4126.94, 4117.74, 4130.55, 4109.01, 4048.85, 4034.11, 4019.85, 3967.14, 4008.69, 3984.7, 3986.9, 3939.15, 3958.82, 3939.08, 3982.38, 3999.44, 4039.09, 4027.05, 4012.48, 3999.51, 4006.14, 4038.53, 4050.93, 4090.57, 4103.11, 4096.64, 4123.28, 4104.81, 4100.15, 4097.29, 4068.98, 4092.0, 4149.38, 4162.03, 4124.56, 4113.02, 4032.57, 3982.64, 3962.67, 3959.23, 3988.42, 4029.09, 4030.25, 4016.88, 4062.66, 4027.88, 3996.87, 3990.66, 3937.76, 3998.89, 3978.21, 3960.17, 3956.07, 3944.54, 3969.33, 3913.19, 3859.09, 3850.5, 3850.95, 3833.94, 3837.75, 3798.54, 3806.87, 3861.83, 3844.25, 3808.16, 3789.34, 3820.19, 3836.7, 3844.43, 3864.91, 3864.02, 3925.5, 3963.35, 3930.91, 3924.24, 3864.03, 3809.7, 3845.43, 3840.8, 3821.84, 3842.45, 3892.88, 3899.01, 3868.81, 3842.75, 3825.7, 3844.33, 3869.49, 3843.44, 3898.42, 3899.1, 3867.17, 3854.94, 3850.87, 3823.69, 3821.91, 3805.22, 3915.12, 3907.01, 3902.35, 3992.74, 4014.63, 3998.0, 3969.9, 4004.98, 4020.58, 3990.15, 3979.73, 3967.57, 3975.72, 3884.25, 3855.91, 3846.54, 3818.33, 3831.1, 3784.0, 3729.56, 3758.23, 3696.63, 3723.43, 3709.15, 3752.62, 3790.11, 3788.51, 3765.27, 3791.49, 3848.95, 3820.32, 3812.03, 3758.47, 3739.99, 3767.54, 3760.6, 3736.65, 3733.51, 3708.78, 3727.71, 3720.5, 3705.69, 3672.44, 3738.93, 3714.6, 3692.89, 3700.5, 3689.52, 3684.73, 3657.13, 3667.55, 3702.38, 3663.41, 3626.6, 3639.4, 3610.58, 3533.54, 3510.59, 3474.24, 3487.13, 3504.46, 3514.14, 3562.39, 3583.77, 3572.51, 3571.03, 3554.19, 3584.14, 3632.61, 3619.76, 3611.07, 3612.83, 3586.49, 3579.41, 3582.06, 3607.25, 3572.36, 3568.07, 3576.32, 3581.07, 3544.42, 3561.52, 3538.01, 3511.94, 3518.52, 3488.31, 3496.2, 3482.88, 3460.14, 3394.26, 3399.6, 3391.28, 3399.46, 3419.45, 3426.8, 3369.61, 3351.96, 3341.55, 3329.37, 3334.04, 3297.5, 3330.87, 3337.23, 3347.45, 3324.79, 3336.36, 3414.54, 3431.11, 3386.35, 3378.3, 3347.05, 3329.11, 3286.06, 3292.5, 3277.13, 3295.67, 3284.17, 3280.92, 3300.88, 3229.08, 3274.73, 3269.78, 3218.9, 3231.93, 3277.11, 3342.92, 3333.82, 3303.96, 3245.04, 3215.35, 3217.71, 3179.63, 3200.42, 3311.69, 3343.63, 3364.93, 3403.81, 3410.85, 3456.87, 3486.67, 3489.74, 3453.36, 3494.79, 3450.26, 3516.08, 3537.8, 3540.87, 3565.51, 3551.05, 3529.72, 3544.91, 3589.26, 3597.49, 3572.36, 3562.22, 3569.99, 3603.53, 3577.63, 3585.38, 3581.09, 3545.0, 3525.76, 3543.75, 3502.79, 3520.96, 3537.48, 3595.65, 3580.68, 3567.8, 3536.41, 3533.49, 3504.71, 3504.24, 3475.84, 3549.08, 3511.11, 3565.4, 3569.8, 3541.66, 3530.9, 3506.22, 3521.62, 3530.28, 3584.27, 3623.91, 3604.39, 3657.88, 3659.01, 3630.22, 3664.56, 3666.28, 3664.69, 3657.05, 3626.06, 3640.36, 3677.97, 3690.96, 3676.16, 3684.45, 3641.79, 3601.48, 3635.71, 3609.17, 3613.52, 3594.31, 3579.92, 3588.75, 3615.67, 3594.79, 3592.25, 3574.11, 3542.88, 3544.12, 3526.13, 3541.53, 3536.2, 3545.59, 3528.75, 3503.28, 3495.62, 3476.81, 3457.9, 3480.26, 3454.12, 3461.66, 3478.18, 3471.79, 3463.41, 3445.81, 3431.06, 3401.76, 3439.81, 3428.97, 3468.17, 3472.4, 3476.25, 3498.28, 3501.58, 3520.93, 3539.02, 3514.92, 3439.88, 3418.17, 3399.27, 3409.29, 3390.74, 3369.38, 3442.08, 3419.27, 3384.39, 3343.32, 3342.98, 3341.49, 3342.94, 3331.63, 3325.86, 3334.39, 3309.24, 3341.95, 3345.63, 3356.97, 3332.7, 3321.64, 3313.14, 3327.19, 3324.22, 3305.33, 3286.5, 3277.68, 3321.43, 3265.01, 3273.43, 3252.16, 3257.76, 3231.35, 3192.95, 3195.76, 3186.13, 3172.47, 3159.25, 3171.01, 3196.04, 3201.05, 3212.76, 3351.91, 3401.53, 3545.32, 3703.68, 4017.85, 4256.1, 3955.98, 3997.79, 3887.17, 3961.34, 3855.99, 3831.59, 3788.22, 3925.23, 3935.2, 3957.78, 3973.21, 3928.83, 3956.42, 3964.16, 3924.65, 3889.45, 3891.04, 3890.02, 3944.76, 4044.57, 4024.28, 4145.7, 4104.05, 4131.13, 4085.74, 4110.89, 4039.62, 3968.83, 3950.38, 3976.89, 3985.77, 3989.3, 3865.7, 3848.09, 3840.18, 3907.04, 3872.55, 3916.58, 3947.63, 3951.89, 3930.56, 3921.59, 3973.14, 3966.57, 3995.64, 3988.83, 4028.5, 3933.18, 3911.84, 3922.03, 3941.89, 3945.46, 3927.74, 3933.57, 3983.69, 3985.63, 3987.48, 3981.03, 3999.05, 3934.91, 3820.4, 3775.16, 3768.97, 3796.11, 3789.22, 3779.88, 3732.48, 3722.51, 3820.54, 3796.03, 3800.38, 3812.34, 3829.68, 3832.61, 3797.02, 3803.74, 3832.86, 3817.08, 3795.08, 3842.83, 3892.7, 3901.06, 3883.14, 3919.86, 3905.14, 3939.01, 3947.4, 3912.78, 3940.16, 3928.9, 3978.44, 3969.72, 3925.65, 3959.94, 3968.12, 3890.05, 3888.47, 3885.22, 3902.57, 3956.24, 3944.01, 3928.8, 3941.42, 3927.23, 3911.58, 4006.56, 3996.79, 4007.72, 4010.17, 3974.99, 3914.7, 3934.85, 3932.3, 3919.36, 3932.41, 3915.17, 3887.31, 3887.68, 3884.39, 3861.5, 3589.44, 3650.76, 3686.79, 3735.12, 3750.52, 3759.14, 3761.23, 3772.82, 3772.22, 3772.52, 3784.88, 3783.95, 3786.88, 3784.36, 3786.99, 3781.62, 3775.08, 3770.57, 3808.54, 3831.63, 3852.9, 3846.16, 3890.61, 3896.26, 3943.21, 3907.2, 3889.09, 3877.15, 3898.17, 3916.38, 3913.87, 3882.27, 3860.11, 3839.4, 3836.24, 3858.7, 3840.23, 3852.01, 3868.74, 3877.56, 3873.98, 3885.25, 3865.47, 3894.63, 3892.2, 3864.18, 3873.8, 3870.38, 3874.97, 3843.09, 3846.64, 3857.9, 3904.03, 3960.07, 3946.02, 3921.76, 3936.08, 3942.76, 3943.68, 3968.07, 3982.2, 3965.17, 3998.45, 3991.4, 4010.02, 4014.81, 4017.67, 4019.06, 4007.2, 4034.49, 4058.55, 4085.61, 4118.96, 4119.77, 4149.04, 4127.16, 4135.82, 4152.02, 4151.24, 4075.59, 4054.93, 4070.7, 4103.45, 4113.49, 4114.67, 4104.97, 4122.51, 4143.83, 4176.58, 4173.31, 4202.35, 4239.41, 4223.37, 4271.4, 4288.07, 4378.0, 4469.22, 4452.59, 4386.13, 4463.78, 4496.76, 4523.71, 4490.45, 4459.83, 4365.21, 4460.32, 4467.57, 4436.26, 4445.36, 4548.03, 4522.0, 4533.06, 4523.34, 4551.02, 4498.11, 4501.92, 4522.61, 4519.78, 4566.07, 4593.49, 4550.05, 4620.05, 4640.69, 4709.48, 4616.83, 4593.98, 4539.06, 4606.29, 4618.42, 4514.23, 4538.22, 4607.87, 4592.57, 4606.34, 4660.68, 4716.02, 4691.97, 4747.84, 4709.91, 4640.67, 4653.4, 4618.7, 4627.26, 4693.4, 4678.79, 4695.05, 4652.17, 4645.91, 4702.07, 4628.14, 4598.05, 4568.19, 4588.29, 4564.95, 4453.61, 4448.05, 4490.4, 4517.63, 4515.4, 4526.66, 4576.49, 4554.33, 4531.05, 4546.57, 4584.54, 4621.75, 4598.22, 4591.83, 4552.18, 4580.95, 4552.06, 4497.55, 4579.88, 4552.79, 4568.18, 4611.62, 4620.73, 4634.06, 4642.54, 4657.24, 4639.37, 4651.28, 4629.94, 4717.75, 4790.69, 4776.67, 4737.65, 4758.92, 4789.92, 4761.03, 4741.93, 4751.43, 4731.87, 4734.46, 4718.88, 4723.07, 4723.71, 4702.5, 4706.96, 4705.69, 4717.99, 4753.87, 4706.34, 4605.98, 4660.11, 4698.68, 4670.42, 4643.6, 4719.06, 4724.3, 4713.82, 4719.58, 4660.41, 4707.54, 4735.89, 4726.87, 4710.65, 4728.67, 4655.9, 4602.62, 4647.69, 4660.44, 4615.46, 4674.76, 4704.5, 4687.56, 4669.14, 4671.56, 4637.44, 4658.33, 4583.25, 4567.02, 4418.0, 4474.72, 4537.47, 4477.53, 4502.57, 4491.95, 4450.05, 4526.07, 4478.91, 4440.79, 4440.62, 4595.56, 4566.22, 4636.57, 4646.15, 4701.28, 4685.25, 4736.61, 4728.67, 4757.44, 4768.0, 4799.63, 4786.33, 4769.37, 4770.95, 4758.21, 4810.35, 4807.31, 4877.09, 4900.51, 4871.91, 4951.84, 4948.05, 4998.34, 4914.6, 4859.59, 4833.52, 4852.88, 4850.7, 4783.1, 4845.1, 4921.6, 4947.85, 4908.17, 4914.21, 4892.12, 4844.26, 4914.56, 4938.81, 4904.75, 4816.92, 4713.64, 4801.81, 4748.59, 4722.41, 4777.32, 4891.71, 4884.23, 4931.39, 4941.6, 5059.66, 4919.39, 4943.02, 5020.1, 4868.22, 4926.92, 4979.43, 4958.98, 4812.3, 4842.17, 4842.0, 4792.26, 4755.53, 4876.31, 4780.79, 4695.38, 4796.5, 4786.78, 4698.43, 4529.1, 4598.32, 4739.23, 4717.24, 4728.0, 4649.19, 4702.43, 4569.52, 4600.26, 4549.72, 4588.2, 4543.18, 4600.93, 4658.15, 4651.31, 4694.44, 4702.02, 4663.79, 4690.92, 4663.95, 4665.88, 4741.1, 4725.81, 4588.7, 4592.75, 4618.9, 4563.13, 4552.03, 4590.79, 4630.28, 4609.18, 4625.09, 4611.44, 4547.96, 4552.58, 4548.05, 4575.02, 4558.74, 4572.6, 4548.39, 4510.16, 4480.08, 4450.04, 4480.27, 4460.16, 4507.39, 4539.57, 4544.59, 4517.28, 4439.14, 4340.76, 4345.21, 4357.62, 4310.28, 4317.25, 4287.98, 4275.68, 4217.68, 4166.01, 4170.61, 4174.53, 4152.11, 4111.93, 4036.3, 4105.33, 4103.54, 4049.55, 4083.87, 4041.84, 3985.5, 4016.92, 4008.87, 4101.34, 4113.41, 4054.28, 4056.11], "ratios": [0.392, 0.392, 0.392, 0.392, 0.392, 0.394, 0.395, 0.396, 0.397, 0.398, 0.399, 0.398, 0.398, 0.398, 0.398, 0.398, 0.399, 0.397, 0.394, 0.391, 0.388, 0.385, 0.382, 0.379, 0.376, 0.373, 0.37, 0.367, 0.365, 0.365, 0.365, 0.364, 0.363, 0.363, 0.363, 0.365, 0.366, 0.37, 0.373, 0.377, 0.38, 0.384, 0.388, 0.391, 0.395, 0.398, 0.397, 0.398, 0.398, 0.399, 0.399, 0.399, 0.399, 0.399, 0.399, 0.399, 0.399, 0.399, 0.399, 0.399, 0.399, 0.399, 0.399, 0.399, 0.399, 0.399, 0.399, 0.399, 0.399, 0.398, 0.398, 0.398, 0.397, 0.394, 0.392, 0.392, 0.392, 0.392, 0.391, 0.39, 0.389, 0.388, 0.386, 0.385, 0.383, 0.381, 0.379, 0.377, 0.375, 0.372, 0.369, 0.366, 0.363, 0.36, 0.356, 0.353, 0.35, 0.347, 0.343, 0.34, 0.337, 0.334, 0.331, 0.327, 0.324, 0.323, 0.322, 0.32, 0.321, 0.322, 0.324, 0.327, 0.328, 0.331, 0.331, 0.33, 0.329, 0.327, 0.325, 0.323, 0.321, 0.319, 0.316, 0.314, 0.312, 0.31, 0.308, 0.306, 0.304, 0.302, 0.299, 0.297, 0.295, 0.293, 0.291, 0.289, 0.289, 0.289, 0.288, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.29, 0.291, 0.293, 0.293, 0.293, 0.293, 0.293, 0.293, 0.293, 0.294, 0.295, 0.296, 0.296, 0.295, 0.295, 0.294, 0.294, 0.293, 0.293, 0.292, 0.292, 0.291, 0.291, 0.29, 0.29, 0.289, 0.29, 0.29, 0.291, 0.291, 0.29, 0.29, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.29, 0.29, 0.29, 0.291, 0.291, 0.291, 0.292, 0.292, 0.292, 0.293, 0.293, 0.293, 0.294, 0.294, 0.294, 0.295, 0.295, 0.295, 0.296, 0.296, 0.296, 0.296, 0.296, 0.295, 0.294, 0.293, 0.292, 0.292, 0.291, 0.29, 0.289, 0.288, 0.287, 0.286, 0.286, 0.285, 0.284, 0.283, 0.283, 0.284, 0.284, 0.283, 0.282, 0.282, 0.282, 0.281, 0.28, 0.278, 0.276, 0.273, 0.271, 0.269, 0.269, 0.268, 0.265, 0.263, 0.26, 0.258, 0.255, 0.255, 0.255, 0.255, 0.255, 0.254, 0.254, 0.254, 0.254, 0.254, 0.254, 0.254, 0.254, 0.254, 0.254, 0.254, 0.254, 0.254, 0.255, 0.255, 0.255, 0.256, 0.257, 0.256, 0.255, 0.255, 0.255, 0.255, 0.255, 0.255, 0.255, 0.256, 0.256, 0.256, 0.255, 0.255, 0.255, 0.255, 0.254, 0.254, 0.254, 0.254, 0.255, 0.255, 0.256, 0.257, 0.257, 0.257, 0.257, 0.257, 0.255, 0.254, 0.253, 0.253, 0.254, 0.255, 0.256, 0.258, 0.259, 0.261, 0.262, 0.264, 0.265, 0.267, 0.269, 0.27, 0.272, 0.273, 0.275, 0.276, 0.278, 0.279, 0.279, 0.281, 0.282, 0.282, 0.282, 0.282, 0.282, 0.281, 0.281, 0.28, 0.28, 0.28, 0.28, 0.28, 0.276, 0.276, 0.276, 0.276, 0.274, 0.273, 0.272, 0.271, 0.27, 0.269, 0.268, 0.266, 0.265, 0.264, 0.263, 0.262, 0.261, 0.26, 0.258, 0.257, 0.256, 0.255, 0.254, 0.253, 0.251, 0.25, 0.249, 0.248, 0.247, 0.246, 0.245, 0.243, 0.242, 0.241, 0.24, 0.239, 0.238, 0.236, 0.235, 0.234, 0.233, 0.232, 0.231, 0.23, 0.228, 0.227, 0.227, 0.227, 0.227, 0.227, 0.227, 0.227, 0.227, 0.228, 0.229, 0.229, 0.23, 0.231, 0.231, 0.232, 0.233, 0.233, 0.234, 0.235, 0.235, 0.236, 0.237, 0.237, 0.238, 0.239, 0.239, 0.24, 0.241, 0.241, 0.242, 0.243, 0.243, 0.244, 0.245, 0.245, 0.246, 0.246, 0.247, 0.248, 0.248, 0.249, 0.25, 0.25, 0.251, 0.252, 0.252, 0.253, 0.254, 0.254, 0.255, 0.256, 0.256, 0.257, 0.258, 0.258, 0.259, 0.26, 0.26, 0.261, 0.262, 0.262, 0.263, 0.264, 0.264, 0.265, 0.266, 0.266, 0.267, 0.268, 0.268, 0.269, 0.27, 0.27, 0.271, 0.272, 0.272, 0.273, 0.273, 0.274, 0.275, 0.275, 0.276, 0.277, 0.277, 0.279, 0.28, 0.282, 0.284, 0.286, 0.288, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.289, 0.288, 0.287, 0.287, 0.286, 0.286, 0.285, 0.284, 0.284, 0.283, 0.282, 0.282, 0.281, 0.28, 0.28, 0.279, 0.279, 0.278, 0.277, 0.277, 0.276, 0.275, 0.275, 0.274, 0.274, 0.273, 0.272, 0.272, 0.271, 0.27, 0.27, 0.269, 0.269, 0.269, 0.269, 0.269, 0.269, 0.269, 0.269, 0.269, 0.269, 0.269, 0.269, 0.269, 0.269, 0.269, 0.269, 0.269, 0.269, 0.269, 0.269, 0.269, 0.269, 0.269, 0.269, 0.269, 0.271, 0.274, 0.277, 0.28, 0.283, 0.286, 0.289, 0.292, 0.294, 0.295, 0.296, 0.296, 0.295, 0.294, 0.293, 0.292, 0.291, 0.289, 0.288, 0.287, 0.286, 0.284, 0.283, 0.282, 0.282, 0.282, 0.282, 0.281, 0.28, 0.278, 0.275, 0.274, 0.273, 0.272, 0.27, 0.269, 0.268, 0.267, 0.265, 0.264, 0.263, 0.262, 0.262, 0.26, 0.258, 0.258, 0.258, 0.258, 0.257, 0.256, 0.256, 0.255, 0.255, 0.255, 0.256, 0.257, 0.258, 0.259, 0.26, 0.261, 0.262, 0.263, 0.264, 0.265, 0.267, 0.268, 0.269, 0.27, 0.271, 0.272, 0.273, 0.274, 0.275, 0.276, 0.277, 0.279, 0.28, 0.281, 0.282, 0.283, 0.284, 0.285, 0.286, 0.287, 0.288, 0.289, 0.29, 0.292, 0.293, 0.294, 0.295, 0.296, 0.297, 0.298, 0.299, 0.3, 0.301, 0.302, 0.303, 0.305, 0.306, 0.307, 0.308, 0.309, 0.31, 0.311, 0.312, 0.313, 0.314, 0.315, 0.316, 0.318, 0.319, 0.32, 0.321, 0.322, 0.323, 0.324, 0.325, 0.326, 0.327, 0.328, 0.33, 0.331, 0.332, 0.333, 0.334, 0.335, 0.336, 0.337, 0.338, 0.339, 0.34, 0.341, 0.343, 0.344, 0.345, 0.346, 0.347, 0.348, 0.349, 0.35, 0.351, 0.352, 0.353, 0.354, 0.356, 0.357, 0.358, 0.359, 0.36, 0.361, 0.362, 0.363, 0.364, 0.365, 0.366, 0.367, 0.369, 0.37, 0.371, 0.372, 0.373, 0.374, 0.375, 0.376, 0.377, 0.378, 0.379, 0.38, 0.382, 0.383, 0.384, 0.385, 0.385, 0.384, 0.384, 0.384, 0.384, 0.385, 0.386, 0.388, 0.389, 0.391, 0.393, 0.394, 0.396, 0.398, 0.399, 0.399, 0.398, 0.398, 0.398, 0.398, 0.396, 0.393, 0.391, 0.388, 0.385, 0.382, 0.379, 0.376, 0.373, 0.37, 0.367, 0.364, 0.361, 0.358, 0.355, 0.353, 0.351, 0.352, 0.352, 0.352, 0.351, 0.351, 0.35, 0.35, 0.349, 0.348, 0.348, 0.347, 0.347, 0.346, 0.345, 0.345, 0.344, 0.343, 0.343, 0.342, 0.341, 0.341, 0.34, 0.34, 0.339, 0.338, 0.338, 0.337, 0.336, 0.336, 0.335, 0.335, 0.334, 0.333, 0.333, 0.332, 0.331, 0.331, 0.331, 0.331, 0.331, 0.331, 0.334, 0.335, 0.334, 0.334, 0.334, 0.334, 0.334, 0.335, 0.336, 0.337, 0.337, 0.338, 0.34, 0.341, 0.342, 0.344, 0.345, 0.347, 0.348, 0.35, 0.351, 0.352, 0.354, 0.355, 0.357, 0.358, 0.36, 0.361, 0.362, 0.364, 0.365, 0.367, 0.368, 0.37, 0.371, 0.373, 0.374, 0.375, 0.377, 0.378, 0.38, 0.381, 0.383, 0.384, 0.385, 0.387, 0.388, 0.39, 0.391, 0.393, 0.394, 0.395, 0.397, 0.398, 0.4, 0.401, 0.403, 0.404, 0.405, 0.41, 0.416, 0.423, 0.43, 0.437, 0.444, 0.451, 0.458, 0.465, 0.472, 0.479, 0.486, 0.493, 0.5, 0.507, 0.514, 0.521, 0.528, 0.535, 0.542, 0.549, 0.556, 0.563, 0.57, 0.577, 0.578, 0.578, 0.578, 0.578, 0.578, 0.578, 0.578, 0.578, 0.578, 0.578, 0.578, 0.578, 0.579, 0.581, 0.583, 0.584, 0.586, 0.588, 0.59, 0.591, 0.593, 0.595, 0.596, 0.598, 0.6, 0.601, 0.603, 0.605, 0.605, 0.605, 0.607, 0.611, 0.614, 0.618, 0.622, 0.626, 0.629, 0.633, 0.637, 0.641, 0.644, 0.648, 0.652, 0.654, 0.653, 0.653, 0.652, 0.651, 0.651, 0.65, 0.65, 0.649, 0.648, 0.648, 0.647, 0.647, 0.647, 0.647, 0.647, 0.647, 0.647, 0.647, 0.646, 0.646, 0.645, 0.644, 0.644, 0.644, 0.645, 0.646, 0.653, 0.664, 0.675, 0.686, 0.697, 0.708, 0.719, 0.73, 0.742, 0.751, 0.754, 0.754, 0.756, 0.759, 0.761, 0.762, 0.768, 0.791, 0.815, 0.838, 0.861, 0.884, 0.907, 0.931, 0.954, 0.977, 1.0, 1.023, 1.047, 1.07, 1.093, 1.116, 1.139, 1.163, 1.186, 1.209, 1.232, 1.256, 1.279, 1.302, 1.325, 1.348, 1.372, 1.395, 1.406, 1.407, 1.408, 1.409, 1.412, 1.417, 1.422, 1.425, 1.426, 1.431, 1.447, 1.463, 1.479, 1.495, 1.506, 1.505, 1.505, 1.506, 1.507, 1.507, 1.507, 1.508, 1.507, 1.507, 1.506, 1.506, 1.505, 1.505, 1.504, 1.503, 1.503, 1.502, 1.502, 1.501, 1.501, 1.5, 1.5, 1.5, 1.499, 1.5, 1.5, 1.501, 1.503, 1.505, 1.507, 1.51, 1.51, 1.51, 1.51, 1.51, 1.51, 1.509, 1.506, 1.504, 1.501, 1.498, 1.496, 1.493, 1.49, 1.488, 1.486, 1.485, 1.484, 1.482, 1.481, 1.48, 1.479, 1.48, 1.48, 1.48, 1.479, 1.48, 1.487, 1.493, 1.499, 1.505, 1.512, 1.518, 1.524, 1.53, 1.536, 1.543, 1.549, 1.555, 1.561, 1.568, 1.574, 1.58, 1.593, 1.607, 1.621, 1.635, 1.649, 1.663, 1.678, 1.692, 1.706, 1.72, 1.734, 1.748, 1.762, 1.776, 1.79, 1.805, 1.819, 1.833, 1.847, 1.861, 1.875, 1.889, 1.903, 1.917, 1.932, 1.946, 1.96, 1.974, 1.988, 2.002, 2.016, 2.03, 2.044, 2.059, 2.073, 2.087, 2.101, 2.115, 2.129, 2.143, 2.157, 2.171, 2.186, 2.2, 2.214, 2.228, 2.242, 2.256, 2.27, 2.284, 2.298, 2.313, 2.327, 2.341, 2.355, 2.369, 2.383, 2.397, 2.411, 2.425, 2.44, 2.446, 2.448, 2.448, 2.449, 2.449, 2.449, 2.449, 2.447, 2.444, 2.441, 2.436, 2.429, 2.421, 2.413, 2.405, 2.397, 2.388, 2.38, 2.374, 2.373, 2.37, 2.367, 2.366, 2.364, 2.364, 2.362, 2.359, 2.353, 2.348, 2.343, 2.338, 2.333, 2.327, 2.322, 2.317, 2.312, 2.306, 2.301, 2.296, 2.291, 2.286, 2.285, 2.285, 2.285, 2.286, 2.287, 2.288, 2.289, 2.291, 2.292, 2.293, 2.293, 2.292, 2.291, 2.291, 2.29, 2.289, 2.287, 2.286, 2.286, 2.286, 2.286, 2.288, 2.289, 2.292, 2.294, 2.296, 2.298, 2.301, 2.303, 2.305, 2.305, 2.305, 2.305, 2.305, 2.305, 2.305, 2.301, 2.298, 2.298, 2.298, 2.295, 2.293, 2.292, 2.291, 2.291, 2.291, 2.287, 2.283, 2.278, 2.274, 2.269, 2.264, 2.26, 2.255, 2.251, 2.246, 2.242, 2.237, 2.232, 2.228, 2.223, 2.219, 2.214, 2.209, 2.205, 2.2, 2.196, 2.191, 2.187, 2.186, 2.184, 2.182, 2.179, 2.177, 2.175, 2.173, 2.174, 2.173, 2.172, 2.172, 2.172, 2.177, 2.287, 2.398, 2.508, 2.51, 2.504, 2.498, 2.502, 2.509, 2.509, 2.509, 2.51, 2.51, 2.509, 2.51, 2.51, 2.51, 2.508, 2.508, 2.507, 2.505, 2.503, 2.501, 2.499, 2.497, 2.495, 2.493, 2.491, 2.489, 2.487, 2.485, 2.483, 2.481, 2.479, 2.477, 2.475, 2.473, 2.471, 2.469, 2.467, 2.465, 2.463, 2.461, 2.459, 2.457, 2.454, 2.452, 2.45, 2.448, 2.446, 2.444, 2.442, 2.44, 2.438, 2.436, 2.434, 2.432, 2.43, 2.428, 2.426, 2.424, 2.422, 2.42, 2.418, 2.416, 2.414, 2.412, 2.41, 2.408, 2.406, 2.404, 2.401, 2.399, 2.397, 2.395, 2.393, 2.391, 2.389, 2.387, 2.385, 2.383, 2.381, 2.379, 2.377, 2.375, 2.372, 2.368, 2.369, 2.37, 2.37, 2.37, 2.37, 2.371, 2.371, 2.371, 2.371, 2.371, 2.371, 2.371, 2.371, 2.371, 2.371, 2.369, 2.369, 2.369, 2.368, 2.368, 2.367, 2.366, 2.366, 2.365, 2.361, 2.36, 2.36, 2.36, 2.36, 2.36, 2.36, 2.361, 2.361, 2.361, 2.362, 2.362, 2.363, 2.363, 2.364, 2.364, 2.365, 2.365, 2.365, 2.366, 2.366, 2.367, 2.367, 2.367, 2.366, 2.366, 2.366, 2.366, 2.367, 2.367, 2.368, 2.368, 2.368, 2.369, 2.365, 2.364, 2.363, 2.363, 2.363, 2.363, 2.363, 2.363, 2.364, 2.365, 2.367, 2.368, 2.369, 2.369, 2.37, 2.37, 2.37, 2.37, 2.369, 2.368, 2.367, 2.367, 2.367, 2.365, 2.364, 2.364, 2.364, 2.364, 2.364, 2.364, 2.364, 2.363, 2.363, 2.362, 2.361, 2.361, 2.36, 2.36, 2.36, 2.36, 2.36, 2.36, 2.36, 2.358, 2.357, 2.342, 2.245, 2.147, 2.05, 1.953, 1.855, 1.758, 1.661, 1.563, 1.466, 1.369, 1.271, 1.174, 1.161, 1.159, 1.156, 1.153, 1.15, 1.147, 1.145, 1.143, 1.141, 1.139, 1.137, 1.135, 1.133, 1.13, 1.128, 1.126, 1.124, 1.122, 1.12, 1.118, 1.116, 1.113, 1.111, 1.109, 1.105, 1.101, 1.102, 1.101, 1.1, 1.1, 1.099, 1.1, 1.1, 1.1, 1.101, 1.101, 1.101, 1.1, 1.093, 1.085, 1.078, 1.07, 1.063, 1.055, 1.048, 1.041, 1.033, 1.026, 1.018, 1.011, 1.003, 0.996, 0.989, 0.981, 0.974, 0.966, 0.959, 0.951, 0.944, 0.937, 0.929, 0.922, 0.914, 0.907, 0.899, 0.892, 0.885, 0.874, 0.862, 0.849, 0.836, 0.823, 0.811, 0.798, 0.785, 0.773, 0.76, 0.747, 0.734, 0.725, 0.725, 0.724, 0.724, 0.723, 0.723, 0.723, 0.721, 0.72, 0.717, 0.692, 0.667, 0.642, 0.617, 0.592, 0.567, 0.542, 0.517, 0.492, 0.467, 0.442, 0.417, 0.392, 0.388, 0.388, 0.389, 0.389, 0.39, 0.392, 0.396, 0.401, 0.41, 0.422, 0.434, 0.446, 0.457, 0.469, 0.477, 0.481, 0.484, 0.488, 0.491, 0.493, 0.493, 0.491, 0.49, 0.489, 0.486, 0.482, 0.479, 0.476, 0.473, 0.47, 0.468, 0.467, 0.467, 0.466, 0.466, 0.466, 0.465, 0.465, 0.465, 0.465, 0.465, 0.464, 0.464, 0.463, 0.461, 0.471, 0.483, 0.495, 0.506, 0.518, 0.529, 0.541, 0.552, 0.564, 0.576, 0.587, 0.599, 0.61, 0.622, 0.633, 0.645, 0.656, 0.668, 0.68, 0.691, 0.703, 0.714, 0.726, 0.737, 0.749, 0.761, 0.772, 0.78, 0.781, 0.78, 0.779, 0.779, 0.78, 0.78, 0.78, 0.78, 0.78, 0.78, 0.779, 0.78, 0.78, 0.779, 0.78, 0.782], "count": 1659};
+(function(){
+  var wrap = document.getElementById('macroChartWrap');
+  var svg = document.getElementById('macroSvg');
+  var tip = document.getElementById('macroTooltip');
+  var ttDate = document.getElementById('ttDate');
+  var ttPt = document.getElementById('ttPt');
+  var ttRt = document.getElementById('ttRt');
+  
+  if (!wrap || !svg || !tip) return;
+  
+  var ns = "http://www.w3.org/2000/svg";
+  var crossLine = document.createElementNS(ns, "line");
+  crossLine.setAttribute("stroke", "#ff4713");
+  crossLine.setAttribute("stroke-width", "1.5");
+  crossLine.setAttribute("stroke-dasharray", "4,4");
+  crossLine.style.display = "none";
+  svg.appendChild(crossLine);
+  
+  var dotPt = document.createElementNS(ns, "circle");
+  dotPt.setAttribute("r", "6");
+  dotPt.setAttribute("fill", "#005eb8");
+  dotPt.setAttribute("stroke", "#ffffff");
+  dotPt.setAttribute("stroke-width", "2.5");
+  dotPt.style.display = "none";
+  svg.appendChild(dotPt);
+  
+  var dotRt = document.createElementNS(ns, "circle");
+  dotRt.setAttribute("r", "6");
+  dotRt.setAttribute("fill", "#ff4713");
+  dotRt.setAttribute("stroke", "#ffffff");
+  dotRt.setAttribute("stroke-width", "2.5");
+  dotRt.style.display = "none";
+  svg.appendChild(dotRt);
+
+  var data = window.MACRO_DAILY;
+  var dates = data.dates;
+  var pts = data.hs300_points;
+  var rts = data.ratios;
+  var n = dates.length;
+  if (!n) return;
+  
+  var viewW = 1196, viewH = 400;
+  var padL = 60, padR = 70, padT = 30, padB = 40;
+  var chartW = viewW - padL - padR;
+  var chartH = viewH - padT - padB;
+  var minPt = 3000.0, maxPt = 6000.0;
+  var minRt = 0.0, maxRt = 3.0;
+  
+  function getX(idx){ return padL + (idx / float_div(n - 1)) * chartW; }
+  function float_div(x){ return x <= 0 ? 1 : x; }
+  function getYPt(v){ return padT + (1.0 - (v - minPt) / (maxPt - minPt)) * chartH; }
+  function getYRt(v){ return padT + (1.0 - (v - minRt) / (maxRt - minRt)) * chartH; }
+  
+  function handleMove(clientX, clientY){
+    var pt = svg.createSVGPoint();
+    pt.x = clientX;
+    pt.y = clientY;
+    var ctm = svg.getScreenCTM();
+    if (!ctm) return;
+    var svgPt = pt.matrixTransform(ctm.inverse());
+    
+    var clampedX = Math.max(padL, Math.min(viewW - padR, svgPt.x));
+    var ratio = (clampedX - padL) / chartW;
+    var idx = Math.round(ratio * (n - 1));
+    idx = Math.max(0, Math.min(n - 1, idx));
+    
+    var actualX = getX(idx);
+    var curDate = dates[idx];
+    var curPt = pts[idx];
+    var curRt = rts[idx];
+    
+    var actualYPt = getYPt(curPt);
+    var actualYRt = getYRt(curRt);
+    
+    crossLine.setAttribute("x1", actualX);
+    crossLine.setAttribute("y1", padT);
+    crossLine.setAttribute("x2", actualX);
+    crossLine.setAttribute("y2", viewH - padB);
+    crossLine.style.display = "block";
+    
+    dotPt.setAttribute("cx", actualX);
+    dotPt.setAttribute("cy", actualYPt);
+    dotPt.style.display = "block";
+    
+    dotRt.setAttribute("cx", actualX);
+    dotRt.setAttribute("cy", actualYRt);
+    dotRt.style.display = "block";
+    
+    var screenPt = svg.createSVGPoint();
+    screenPt.x = actualX;
+    screenPt.y = padT;
+    var domPos = screenPt.matrixTransform(ctm);
+    var wrapRect = wrap.getBoundingClientRect();
+    var tipLeft = domPos.x - wrapRect.left + 16;
+    
+    var tipW = tip.offsetWidth || 200;
+    if (tipLeft + tipW > wrapRect.width - 15) {
+      tipLeft = domPos.x - wrapRect.left - tipW - 16;
+    }
+    
+    ttDate.textContent = curDate;
+    ttPt.textContent = curPt.toFixed(2);
+    ttRt.textContent = curRt.toFixed(3) + '%';
+    
+    tip.style.left = tipLeft + 'px';
+    tip.style.display = 'block';
+  }
+  
+  wrap.addEventListener('mousemove', function(e){ }
+    handleMove(e.clientX, e.clientY);
+  });
+  
+  wrap.addEventListener('touchmove', function(e){ }
+    if (e.touches && e.touches[0]) { }
+      handleMove(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, {passive: true});
+  
+  wrap.addEventListener('mouseleave', function(){ }
+    crossLine.style.display = 'none';
+    dotPt.style.display = 'none';
+    dotRt.style.display = 'none';
+    tip.style.display = 'none';
+  });
+  
+  wrap.addEventListener('touchend', function(){ }
+    crossLine.style.display = 'none';
+    dotPt.style.display = 'none';
+    dotRt.style.display = 'none';
+    tip.style.display = 'none';
+  });
+})();
+</script>
+
+</body>
+</html>
