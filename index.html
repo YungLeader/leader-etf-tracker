@@ -1223,6 +1223,7 @@ window.MACRO_DAILY = {"dates": ["2020-01-02", "2020-01-03", "2020-01-06", "2020-
   svg.appendChild(dotRt);
 
   var data = window.MACRO_DAILY;
+  if (!data || !data.dates) return;
   var dates = data.dates;
   var pts = data.hs300_points;
   var rts = data.ratios;
@@ -1236,8 +1237,7 @@ window.MACRO_DAILY = {"dates": ["2020-01-02", "2020-01-03", "2020-01-06", "2020-
   var minPt = 3000.0, maxPt = 6000.0;
   var minRt = 0.0, maxRt = 3.0;
   
-  function getX(idx){ return padL + (idx / float_div(n - 1)) * chartW; }
-  function float_div(x){ return x <= 0 ? 1 : x; }
+  function getX(idx){ return padL + (idx / (n <= 1 ? 1 : (n - 1))) * chartW; }
   function getYPt(v){ return padT + (1.0 - (v - minPt) / (maxPt - minPt)) * chartH; }
   function getYRt(v){ return padT + (1.0 - (v - minRt) / (maxRt - minRt)) * chartH; }
   
@@ -1296,30 +1296,31 @@ window.MACRO_DAILY = {"dates": ["2020-01-02", "2020-01-03", "2020-01-06", "2020-
     tip.style.display = 'block';
   }
   
-  wrap.addEventListener('mousemove', function(e){ }
+  wrap.addEventListener('mousemove', function(e){
     handleMove(e.clientX, e.clientY);
   });
   
-  wrap.addEventListener('touchmove', function(e){ }
-    if (e.touches && e.touches[0]) { }
+  wrap.addEventListener('touchmove', function(e){
+    if (e.touches && e.touches[0]) {
       handleMove(e.touches[0].clientX, e.touches[0].clientY);
     }
   }, {passive: true});
   
-  wrap.addEventListener('mouseleave', function(){ }
+  wrap.addEventListener('mouseleave', function(){
     crossLine.style.display = 'none';
     dotPt.style.display = 'none';
     dotRt.style.display = 'none';
     tip.style.display = 'none';
   });
   
-  wrap.addEventListener('touchend', function(){ }
+  wrap.addEventListener('touchend', function(){
     crossLine.style.display = 'none';
     dotPt.style.display = 'none';
     dotRt.style.display = 'none';
     tip.style.display = 'none';
   });
 })();
+
 </script>
 
 </body>
