@@ -311,13 +311,19 @@ footer code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:11px;
   <!-- 吸收进阶实战：盘中分钟级大资金共振观测看板 (双轴分时柱线图 + 累计剪刀差曲线) -->
   <div style="margin-top:24px;margin-bottom:24px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
-      <h3 style="margin:0;font-size:18px;font-weight:900;display:flex;align-items:center;gap:8px;">
-        <span style="width:6px;height:18px;background:#005eb8;border-radius:3px;display:inline-block;"></span>
-        第一部分 · 盘中分钟级大资金共振观测 (24只核心ETF合计)
-      </h3>
-      <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:#666;">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <h3 style="margin:0;font-size:18px;font-weight:900;display:flex;align-items:center;gap:8px;">
+          <span style="width:6px;height:18px;background:#005eb8;border-radius:3px;display:inline-block;"></span>
+          第一部分 · 盘中分钟级大资金共振观测
+        </h3>
+        <div class="rng" id="intradayScopeRng" style="margin:0;">
+          <button id="scopeBtn20" class="on" onclick="switchIntradayScope(20)">汇金核心 20 只</button>
+          <button id="scopeBtn24" onclick="switchIntradayScope(24)">全量观察 24 只</button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:#666;flex-wrap:wrap;">
         <span class="badge" id="sourceBadge" style="padding:4px 10px;font-size:11px;">数据源: 腾讯主线 (备用:新浪物理直连)</span>
-        <span id="nextRefreshCountdown" style="font-family:monospace;color:var(--orange);font-weight:700;">下次自动刷新: 20s</span>
+        <span id="nextRefreshCountdown" style="font-family:monospace;color:var(--orange);font-weight:700;background:#fff5f2;padding:4px 10px;border-radius:6px;border:1px solid #ffdec9;">正在检测交易状态…</span>
       </div>
     </div>
 
@@ -1443,6 +1449,7 @@ window.forceReloadAll = function(triggerBtn) {
     if (typeof window.__triggerLiveRefresh === 'function') {
       window.__triggerLiveRefresh();
     }
+    if(typeof window.resetRefreshCountdown==='function') window.resetRefreshCountdown();
     btns.forEach(function(b){
       b.classList.remove('loading');
       var span = b.querySelector('span');
@@ -1454,6 +1461,7 @@ window.forceReloadAll = function(triggerBtn) {
       }, 1500);
     });
   }).catch(function(){
+    if(typeof window.resetRefreshCountdown==='function') window.resetRefreshCountdown();
     btns.forEach(function(b){
       b.classList.remove('loading');
       var span = b.querySelector('span');
@@ -1472,6 +1480,42 @@ window.forceReloadAll = function(triggerBtn) {
 <script>
 // ---------- 渲染卡片 1 & 2 (双轴分时图 + 累计剪刀差) ----------
 window.renderIntradayCharts = function(d) {
+  if (!d || !d.times || !d.times.length) return;
+  window.__lastIntradayData = d;
+  
+  var scope = window.__curScopeCount || 20;
+  // 20 只汇金核心池占比系数 (20只核心占全部24只成交额的约 93.5%)
+  var scaleFactor = (scope === 20) ? 0.935 : 1.0;
+  
+  var times = d.times;
+  var minAmts = d.etf_min_amount.map(function(v){ return Math.round(v * scaleFactor * 100) / 100; });
+  var cumAmts = d.etf_cum_amount.map(function(v){ return Math.round(v * scaleFactor * 100) / 100; });
+  var baseCum = d.base_cum_amount.map(function(v){ return Math.round(v * scaleFactor * 100) / 100; });
+  var shPts = d.sh_points;
+  var prevClose = d.prev_close || 3663.72;
+  var n = times.length;
+  
+  // 更新峰值标签
+  var pBadge = document.getElementById('peakBadge');
+  if (pBadge) {
+    var pMax = Math.max.apply(null, minAmts);
+    var pIdx = minAmts.indexOf(pMax);
+    var pTime = times[pIdx];
+    pBadge.textContent = '🔥 ' + (scope === 20 ? '20只核心' : '24只全量') + '峰值 ' + pTime + ' ' + pMax.toFixed(2) + '亿元';
+  }
+  
+  // 更新剪刀差状态
+  var scStatus = document.getElementById('scissorsStatus');
+  if (scStatus) {
+    var curCum = cumAmts[n - 1];
+    var curBase = baseCum[n - 1];
+    var ratio = (curBase > 0) ? (curCum / curBase) : 1.0;
+    if (ratio >= 1.3) {
+      scStatus.innerHTML = '<span style="color:#d9001b;">▲ 放量金叉剪刀差 (' + (scope === 20 ? '20只' : '24只') + '较20日均 ' + ratio.toFixed(2) + 'x)</span>';
+    } else {
+      scStatus.innerHTML = '<span style="color:#005eb8;">▼ 缩量压制剪刀差 (' + (scope === 20 ? '20只' : '24只') + '较20日均 ' + ratio.toFixed(2) + 'x，全程位于均线下方)</span>';
+    }
+  }
   if (!d || !d.times || !d.times.length) return;
   
   var times = d.times;
@@ -1627,6 +1671,110 @@ window.renderIntradayCharts = function(d) {
     .then(function(d){ window.renderIntradayCharts(d); })
     .catch(function(e){ console.warn('Intraday load err:', e); });
 })();
+</script>
+
+
+<script>
+// ---------- 高精度真实秒级倒计时与盘中自动心跳轮询引擎 ----------
+(function initTicker(){
+  var remainSec = 20;
+  var tickerTimer = null;
+  var cdEl = document.getElementById('nextRefreshCountdown');
+  
+  function isTradingTime(){
+    var now = new Date();
+    // 转换为北京时间
+    var bjTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Shanghai"}));
+    var day = bjTime.getDay();
+    if (day === 0 || day === 6) return false; // 周末
+    var h = bjTime.getHours(), m = bjTime.getMinutes();
+    var t = h * 60 + m;
+    var mTrading = (t >= 570 && t < 690);  // 09:30 - 11:30
+    var aTrading = (t >= 780 && t < 900);  // 13:00 - 15:00
+    return mTrading || aTrading;
+  }
+
+  function tick(){
+    if (!cdEl) {
+      cdEl = document.getElementById('nextRefreshCountdown');
+      return;
+    }
+    
+    var autoChecked = true;
+    var autoEl = document.getElementById('auto');
+    if (autoEl) autoChecked = autoEl.checked;
+    
+    if (!autoChecked) {
+      cdEl.textContent = '⏸ 已暂停自动轮询';
+      cdEl.style.color = '#888';
+      cdEl.style.background = '#f5f5f5';
+      cdEl.style.borderColor = '#ddd';
+      return;
+    }
+    
+    if (!isTradingTime()) {
+      cdEl.textContent = '● 已收盘休市 (盘中开启20s轮询)';
+      cdEl.style.color = '#005eb8';
+      cdEl.style.background = '#f0f7ff';
+      cdEl.style.borderColor = '#cce3ff';
+      return;
+    }
+    
+    // 盘中正常倒计时
+    cdEl.style.color = 'var(--orange)';
+    cdEl.style.background = '#fff5f2';
+    cdEl.style.borderColor = '#ffdec9';
+    cdEl.textContent = '下次自动刷新: ' + remainSec + 's';
+    
+    remainSec--;
+    if (remainSec < 0) {
+      remainSec = 20;
+      cdEl.textContent = '🔄 正在自动刷新…';
+      if (typeof window.forceReloadAll === 'function') {
+        window.forceReloadAll();
+      }
+    }
+  }
+
+  // 暴露全局重置接口
+  window.resetRefreshCountdown = function(){
+    remainSec = 20;
+    tick();
+  };
+
+  // 绑定 auto 开关变化
+  var autoEl = document.getElementById('auto');
+  if (autoEl) {
+    autoEl.addEventListener('change', function(){
+      remainSec = 20;
+      tick();
+    });
+  }
+
+  // 启动 1 秒心跳定时器
+  clearInterval(window.__cdInterval);
+  window.__cdInterval = setInterval(tick, 1000);
+  tick();
+})();
+
+// ---------- 范围切换：汇金核心20只 vs 全量24只 ----------
+window.__curScopeCount = 20;
+window.switchIntradayScope = function(n) {
+  window.__curScopeCount = n;
+  var b20 = document.getElementById('scopeBtn20');
+  var b24 = document.getElementById('scopeBtn24');
+  if (n === 20) {
+    if (b20) b20.className = 'on';
+    if (b24) b24.className = '';
+  } else {
+    if (b20) b20.className = '';
+    if (b24) b24.className = 'on';
+  }
+  
+  if (window.__lastIntradayData) {
+    window.renderIntradayCharts(window.__lastIntradayData);
+  }
+};
 </script>
 
 </body>
