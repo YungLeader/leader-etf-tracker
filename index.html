@@ -167,6 +167,70 @@ footer code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:11px;
   .controls{margin-top:18px}
   .meta{margin-left:0;width:100%;text-align:left}
 }
+
+/* 立即刷新按钮交互体系 */
+.header-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--orange);
+  color: #fff;
+  border: 1px solid var(--orange);
+  border-radius: 100px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(255, 71, 19, 0.25);
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.header-refresh-btn:hover {
+  background: #e03b0d;
+  box-shadow: 0 4px 12px rgba(255, 71, 19, 0.35);
+  transform: translateY(-1px);
+}
+.header-refresh-btn:active {
+  transform: translateY(0);
+}
+.spin-icon {
+  transition: transform 0.2s ease;
+}
+.loading .spin-icon {
+  animation: spin-refresh 0.8s linear infinite;
+}
+@keyframes spin-refresh { 100% { transform: rotate(360deg); } }
+
+/* 全局右下角悬浮刷新按钮 FAB */
+.fab-refresh {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999;
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 800;
+  box-shadow: 0 6px 20px rgba(255, 71, 19, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+.fab-refresh:hover {
+  background: #e03b0d;
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(255, 71, 19, 0.5);
+}
+.fab-refresh:active {
+  transform: scale(0.98);
+}
+
 </style>
 </head>
 <body>
@@ -178,7 +242,13 @@ footer code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:11px;
     <div class="sub">中央汇金与类平准资金动向监控 · 纯物理计算 · 0 Token 实时刷新</div>
   </div>
   <div class="status">
-    <span class="badge" id="badge"><i></i><span id="badgeText">载入中</span></span>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button id="btnHeaderRefresh" class="header-refresh-btn js-refresh-trigger" onclick="forceReloadAll(this)" title="点击立即强制拉取全市场最新真实数据">
+        <svg class="spin-icon" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        <span>立即刷新</span>
+      </button>
+      <span class="badge" id="badge"><i></i><span id="badgeText">载入中</span></span>
+    </div>
     <span class="stamp num" id="stamp">—</span>
   </div>
 </header>
@@ -292,7 +362,7 @@ footer code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:11px;
     </select>
   </div>
   <input type="text" id="q" placeholder="搜代码 / 名称 / 指数">
-  <button class="primary" id="refresh">立即刷新</button>
+  <button class="primary js-refresh-trigger" id="refresh" onclick="forceReloadAll(this)">立即刷新</button>
   <label class="toggle"><input type="checkbox" id="auto" checked>自动刷新</label>
   <div class="meta" id="meta">—</div>
 </div>
@@ -907,6 +977,7 @@ function bootSnapshot(){
     });
     return got;
   }
+  window.__triggerLiveRefresh = refresh;
   function refresh(){
     if(refreshing) return;
     refreshing=true;
@@ -1313,6 +1384,160 @@ window.MACRO_DAILY = {"dates": ["2020-01-02", "2020-01-03", "2020-01-06", "2020-
     tip.style.display = 'none';
   });
 })();
+</script>
+
+
+<script>
+// ---------- 全量动态渲染宏观大底 SVG ----------
+window.renderMacroChart = function(data) {
+  if (!data || !data.dates || !data.dates.length) return;
+  var wrap = document.getElementById('macroChartWrap');
+  var svg = document.getElementById('macroSvg');
+  var tip = document.getElementById('macroTooltip');
+  var badge = document.getElementById('macro-badge');
+  if (!wrap || !svg) return;
+  
+  var dates = data.dates;
+  var pts = data.hs300_points;
+  var ratios = data.ratios;
+  var n = dates.length;
+  
+  if (badge) {
+    badge.textContent = '当前比重: ' + ratios[n-1] + '% (估值大底回升区)';
+  }
+  
+  var w = 1196, h = 400;
+  var padL = 60, padR = 70, padT = 30, padB = 40;
+  var chartW = w - padL - padR;
+  var chartH = h - padT - padB;
+  var minPt = 3000.0, maxPt = 6000.0;
+  var minRt = 0.0, maxRt = 3.0;
+
+  function getX(idx){ return padL + (idx / float_div(n - 1)) * chartW; }
+  function float_div(x){ return x <= 0 ? 1 : x; }
+  function getYPt(v){ return padT + (1.0 - (v - minPt) / (maxPt - minPt)) * chartH; }
+  function getYRt(v){ return padT + (1.0 - (v - minRt) / (maxRt - minRt)) * chartH; }
+
+  var pathPt = "M " + getX(0).toFixed(1) + " " + getYPt(pts[0]).toFixed(1);
+  var pathRt = "M " + getX(0).toFixed(1) + " " + getYRt(ratios[0]).toFixed(1);
+  for (var idx = 1; idx < n; idx++) {
+    pathPt += " L " + getX(idx).toFixed(1) + " " + getYPt(pts[idx]).toFixed(1);
+    pathRt += " L " + getX(idx).toFixed(1) + " " + getYRt(ratios[idx]).toFixed(1);
+  }
+
+  var svgInner = [];
+  for (var step = 0; step < 7; step++) {
+    var v = step * 0.5;
+    var y = getYRt(v);
+    var ptVal = Math.round(minPt + (v / 3.0) * (maxPt - minPt));
+    svgInner.push('<line x1="' + padL + '" y1="' + y.toFixed(1) + '" x2="' + (w - padR) + '" y2="' + y.toFixed(1) + '" stroke="#f0f0f0" stroke-width="1"/>');
+    svgInner.push('<text x="' + (padL - 12) + '" y="' + (y + 4).toFixed(1) + '" fill="#005eb8" font-size="12" text-anchor="end" font-family="monospace">' + ptVal.toLocaleString() + '</text>');
+    svgInner.push('<text x="' + (w - padR + 12) + '" y="' + (y + 4).toFixed(1) + '" fill="#ff4713" font-size="12" text-anchor="start" font-family="monospace">' + v.toFixed(2) + '%</text>');
+  }
+
+  for (var idx = 0; idx < n; idx++) {
+    var d = dates[idx];
+    if (d.slice(5) === '01-02' || (['01-03','01-04','01-05','01-06'].indexOf(d.slice(5)) !== -1 && idx > 0 && dates[idx-1].slice(0,4) !== d.slice(0,4))) {
+      var x = getX(idx);
+      svgInner.push('<line x1="' + x.toFixed(1) + '" y1="' + (h - padB) + '" x2="' + x.toFixed(1) + '" y2="' + (h - padB + 6) + '" stroke="#ccc"/>');
+      svgInner.push('<text x="' + x.toFixed(1) + '" y="' + (h - padB + 20) + '" fill="#888" font-size="12" text-anchor="middle">' + d.slice(0,4) + '-01</text>');
+    }
+  }
+
+  var x_last = getX(n - 1);
+  svgInner.push('<line x1="' + x_last.toFixed(1) + '" y1="' + (h - padB) + '" x2="' + x_last.toFixed(1) + '" y2="' + (h - padB + 6) + '" stroke="#ccc"/>');
+  svgInner.push('<text x="' + x_last.toFixed(1) + '" y="' + (h - padB + 20) + '" fill="#888" font-size="12" text-anchor="middle">' + dates[n - 1] + '</text>');
+
+  svgInner.push('<path d="' + pathPt + '" fill="none" stroke="#005eb8" stroke-width="2.0" stroke-linejoin="round"/>');
+  svgInner.push('<path d="' + pathRt + '" fill="none" stroke="#ff4713" stroke-width="2.6" stroke-linejoin="round"/>');
+
+  var peakIdx = ratios.indexOf(2.51);
+  if (peakIdx === -1) peakIdx = 1147;
+  var peakX = getX(peakIdx);
+  var peakY = getYRt(2.51);
+  svgInner.push('<circle cx="' + peakX.toFixed(1) + '" cy="' + peakY.toFixed(1) + '" r="5" fill="#ff4713"/>');
+  svgInner.push('<rect x="' + (peakX - 25).toFixed(1) + '" y="' + (peakY - 26).toFixed(1) + '" width="50" height="20" rx="4" fill="#ff4713"/>');
+  svgInner.push('<text x="' + peakX.toFixed(1) + '" y="' + (peakY - 12).toFixed(1) + '" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">2.51%</text>');
+
+  var lastX = getX(n - 1);
+  var lastY = getYRt(ratios[n - 1]);
+  svgInner.push('<circle cx="' + lastX.toFixed(1) + '" cy="' + lastY.toFixed(1) + '" r="5" fill="#ff4713"/>');
+  svgInner.push('<rect x="' + (lastX - 45).toFixed(1) + '" y="' + (lastY - 26).toFixed(1) + '" width="50" height="20" rx="4" fill="#ff4713"/>');
+  svgInner.push('<text x="' + (lastX - 20).toFixed(1) + '" y="' + (lastY - 12).toFixed(1) + '" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">' + ratios[n - 1] + '%</text>');
+
+  svg.innerHTML = svgInner.join('');
+};
+
+// ---------- 全局一键强制拉取最新数据（强力穿透 CDN 与浏览器缓存） ----------
+window.forceReloadAll = function(triggerBtn) {
+  var btns = document.querySelectorAll('.js-refresh-trigger, #refresh, .header-refresh-btn, .fab-refresh');
+  btns.forEach(function(b){
+    b.classList.add('loading');
+    var span = b.querySelector('span');
+    if (span) span.textContent = '刷新中…';
+    else b.textContent = '刷新中…';
+  });
+
+  var ts = Date.now();
+  
+  // 1. 强刷 macro_daily_history.json
+  var pMacro = fetch('data/macro_daily_history.json?t=' + ts, {cache: 'no-store'})
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      window.MACRO_DAILY = data;
+      if (typeof window.renderMacroChart === 'function') {
+        window.renderMacroChart(data);
+      }
+    }).catch(function(e){ console.warn('Macro reload err:', e); });
+
+  // 2. 强刷 snapshot.js
+  var pSnap = new Promise(function(resolve, reject){
+    var oldScript = document.getElementById('snapshotScript');
+    if (oldScript && oldScript.parentNode) oldScript.parentNode.removeChild(oldScript);
+    
+    var s = document.createElement('script');
+    s.id = 'snapshotScript';
+    s.src = 'data/snapshot.js?t=' + ts;
+    s.onload = function(){
+      if (typeof bootSnapshot === 'function') {
+        bootSnapshot();
+      }
+      resolve();
+    };
+    s.onerror = function(){
+      reject();
+    };
+    document.head.appendChild(s);
+  });
+
+  Promise.all([pMacro, pSnap]).then(function(){
+    // 3. 触发实时行情更新
+    if (typeof window.__triggerLiveRefresh === 'function') {
+      window.__triggerLiveRefresh();
+    }
+    btns.forEach(function(b){
+      b.classList.remove('loading');
+      var span = b.querySelector('span');
+      if (span) span.textContent = '✓ 已更新';
+      else b.textContent = '✓ 已更新';
+      setTimeout(function(){
+        if (span) span.textContent = '立即刷新';
+        else b.textContent = '立即刷新';
+      }, 1500);
+    });
+  }).catch(function(){
+    btns.forEach(function(b){
+      b.classList.remove('loading');
+      var span = b.querySelector('span');
+      if (span) span.textContent = '刷新失败';
+      else b.textContent = '刷新失败';
+      setTimeout(function(){
+        if (span) span.textContent = '立即刷新';
+        else b.textContent = '立即刷新';
+      }, 1500);
+    });
+  });
+};
 </script>
 
 </body>
