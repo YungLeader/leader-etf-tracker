@@ -307,6 +307,59 @@ footer code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:11px;
     </div>
   </div>
 
+
+  <!-- 吸收进阶实战：盘中分钟级大资金共振观测看板 (双轴分时柱线图 + 累计剪刀差曲线) -->
+  <div style="margin-top:24px;margin-bottom:24px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+      <h3 style="margin:0;font-size:18px;font-weight:900;display:flex;align-items:center;gap:8px;">
+        <span style="width:6px;height:18px;background:#005eb8;border-radius:3px;display:inline-block;"></span>
+        第一部分 · 盘中分钟级大资金共振观测 (24只核心ETF合计)
+      </h3>
+      <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:#666;">
+        <span class="badge" id="sourceBadge" style="padding:4px 10px;font-size:11px;">数据源: 腾讯主线 (备用:新浪物理直连)</span>
+        <span id="nextRefreshCountdown" style="font-family:monospace;color:var(--orange);font-weight:700;">下次自动刷新: 20s</span>
+      </div>
+    </div>
+
+    <!-- 卡片 1: 24只ETF分钟成交额与上证综指分时 -->
+    <div class="card" style="border:1px solid var(--line);box-shadow:var(--shadow);border-radius:12px;padding:20px;background:#fff;margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div>
+          <div style="font-size:15px;font-weight:800;color:#222;">24只ETF分钟成交额与上证综指分时叠加图</div>
+          <div style="font-size:12px;color:#666;margin-top:4px;display:flex;gap:14px;flex-wrap:wrap;">
+            <span><span style="display:inline-block;width:10px;height:10px;background:#005eb8;margin-right:4px;border-radius:2px;vertical-align:middle;"></span>左轴柱状: 24只ETF分钟成交额合计 (亿元)</span>
+            <span><span style="display:inline-block;width:12px;height:3px;background:#ff7a00;margin-right:4px;vertical-align:middle;"></span>右轴折线: 上证综指分时走势</span>
+            <span id="peakBadge" style="color:#d9001b;font-weight:700;">—</span>
+          </div>
+        </div>
+        <div style="font-size:12px;color:#888;" id="intradayUpdateTime">2026-11-11 15:00 收盘锁定</div>
+      </div>
+      <div id="chartMinWrap" style="position:relative;height:240px;width:100%;cursor:crosshair;">
+        <svg id="svgMinChart" viewBox="0 0 1196 240" style="width:100%;height:240px;display:block;"></svg>
+        <div id="tipMin" class="chart-tip" style="position:absolute;display:none;z-index:10;background:rgba(255,255,255,0.96);padding:8px 12px;border:1px solid #005eb8;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,0.1);font-size:12px;pointer-events:none;"></div>
+      </div>
+    </div>
+
+    <!-- 卡片 2: 当日分钟累计成交额 vs 20日均值 (剪刀差走势) -->
+    <div class="card" style="border:1px solid var(--line);box-shadow:var(--shadow);border-radius:12px;padding:20px;background:#fff;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div>
+          <div style="font-size:15px;font-weight:800;color:#222;">24只ETF当日分钟累计成交额 vs 20日均值曲线（剪刀差看板）</div>
+          <div style="font-size:12px;color:#666;margin-top:4px;display:flex;gap:14px;flex-wrap:wrap;">
+            <span><span style="display:inline-block;width:14px;height:3px;background:#d9001b;margin-right:4px;vertical-align:middle;"></span>今日实际累计成交额 (亿元)</span>
+            <span><span style="display:inline-block;width:14px;height:2px;border-top:2px dashed #005eb8;margin-right:4px;vertical-align:middle;"></span>近20日均值分钟基准底座 (亿元)</span>
+          </div>
+        </div>
+        <div id="scissorsStatus" style="font-size:13px;font-weight:800;color:#666;">—</div>
+      </div>
+      <div id="chartCumWrap" style="position:relative;height:220px;width:100%;cursor:crosshair;">
+        <svg id="svgCumChart" viewBox="0 0 1196 220" style="width:100%;height:220px;display:block;"></svg>
+        <div id="tipCum" class="chart-tip" style="position:absolute;display:none;z-index:10;background:rgba(255,255,255,0.96);padding:8px 12px;border:1px solid #d9001b;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,0.1);font-size:12px;pointer-events:none;"></div>
+      </div>
+    </div>
+  </div>
+
+
 <div class="mgrid" id="mgrid"></div>
   <div class="caveat" id="caveat">
     名单为 2025 年报历史标签，非当前持仓；所有结论均为量价推测。<a href="#notes">完整口径与合规说明 ↓</a>
@@ -1413,6 +1466,167 @@ window.forceReloadAll = function(triggerBtn) {
     });
   });
 };
+</script>
+
+
+<script>
+// ---------- 渲染卡片 1 & 2 (双轴分时图 + 累计剪刀差) ----------
+window.renderIntradayCharts = function(d) {
+  if (!d || !d.times || !d.times.length) return;
+  
+  var times = d.times;
+  var minAmts = d.etf_min_amount;
+  var cumAmts = d.etf_cum_amount;
+  var baseCum = d.base_cum_amount;
+  var shPts = d.sh_points;
+  var prevClose = d.prev_close || 3663.72;
+  var n = times.length;
+  
+  // 更新峰值标签
+  var pBadge = document.getElementById('peakBadge');
+  if (pBadge && d.peak_amount) {
+    pBadge.textContent = '🔥 峰值 ' + d.peak_time + ' ' + d.peak_amount + '亿元';
+  }
+  
+  // 更新剪刀差状态
+  var scStatus = document.getElementById('scissorsStatus');
+  if (scStatus && d.total_today_amount && d.total_avg20_amount) {
+    var ratio = d.total_today_amount / d.total_avg20_amount;
+    if (ratio >= 1.3) {
+      scStatus.innerHTML = '<span style="color:#d9001b;">▲ 放量金叉剪刀差 (较20日均 ' + ratio.toFixed(2) + 'x)</span>';
+    } else {
+      scStatus.innerHTML = '<span style="color:#005eb8;">▼ 缩量压制剪刀差 (较20日均 ' + ratio.toFixed(2) + 'x，全程位于均线下方)</span>';
+    }
+  }
+
+  // ===== 绘制卡片 1: svgMinChart (宽1196 高240) =====
+  var svgMin = document.getElementById('svgMinChart');
+  if (svgMin) {
+    var w = 1196, h = 240, padL = 50, padR = 60, padT = 20, padB = 30;
+    var cW = w - padL - padR, cH = h - padT - padB;
+    
+    var maxMinAmt = Math.max(10.0, Math.max.apply(null, minAmts) * 1.2);
+    var minSh = Math.min.apply(null, shPts);
+    var maxSh = Math.max.apply(null, shPts);
+    var shSpan = Math.max(Math.abs(maxSh - prevClose), Math.abs(prevClose - minSh), 10.0);
+    var shLow = prevClose - shSpan * 1.1;
+    var shHigh = prevClose + shSpan * 1.1;
+    
+    function getX(i){ return padL + (i / float_div(n - 1)) * cW; }
+    function float_div(x){ return x <= 0 ? 1 : x; }
+    function getYMinAmt(v){ return padT + (1.0 - (v / maxMinAmt)) * cH; }
+    function getYSh(v){ return padT + (1.0 - (v - shLow) / (shHigh - shLow)) * cH; }
+    
+    var inner1 = [];
+    // 水平虚线与平盘线
+    var yPrev = getYSh(prevClose);
+    inner1.push('<line x1="' + padL + '" y1="' + yPrev.toFixed(1) + '" x2="' + (w - padR) + '" y2="' + yPrev.toFixed(1) + '" stroke="#999" stroke-width="1" stroke-dasharray="3,3"/>');
+    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (yPrev + 4).toFixed(1) + '" fill="#666" font-size="11" font-family="monospace">昨收 ' + prevClose.toFixed(2) + '</text>');
+    
+    // 刻度
+    inner1.push('<text x="' + (padL - 8) + '" y="' + (padT + 10) + '" fill="#005eb8" font-size="11" text-anchor="end" font-family="monospace">' + maxMinAmt.toFixed(0) + '亿</text>');
+    inner1.push('<text x="' + (padL - 8) + '" y="' + (h - padB) + '" fill="#005eb8" font-size="11" text-anchor="end" font-family="monospace">0</text>');
+    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (padT + 10) + '" fill="#ff7a00" font-size="11" font-family="monospace">' + shHigh.toFixed(0) + '</text>');
+    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (h - padB) + '" fill="#ff7a00" font-size="11" font-family="monospace">' + shLow.toFixed(0) + '</text>');
+
+    // 时间标尺 (9:30, 10:30, 11:30, 14:00, 15:00)
+    var timeMarkers = ['09:30', '10:00', '10:30', '11:00', '11:30', '13:30', '14:00', '14:30', '15:00'];
+    for (var i = 0; i < n; i++) {
+      if (timeMarkers.indexOf(times[i]) !== -1) {
+        var x = getX(i);
+        inner1.push('<line x1="' + x.toFixed(1) + '" y1="' + (h - padB) + '" x2="' + x.toFixed(1) + '" y2="' + (h - padB + 5) + '" stroke="#ccc"/>');
+        inner1.push('<text x="' + x.toFixed(1) + '" y="' + (h - padB + 16) + '" fill="#888" font-size="11" text-anchor="middle">' + times[i] + '</text>');
+      }
+    }
+
+    // 柱状图 (分钟成交额)
+    var barW = Math.max(2.0, (cW / n) * 0.7);
+    for (var i = 0; i < n; i++) {
+      var v = minAmts[i];
+      var x = getX(i) - barW / 2;
+      var y = getYMinAmt(v);
+      var barH = (h - padB) - y;
+      var isPeak = (times[i] === d.peak_time);
+      var barColor = isPeak ? '#d9001b' : (v >= 5.0 ? '#ff7a00' : '#4a90e2');
+      inner1.push('<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + barW.toFixed(1) + '" height="' + Math.max(1, barH).toFixed(1) + '" fill="' + barColor + '"/>');
+      if (isPeak) {
+        inner1.push('<text x="' + getX(i).toFixed(1) + '" y="' + (y - 5).toFixed(1) + '" fill="#d9001b" font-size="10" font-weight="bold" text-anchor="middle">' + v.toFixed(1) + '亿</text>');
+      }
+    }
+
+    // 折线 (上证综指)
+    var pathSh = "M " + getX(0).toFixed(1) + " " + getYSh(shPts[0]).toFixed(1);
+    for (var i = 1; i < n; i++) {
+      pathSh += " L " + getX(i).toFixed(1) + " " + getYSh(shPts[i]).toFixed(1);
+    }
+    inner1.push('<path d="' + pathSh + '" fill="none" stroke="#ff7a00" stroke-width="2.2" stroke-linejoin="round"/>');
+    
+    svgMin.innerHTML = inner1.join('');
+  }
+
+  // ===== 绘制卡片 2: svgCumChart (宽1196 高220) =====
+  var svgCum = document.getElementById('svgCumChart');
+  if (svgCum) {
+    var w = 1196, h = 220, padL = 50, padR = 60, padT = 20, padB = 30;
+    var cW = w - padL - padR, cH = h - padT - padB;
+    var maxCum = Math.max(d.total_avg20_amount * 1.15, d.total_today_amount * 1.15, 800.0);
+    
+    function getX(i){ return padL + (i / float_div(n - 1)) * cW; }
+    function getYCum(v){ return padT + (1.0 - (v / maxCum)) * cH; }
+
+    var inner2 = [];
+    // 网格线
+    for (var step = 0; step <= 4; step++) {
+      var val = (maxCum / 4) * step;
+      var y = getYCum(val);
+      inner2.push('<line x1="' + padL + '" y1="' + y.toFixed(1) + '" x2="' + (w - padR) + '" y2="' + y.toFixed(1) + '" stroke="#f0f0f0" stroke-width="1"/>');
+      inner2.push('<text x="' + (padL - 8) + '" y="' + (y + 4).toFixed(1) + '" fill="#888" font-size="11" text-anchor="end" font-family="monospace">' + val.toFixed(0) + '亿</text>');
+    }
+
+    // 时间标尺
+    for (var i = 0; i < n; i++) {
+      if (['09:30', '10:30', '11:30', '14:00', '15:00'].indexOf(times[i]) !== -1) {
+        var x = getX(i);
+        inner2.push('<line x1="' + x.toFixed(1) + '" y1="' + (h - padB) + '" x2="' + x.toFixed(1) + '" y2="' + (h - padB + 5) + '" stroke="#ccc"/>');
+        inner2.push('<text x="' + x.toFixed(1) + '" y="' + (h - padB + 16) + '" fill="#888" font-size="11" text-anchor="middle">' + times[i] + '</text>');
+      }
+    }
+
+    // 20日均值基准虚线 (蓝色)
+    var pathBase = "M " + getX(0).toFixed(1) + " " + getYCum(baseCum[0]).toFixed(1);
+    for (var i = 1; i < n; i++) {
+      pathBase += " L " + getX(i).toFixed(1) + " " + getYCum(baseCum[i]).toFixed(1);
+    }
+    inner2.push('<path d="' + pathBase + '" fill="none" stroke="#005eb8" stroke-width="2.0" stroke-dasharray="5,4" stroke-linejoin="round"/>');
+    
+    // 今日实际累计曲线 (红色)
+    var pathToday = "M " + getX(0).toFixed(1) + " " + getYCum(cumAmts[0]).toFixed(1);
+    for (var i = 1; i < n; i++) {
+      pathToday += " L " + getX(i).toFixed(1) + " " + getYCum(cumAmts[i]).toFixed(1);
+    }
+    inner2.push('<path d="' + pathToday + '" fill="none" stroke="#d9001b" stroke-width="2.6" stroke-linejoin="round"/>');
+
+    // 终点标注
+    var lastX = getX(n - 1);
+    var yB = getYCum(baseCum[n - 1]);
+    var yT = getYCum(cumAmts[n - 1]);
+    inner2.push('<circle cx="' + lastX.toFixed(1) + '" cy="' + yB.toFixed(1) + '" r="4" fill="#005eb8"/>');
+    inner2.push('<text x="' + (lastX - 8).toFixed(1) + '" y="' + (yB - 8).toFixed(1) + '" fill="#005eb8" font-size="11" font-weight="bold" text-anchor="end">20日均 ' + baseCum[n-1].toFixed(1) + '亿</text>');
+    
+    inner2.push('<circle cx="' + lastX.toFixed(1) + '" cy="' + yT.toFixed(1) + '" r="5" fill="#d9001b"/>');
+    inner2.push('<text x="' + (lastX - 8).toFixed(1) + '" y="' + (yT + 18).toFixed(1) + '" fill="#d9001b" font-size="12" font-weight="bold" text-anchor="end">今日累计 ' + cumAmts[n-1].toFixed(1) + '亿</text>');
+
+    svgCum.innerHTML = inner2.join('');
+  }
+};
+
+// 页面初始化时拉取分时数据
+(function initIntraday(){
+  fetch('data/intraday_min.json?t=' + Date.now())
+    .then(function(r){ return r.json(); })
+    .then(function(d){ window.renderIntradayCharts(d); })
+    .catch(function(e){ console.warn('Intraday load err:', e); });
+})();
 </script>
 
 </body>
