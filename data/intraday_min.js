@@ -1,6 +1,6 @@
 window.INTRADAY_MIN = {
   "date": "2026-11-12",
-  "prev_close": 3680.64,
+  "prev_close": 3676.01,
   "times": [
     "09:31",
     "09:32",
