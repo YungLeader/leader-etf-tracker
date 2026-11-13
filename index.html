@@ -1747,7 +1747,7 @@ window.renderIntradayCharts = function(d) {
     var w = 1196, h = 240, padL = 55, padR = 65, padT = 20, padB = 30;
     var cW = w - padL - padR, cH = h - padT - padB;
     
-    var maxMinAmt = Math.max(12.0, Math.ceil(Math.max.apply(null, minAmts) * 1.25));
+    var maxMinAmt = Math.max(20.0, Math.ceil(Math.max.apply(null, minAmts) * 1.25));
     var cyPts = d.cy_points || [];
     var prevCloseCy = d.prev_close_cy || 2509.43;
 
@@ -1763,7 +1763,7 @@ window.renderIntradayCharts = function(d) {
         if (pCy > maxCyPct) maxCyPct = pCy;
       }
     }
-    var commonSpanPct = Math.max(maxShPct, maxCyPct, 0.8) * 1.25;
+    var commonSpanPct = Math.max(maxShPct, maxCyPct, 0.5) * 1.05;
 
     function getX(i){ return padL + (i / float_div(n - 1)) * cW; }
     function float_div(x){ return x <= 0 ? 1 : x; }
