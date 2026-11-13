@@ -331,7 +331,7 @@ footer code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:11px;
     <div class="card" style="border:1px solid var(--line);box-shadow:var(--shadow);border-radius:12px;padding:20px;background:#fff;margin-bottom:16px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
         <div>
-          <div id="titleMinChart" style="font-size:15px;font-weight:800;color:#222;">20只ETF分钟成交额与上证综指分时叠加图</div>
+          <div id="titleMinChart" style="font-size:15px;font-weight:800;color:#222;">20只ETF分钟成交额与双指数(上证/创业板)分时叠加图</div>
           <div style="font-size:12px;color:#666;margin-top:4px;display:flex;gap:14px;flex-wrap:wrap;">
             <span><span style="display:inline-block;width:10px;height:10px;background:#005eb8;margin-right:4px;border-radius:2px;vertical-align:middle;"></span>左轴柱状: 26只ETF分钟成交额合计 (亿元)</span>
             <span><span style="display:inline-block;width:12px;height:3px;background:#ff7a00;margin-right:4px;vertical-align:middle;"></span>右轴折线: 上证综指分时走势</span>
@@ -1748,26 +1748,39 @@ window.renderIntradayCharts = function(d) {
     var cW = w - padL - padR, cH = h - padT - padB;
     
     var maxMinAmt = Math.max(12.0, Math.ceil(Math.max.apply(null, minAmts) * 1.25));
-    var minSh = Math.min.apply(null, shPts);
-    var maxSh = Math.max.apply(null, shPts);
-    var shSpan = Math.max(Math.abs(maxSh - prevClose), Math.abs(prevClose - minSh), 12.0);
-    var shLow = prevClose - shSpan * 1.15;
-    var shHigh = prevClose + shSpan * 1.15;
-    
+    var cyPts = d.cy_points || [];
+    var prevCloseCy = d.prev_close_cy || 2509.43;
+
+    // 计算双指数综合涨跌幅极值跨度，使 0% 昨收线在同一基准线上
+    var maxShPct = 0.5, maxCyPct = 0.5;
+    for (var i = 0; i < n; i++) {
+      if (shPts[i]) {
+        var pSh = Math.abs((shPts[i] - prevClose) / prevClose * 100);
+        if (pSh > maxShPct) maxShPct = pSh;
+      }
+      if (cyPts[i]) {
+        var pCy = Math.abs((cyPts[i] - prevCloseCy) / prevCloseCy * 100);
+        if (pCy > maxCyPct) maxCyPct = pCy;
+      }
+    }
+    var commonSpanPct = Math.max(maxShPct, maxCyPct, 0.8) * 1.25;
+
     function getX(i){ return padL + (i / float_div(n - 1)) * cW; }
     function float_div(x){ return x <= 0 ? 1 : x; }
     function getYMinAmt(v){ return padT + (1.0 - (v / maxMinAmt)) * cH; }
-    function getYSh(v){ return padT + (1.0 - (v - shLow) / (shHigh - shLow)) * cH; }
+    function getYByPct(pct){ return padT + (1.0 - (pct - (-commonSpanPct)) / (commonSpanPct * 2)) * cH; }
+    function getYSh(v){ return getYByPct(((v - prevClose) / prevClose) * 100); }
+    function getYCy(v){ return getYByPct(((v - prevCloseCy) / prevCloseCy) * 100); }
     
     var inner1 = [];
-    var yPrev = getYSh(prevClose);
-    inner1.push('<line x1="' + padL + '" y1="' + yPrev.toFixed(1) + '" x2="' + (w - padR) + '" y2="' + yPrev.toFixed(1) + '" stroke="#aaa" stroke-width="1" stroke-dasharray="3,3"/>');
-    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (yPrev + 4).toFixed(1) + '" fill="#888" font-size="11" font-family="monospace">昨收 ' + prevClose.toFixed(2) + '</text>');
+    var yZero = getYByPct(0);
+    inner1.push('<line x1="' + padL + '" y1="' + yZero.toFixed(1) + '" x2="' + (w - padR) + '" y2="' + yZero.toFixed(1) + '" stroke="#aaa" stroke-width="1" stroke-dasharray="3,3"/>');
+    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (yZero + 4).toFixed(1) + '" fill="#888" font-size="11" font-family="monospace">昨收 0.00%</text>');
     
     inner1.push('<text x="' + (padL - 8) + '" y="' + (padT + 10) + '" fill="#005eb8" font-size="11" text-anchor="end" font-family="monospace">' + maxMinAmt.toFixed(0) + '亿</text>');
     inner1.push('<text x="' + (padL - 8) + '" y="' + (h - padB) + '" fill="#005eb8" font-size="11" text-anchor="end" font-family="monospace">0</text>');
-    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (padT + 10) + '" fill="#ff7a00" font-size="11" font-family="monospace">' + shHigh.toFixed(0) + '</text>');
-    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (h - padB) + '" fill="#ff7a00" font-size="11" font-family="monospace">' + shLow.toFixed(0) + '</text>');
+    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (padT + 10) + '" fill="#ff7a00" font-size="11" font-family="monospace">+' + commonSpanPct.toFixed(2) + '%</text>');
+    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (h - padB) + '" fill="#ff7a00" font-size="11" font-family="monospace">-' + commonSpanPct.toFixed(2) + '%</text>');
 
     var timeMarkers = ['09:30', '10:00', '10:30', '11:00', '11:30', '13:30', '14:00', '14:30', '15:00'];
     for (var i = 0; i < n; i++) {
@@ -1792,11 +1805,24 @@ window.renderIntradayCharts = function(d) {
       }
     }
 
-    var pathSh = "M " + getX(0).toFixed(1) + " " + getYSh(shPts[0]).toFixed(1);
-    for (var i = 1; i < n; i++) {
-      pathSh += " L " + getX(i).toFixed(1) + " " + getYSh(shPts[i]).toFixed(1);
+    // 绘制上证指数折线 (橙色)
+    if (shPts.length) {
+      var pathSh = "M " + getX(0).toFixed(1) + " " + getYSh(shPts[0]).toFixed(1);
+      for (var i = 1; i < Math.min(n, shPts.length); i++) {
+        pathSh += " L " + getX(i).toFixed(1) + " " + getYSh(shPts[i]).toFixed(1);
+      }
+      inner1.push('<path d="' + pathSh + '" fill="none" stroke="#ff7a00" stroke-width="2.2" stroke-linejoin="round"/>');
     }
-    inner1.push('<path d="' + pathSh + '" fill="none" stroke="#ff7a00" stroke-width="2.2" stroke-linejoin="round"/>');
+
+    // 绘制创业板指折线 (紫色)
+    if (cyPts.length) {
+      var pathCy = "M " + getX(0).toFixed(1) + " " + getYCy(cyPts[0]).toFixed(1);
+      for (var i = 1; i < Math.min(n, cyPts.length); i++) {
+        pathCy += " L " + getX(i).toFixed(1) + " " + getYCy(cyPts[i]).toFixed(1);
+      }
+      inner1.push('<path d="' + pathCy + '" fill="none" stroke="#8e44ad" stroke-width="2.0" stroke-linejoin="round"/>');
+    }
+
     svgMin.innerHTML = inner1.join('');
 
     if (wrapMin && tipMin) {
@@ -1806,11 +1832,17 @@ window.renderIntradayCharts = function(d) {
         var ratio = Math.max(0, Math.min(1, (rx - (padL * rect.width / w)) / (cW * rect.width / w)));
         var idx = Math.min(n - 1, Math.round(ratio * (n - 1)));
         
+        var shVal = shPts[idx] || 0;
+        var cyVal = (cyPts && cyPts[idx]) ? cyPts[idx] : 0;
+        var shPct = shVal ? (((shVal - prevClose) / prevClose) * 100).toFixed(2) : '0.00';
+        var cyPct = cyVal ? (((cyVal - prevCloseCy) / prevCloseCy) * 100).toFixed(2) : '0.00';
+
         tipMin.innerHTML = '<b>' + times[idx] + '</b><br>' +
           '<span style="color:#005eb8;">' + countLabel + '成交: <b>' + minAmts[idx].toFixed(2) + ' 亿元</b></span><br>' +
-          '<span style="color:#ff7a00;">上证综指: <b>' + shPts[idx].toFixed(2) + '</b> (' + (shPts[idx] >= prevClose ? '+' : '') + (((shPts[idx]-prevClose)/prevClose)*100).toFixed(2) + '%)</span>';
+          '<span style="color:#ff7a00;">上证综指: <b>' + shVal.toFixed(2) + '</b> (' + (shPct >= 0 ? '+' : '') + shPct + '%)</span><br>' +
+          '<span style="color:#8e44ad;">创业板指: <b>' + (cyVal ? cyVal.toFixed(2) : '--') + '</b> (' + (cyPct >= 0 ? '+' : '') + cyPct + '%)</span>';
         
-        var tW = tipMin.offsetWidth || 150;
+        var tW = tipMin.offsetWidth || 180;
         var leftPx = rx + 14;
         if (leftPx + tW > rect.width - 10) leftPx = rx - tW - 14;
         tipMin.style.left = leftPx + 'px';
@@ -1962,52 +1994,73 @@ window.fetchLiveIntraday = function() {
   var ss = String(bjTime.getSeconds()).padStart(2, '0');
   var timeStr = hh + ':' + mm + ':' + ss;
 
-  // 1. 直连腾讯实时分时接口 (原生支持 Access-Control-Allow-Origin: *)
+  // 1. 直连腾讯实时分时接口，同时并发拉取上证指数 (sh000001) 与 创业板指 (sz399006)
   var urlSh = 'https://web.ifzq.gtimg.cn/appstock/app/minute/query?code=sh000001&r=' + Date.now();
-  fetch(urlSh, {cache: 'no-store'})
-    .then(function(res){ return res.json(); })
-    .then(function(d){
-      if (!d || !d.data || !d.data.sh000001) return;
-      var raw = d.data.sh000001.data;
-      var minList = raw.data;
-      if (!minList || !minList.length) return;
-      
-      var prevClose = parseFloat(raw.prev_close || 3680.64);
-      var times = [];
-      var shPts = [];
-      
-      for (var i = 0; i < minList.length; i++) {
-        var parts = minList[i].split(' ');
-        var t = parts[0];
-        times.push(t.slice(0, 2) + ':' + t.slice(2, 4));
-        shPts.push(parseFloat(parts[1]));
+  var urlCy = 'https://web.ifzq.gtimg.cn/appstock/app/minute/query?code=sz399006&r=' + Date.now();
+  
+  Promise.all([
+    fetch(urlSh, {cache: 'no-store'}).then(function(r){ return r.json(); }).catch(function(){ return null; }),
+    fetch(urlCy, {cache: 'no-store'}).then(function(r){ return r.json(); }).catch(function(){ return null; })
+  ]).then(function(results){
+    var dSh = results[0];
+    var dCy = results[1];
+    
+    if (!dSh || !dSh.data || !dSh.data.sh000001) return;
+    var rawSh = dSh.data.sh000001.data;
+    var minListSh = rawSh.data || [];
+    if (!minListSh.length) return;
+    
+    var prevCloseSh = parseFloat(rawSh.prev_close || (window.INTRADAY_MIN ? window.INTRADAY_MIN.prev_close : 3655.83));
+    var times = [];
+    var shPts = [];
+    for (var i = 0; i < minListSh.length; i++) {
+      var parts = minListSh[i].split(' ');
+      var t = parts[0];
+      times.push(t.slice(0, 2) + ':' + t.slice(2, 4));
+      shPts.push(parseFloat(parts[1]));
+    }
+    
+    // 解析创业板指分时
+    var cyPts = [];
+    var prevCloseCy = 2509.43;
+    if (dCy && dCy.data && dCy.data.sz399006) {
+      var rawCy = dCy.data.sz399006.data;
+      var minListCy = rawCy.data || [];
+      prevCloseCy = parseFloat(rawCy.prev_close || (window.INTRADAY_MIN && window.INTRADAY_MIN.prev_close_cy ? window.INTRADAY_MIN.prev_close_cy : 2509.43));
+      for (var j = 0; j < minListCy.length; j++) {
+        cyPts.push(parseFloat(minListCy[j].split(' ')[1]));
       }
-      
-      // 更新上证指数实时点位
-      var curSh = shPts[shPts.length - 1];
-      var chgPct = ((curSh - prevClose) / prevClose * 100).toFixed(2);
-      
-      // 更新更新时间标签
-      var utEl = document.getElementById('intradayUpdateTime');
-      if (utEl) {
-        utEl.innerHTML = '<span style="color:#005eb8;font-weight:700;">● 盘中实时更新 ' + timeStr + '</span> (沪指: ' + curSh.toFixed(2) + ' ' + (chgPct >= 0 ? '+' : '') + chgPct + '%)';
-      }
+    }
+    
+    // 实时最新点位与涨跌幅
+    var curSh = shPts[shPts.length - 1];
+    var chgSh = ((curSh - prevCloseSh) / prevCloseSh * 100).toFixed(2);
+    var curCy = cyPts.length ? cyPts[cyPts.length - 1] : 0;
+    var chgCy = curCy ? ((curCy - prevCloseCy) / prevCloseCy * 100).toFixed(2) : '0.00';
+    
+    var utEl = document.getElementById('intradayUpdateTime');
+    if (utEl) {
+      utEl.innerHTML = '<span style="color:#005eb8;font-weight:700;">● 盘中实时更新 ' + timeStr + '</span> ' +
+        '(沪指: ' + curSh.toFixed(2) + ' <span style="color:' + (chgSh >= 0 ? '#d9001b' : '#008000') + '">' + (chgSh >= 0 ? '+' : '') + chgSh + '%</span> | ' +
+        '创指: ' + (curCy ? curCy.toFixed(2) : '--') + ' <span style="color:' + (chgCy >= 0 ? '#d9001b' : '#008000') + '">' + (chgCy >= 0 ? '+' : '') + chgCy + '%</span>)';
+    }
 
-      // 如果已有分时底座，将分时点位就地对齐升级
-      if (window.INTRADAY_MIN) {
-        window.INTRADAY_MIN.times = times;
-        window.INTRADAY_MIN.sh_points = shPts;
-        window.INTRADAY_MIN.prev_close = prevClose;
-        
-        // 重新渲染分时图表
-        if (typeof window.renderIntradayCharts === 'function') {
-          window.renderIntradayCharts(window.INTRADAY_MIN);
-        }
+    if (window.INTRADAY_MIN) {
+      window.INTRADAY_MIN.times = times;
+      window.INTRADAY_MIN.sh_points = shPts;
+      window.INTRADAY_MIN.prev_close = prevCloseSh;
+      if (cyPts.length) {
+        window.INTRADAY_MIN.cy_points = cyPts.slice(0, times.length);
+        window.INTRADAY_MIN.prev_close_cy = prevCloseCy;
       }
-    })
-    .catch(function(err){
-      console.warn('Live intraday fetch failed:', err);
-    });
+      
+      if (typeof window.renderIntradayCharts === 'function') {
+        window.renderIntradayCharts(window.INTRADAY_MIN);
+      }
+    }
+  }).catch(function(err){
+    console.warn('Live intraday dual-index fetch failed:', err);
+  });
 
   // 2. 同时抓取今日 4 只头部 300 ETF 现价与沪深 300 实时点位，动态注入宏观走势图
   var urlMacroLive = 'https://qt.gtimg.cn/q=sh000300,sh510300,sh510310,sh510330,sz159919&r=' + Date.now();

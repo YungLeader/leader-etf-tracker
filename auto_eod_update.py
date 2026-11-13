@@ -152,6 +152,21 @@ def compute_and_save_intraday_min(items, today_dash):
             "base_cum_amount": base_cum
         }
 
+    # 同时拉取创业板指 (sz399006) 分时数据
+    url_cy = 'https://quotes.sina.cn/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol=sz399006&scale=1&ma=no&datalen=245'
+    req_cy = urllib.request.Request(url_cy, headers={'User-Agent': 'Mozilla/5.0'})
+    try:
+        with urllib.request.urlopen(req_cy, timeout=4) as resp:
+            cy_raw = json.loads(resp.read().decode('gbk'))
+            cy_today = [x for x in cy_raw if x['day'].startswith(today_dash) and x['day'][11:16] not in ['14:58', '14:59']]
+            cy_map = {x['day'][11:16]: float(x['close']) for x in cy_today}
+            cy_pts = [cy_map.get(t, float(cy_today[-1]['close']) if cy_today else 2426.08) for t in sh_times]
+            prev_close_cy = float(cy_today[0]['open']) if cy_today else 2509.43
+    except Exception as e:
+        print(f"[WARN] 创业板指分时拉取降级: {e}")
+        cy_pts = [2426.08] * n_pts
+        prev_close_cy = 2509.43
+
     scope_20 = compute_scope(core_items)
     scope_24 = compute_scope(items)
 
@@ -160,6 +175,8 @@ def compute_and_save_intraday_min(items, today_dash):
         "prev_close": round(sh_pts[0], 2) if sh_pts else 3663.72,
         "times": sh_times,
         "sh_points": sh_pts,
+        "cy_points": cy_pts,
+        "prev_close_cy": prev_close_cy,
         "scope_20": scope_20,
         "scope_24": scope_24
     }
