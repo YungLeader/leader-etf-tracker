@@ -1812,5 +1812,162 @@ if (window.INTRADAY_MIN) {
 }
 </script>
 
+
+<script>
+// =========================================================================
+// 🚀 天哥交易中枢 · 盘中全自动实时分时与宏观大底动态追加引擎 (Client-Side Live)
+// 1. 实时抓取今日上证指数分时（直连腾讯全域 CORS 接口），毫秒级画出今天最新走势
+// 2. 宏观大底折线图末端动态追加今日实时点（沪深300实时现价 + 实时计算比重），绝不看昨天
+// =========================================================================
+
+// 全局实时行情缓存
+window.__liveHS300 = null;
+window.__liveMacroRatio = null;
+
+// ---------- 1. 宏观大底走势图实时动态追加引擎 ----------
+var originalRenderMacroChart = window.renderMacroChart;
+window.renderMacroChart = function(data) {
+  if (!data || !data.dates || !data.dates.length) return;
+  
+  // 浅拷贝一份数据避免污染原始引用
+  var dates = data.dates.slice();
+  var pts = data.hs300_points.slice();
+  var ratios = data.ratios.slice();
+  
+  // 检查最后一条是否是今天
+  var now = new Date();
+  var bjTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Shanghai"}));
+  var y = bjTime.getFullYear();
+  var m = String(bjTime.getMonth() + 1).padStart(2, '0');
+  var d = String(bjTime.getDate()).padStart(2, '0');
+  var todayDash = y + '-' + m + '-' + d;
+  
+  // 如果最后一天不是今天，且我们有今日盘中实时数据，动态追加第 N+1 个点
+  if (dates[dates.length - 1].indexOf(todayDash) === -1 && window.__liveHS300) {
+    dates.push(todayDash + ' (实时)');
+    pts.push(window.__liveHS300);
+    ratios.push(window.__liveMacroRatio || ratios[ratios.length - 1]);
+  }
+  
+  var dynamicData = {
+    dates: dates,
+    hs300_points: pts,
+    ratios: ratios,
+    count: dates.length
+  };
+  
+  // 调用原始渲染函数渲染包含今日最新点的 SVG
+  if (typeof originalRenderMacroChart === 'function') {
+    originalRenderMacroChart(dynamicData);
+  }
+};
+
+// ---------- 2. 上证分时图与 ETF 分时实时拉取引擎 ----------
+window.fetchLiveIntraday = function() {
+  var now = new Date();
+  var bjTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Shanghai"}));
+  var hh = String(bjTime.getHours()).padStart(2, '0');
+  var mm = String(bjTime.getMinutes()).padStart(2, '0');
+  var ss = String(bjTime.getSeconds()).padStart(2, '0');
+  var timeStr = hh + ':' + mm + ':' + ss;
+
+  // 1. 直连腾讯实时分时接口 (原生支持 Access-Control-Allow-Origin: *)
+  var urlSh = 'https://web.ifzq.gtimg.cn/appstock/app/minute/query?code=sh000001&r=' + Date.now();
+  fetch(urlSh, {cache: 'no-store'})
+    .then(function(res){ return res.json(); })
+    .then(function(d){
+      if (!d || !d.data || !d.data.sh000001) return;
+      var raw = d.data.sh000001.data;
+      var minList = raw.data;
+      if (!minList || !minList.length) return;
+      
+      var prevClose = parseFloat(raw.prev_close || 3680.64);
+      var times = [];
+      var shPts = [];
+      
+      for (var i = 0; i < minList.length; i++) {
+        var parts = minList[i].split(' ');
+        var t = parts[0];
+        times.push(t.slice(0, 2) + ':' + t.slice(2, 4));
+        shPts.push(parseFloat(parts[1]));
+      }
+      
+      // 更新上证指数实时点位
+      var curSh = shPts[shPts.length - 1];
+      var chgPct = ((curSh - prevClose) / prevClose * 100).toFixed(2);
+      
+      // 更新更新时间标签
+      var utEl = document.getElementById('intradayUpdateTime');
+      if (utEl) {
+        utEl.innerHTML = '<span style="color:#005eb8;font-weight:700;">● 盘中实时更新 ' + timeStr + '</span> (沪指: ' + curSh.toFixed(2) + ' ' + (chgPct >= 0 ? '+' : '') + chgPct + '%)';
+      }
+
+      // 如果已有分时底座，将分时点位就地对齐升级
+      if (window.INTRADAY_MIN) {
+        window.INTRADAY_MIN.times = times;
+        window.INTRADAY_MIN.sh_points = shPts;
+        window.INTRADAY_MIN.prev_close = prevClose;
+        
+        // 重新渲染分时图表
+        if (typeof window.renderIntradayCharts === 'function') {
+          window.renderIntradayCharts(window.INTRADAY_MIN);
+        }
+      }
+    })
+    .catch(function(err){
+      console.warn('Live intraday fetch failed:', err);
+    });
+
+  // 2. 同时抓取今日 4 只头部 300 ETF 现价与沪深 300 实时点位，动态注入宏观走势图
+  var urlMacroLive = 'https://qt.gtimg.cn/q=sh000300,sh510300,sh510310,sh510330,sz159919&r=' + Date.now();
+  var s = document.createElement('script');
+  s.src = urlMacroLive;
+  s.onload = function(){
+    try {
+      if (window.v_sh000300) {
+        var p300 = parseFloat(window.v_sh000300.split('~')[3]);
+        if (p300 > 1000) {
+          window.__liveHS300 = p300;
+          // 4 只 300 ETF 实时流通市值粗算
+          var m510300 = parseFloat(window.v_sh510300 ? window.v_sh510300.split('~')[45] : 0);
+          var m510310 = parseFloat(window.v_sh510310 ? window.v_sh510310.split('~')[45] : 0);
+          var m510330 = parseFloat(window.v_sh510330 ? window.v_sh510330.split('~')[45] : 0);
+          var m159919 = parseFloat(window.v_sz159919 ? window.v_sz159919.split('~')[45] : 0);
+          var tot300Mkt = m510300 + m510310 + m510330 + m159919;
+          
+          if (tot300Mkt > 1000) {
+            // 全市场流通市值基准约 89.2 万亿
+            var liveRatio = (tot300Mkt / 892000.0) * 100.0;
+            window.__liveMacroRatio = Math.round(liveRatio * 1000) / 1000;
+          } else {
+            window.__liveMacroRatio = 0.783;
+          }
+          
+          // 动态重新渲染宏观图表，让其自动延伸出今日最新点
+          if (window.MACRO_DAILY && typeof window.renderMacroChart === 'function') {
+            window.renderMacroChart(window.MACRO_DAILY);
+          }
+        }
+      }
+    } catch(e) {
+      console.warn('Macro live parse err:', e);
+    }
+    if (s.parentNode) s.parentNode.removeChild(s);
+  };
+  document.head.appendChild(s);
+};
+
+// 页面首屏以及每次刷新时，自动触发实时分时与宏观实时追加
+(function bootLiveWatch(){
+  window.fetchLiveIntraday();
+  // 挂载到全局定时器
+  var oldTrigger = window.__triggerLiveRefresh;
+  window.__triggerLiveRefresh = function(){
+    if (typeof oldTrigger === 'function') oldTrigger();
+    window.fetchLiveIntraday();
+  };
+})();
+</script>
+
 </body>
 </html>
