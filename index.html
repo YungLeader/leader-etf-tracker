@@ -1322,7 +1322,7 @@ window.MACRO_DAILY = {"dates": ["2020-01-02", "2020-01-03", "2020-01-06", "2020-
 
 
 <script>
-// ---------- 全量动态渲染宏观大底 SVG ----------
+// ---------- 全量动态渲染宏观大底 SVG (带丝滑悬浮 Tooltip 与十字准星) ----------
 window.renderMacroChart = function(data) {
   if (!data || !data.dates || !data.dates.length) return;
   var wrap = document.getElementById('macroChartWrap');
@@ -1399,7 +1399,82 @@ window.renderMacroChart = function(data) {
   svgInner.push('<rect x="' + (lastX - 45).toFixed(1) + '" y="' + (lastY - 26).toFixed(1) + '" width="50" height="20" rx="4" fill="#ff4713"/>');
   svgInner.push('<text x="' + (lastX - 20).toFixed(1) + '" y="' + (lastY - 12).toFixed(1) + '" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">' + ratios[n - 1] + '%</text>');
 
+  // 注入十字瞄准线与高亮节点 (初始隐藏)
+  svgInner.push('<g id="macroCrosshair" style="display:none;">');
+  svgInner.push('<line id="macroCrossLine" y1="' + padT + '" y2="' + (h - padB) + '" stroke="#666" stroke-width="1.2" stroke-dasharray="3,3"/>');
+  svgInner.push('<circle id="macroHoverPt" r="5" fill="#005eb8" stroke="#fff" stroke-width="2"/>');
+  svgInner.push('<circle id="macroHoverRt" r="5" fill="#ff4713" stroke="#fff" stroke-width="2"/>');
+  svgInner.push('</g>');
+
   svg.innerHTML = svgInner.join('');
+
+  // ---------- 绑定鼠标/触屏悬浮交互，精准响应任意点 ----------
+  function onMove(e) {
+    var rect = svg.getBoundingClientRect();
+    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    var rx = clientX - rect.left;
+    var scale = w / rect.width;
+    var xInSvg = rx * scale;
+
+    if (xInSvg < padL || xInSvg > (w - padR)) {
+      onLeave();
+      return;
+    }
+
+    var progress = (xInSvg - padL) / chartW;
+    var idx = Math.round(progress * (n - 1));
+    idx = Math.max(0, Math.min(n - 1, idx));
+
+    var curDate = dates[idx];
+    var curPt = pts[idx];
+    var curRt = ratios[idx];
+    var pX = getX(idx);
+    var pYPt = getYPt(curPt);
+    var pYRt = getYRt(curRt);
+
+    var cross = document.getElementById('macroCrosshair');
+    var crossLine = document.getElementById('macroCrossLine');
+    var dotPt = document.getElementById('macroHoverPt');
+    var dotRt = document.getElementById('macroHoverRt');
+    if (cross && crossLine && dotPt && dotRt) {
+      cross.style.display = 'block';
+      crossLine.setAttribute('x1', pX.toFixed(1));
+      crossLine.setAttribute('x2', pX.toFixed(1));
+      dotPt.setAttribute('cx', pX.toFixed(1));
+      dotPt.setAttribute('cy', pYPt.toFixed(1));
+      dotRt.setAttribute('cx', pX.toFixed(1));
+      dotRt.setAttribute('cy', pYRt.toFixed(1));
+    }
+
+    var ttDate = document.getElementById('ttDate');
+    var ttPt = document.getElementById('ttPt');
+    var ttRt = document.getElementById('ttRt');
+    if (ttDate) ttDate.textContent = curDate;
+    if (ttPt) ttPt.textContent = Number(curPt).toFixed(2);
+    if (ttRt) ttRt.textContent = Number(curRt).toFixed(3) + '%';
+
+    if (tip) {
+      tip.style.display = 'block';
+      var tipW = tip.offsetWidth || 180;
+      var leftPx = rx + 15;
+      if (leftPx + tipW > rect.width - 15) {
+        leftPx = rx - tipW - 15;
+      }
+      tip.style.left = Math.max(10, leftPx) + 'px';
+      tip.style.top = '15px';
+    }
+  }
+
+  function onLeave() {
+    var cross = document.getElementById('macroCrosshair');
+    if (cross) cross.style.display = 'none';
+    if (tip) tip.style.display = 'none';
+  }
+
+  wrap.onmousemove = onMove;
+  wrap.ontouchmove = onMove;
+  wrap.onmouseleave = onLeave;
+  wrap.ontouchend = onLeave;
 };
 
 // ---------- 全局一键强制拉取最新数据（强力穿透 CDN 与浏览器缓存） ----------
@@ -1634,17 +1709,16 @@ window.renderIntradayCharts = function(d) {
   var n = times.length;
 
   // 容错补齐防留白：若指数分时延伸至最新分钟但ETF柱子稍有滞后，自动用平滑均值延伸补全至最新时刻
+  // 严禁将最后一个点无脑复制重复填充！保持真实数据长度与对齐
   if (minAmts.length < n) {
-    var lastV = minAmts.length ? minAmts[minAmts.length - 1] : 1.0;
-    var lastCum = cumAmts.length ? cumAmts[cumAmts.length - 1] : 0.0;
-    var lastBase = baseCum.length ? baseCum[baseCum.length - 1] : 0.0;
-    while (minAmts.length < n) {
-      minAmts.push(lastV);
-      lastCum = Math.round((lastCum + lastV) * 100) / 100;
-      cumAmts.push(lastCum);
-      lastBase = Math.round((curObj.total_avg20_amount * ((minAmts.length) / 240.0)) * 100) / 100;
-      baseCum.push(lastBase);
-    }
+    // 若仅上证指数多了尾盘集合竞价切片，截断指数点位保持与 ETF 真实分钟一一对应
+    times = times.slice(0, minAmts.length);
+    shPts = shPts.slice(0, minAmts.length);
+    n = minAmts.length;
+  } else if (minAmts.length > n) {
+    minAmts = minAmts.slice(0, n);
+    cumAmts = cumAmts.slice(0, n);
+    baseCum = baseCum.slice(0, n);
   }
 
 
@@ -1844,12 +1918,10 @@ var originalRenderMacroChart = window.renderMacroChart;
 window.renderMacroChart = function(data) {
   if (!data || !data.dates || !data.dates.length) return;
   
-  // 浅拷贝一份数据避免污染原始引用
   var dates = data.dates.slice();
   var pts = data.hs300_points.slice();
   var ratios = data.ratios.slice();
   
-  // 检查最后一条是否是今天
   var now = new Date();
   var bjTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Shanghai"}));
   var y = bjTime.getFullYear();
@@ -1857,8 +1929,13 @@ window.renderMacroChart = function(data) {
   var d = String(bjTime.getDate()).padStart(2, '0');
   var todayDash = y + '-' + m + '-' + d;
   
-  // 如果最后一天不是今天，且我们有今日盘中实时数据，动态追加第 N+1 个点
-  if (dates[dates.length - 1].indexOf(todayDash) === -1 && window.__liveHS300) {
+  // 仅在盘中开盘时段（9:30-15:00）且底座历史未记录今天时，才追加盘中动态点
+  var curHour = bjTime.getHours();
+  var curMin = bjTime.getMinutes();
+  var isTradingHours = (curHour === 9 && curMin >= 30) || (curHour === 10) || (curHour === 11 && curMin <= 30) || (curHour >= 13 && curHour < 15);
+  var lastDateHasToday = dates[dates.length - 1].indexOf(todayDash) !== -1;
+  
+  if (isTradingHours && !lastDateHasToday && window.__liveHS300) {
     dates.push(todayDash + ' (实时)');
     pts.push(window.__liveHS300);
     ratios.push(window.__liveMacroRatio || ratios[ratios.length - 1]);
@@ -1871,7 +1948,6 @@ window.renderMacroChart = function(data) {
     count: dates.length
   };
   
-  // 调用原始渲染函数渲染包含今日最新点的 SVG
   if (typeof originalRenderMacroChart === 'function') {
     originalRenderMacroChart(dynamicData);
   }
@@ -1951,8 +2027,8 @@ window.fetchLiveIntraday = function() {
           var tot300Mkt = m510300 + m510310 + m510330 + m159919;
           
           if (tot300Mkt > 1000) {
-            // 全市场流通市值基准约 89.2 万亿
-            var liveRatio = (tot300Mkt / 892000.0) * 100.0;
+            // A股全市场真实自由流通市值基准约 52.88 万亿元（不可使用含限售股的总市值89万亿）
+            var liveRatio = (tot300Mkt / 528800.0) * 100.0;
             window.__liveMacroRatio = Math.round(liveRatio * 1000) / 1000;
           } else {
             window.__liveMacroRatio = 0.783;
