@@ -8932,6 +8932,268 @@ window.SNAPSHOT = {
           "volume_lots": 443407.0
         }
       ]
+    },
+    {
+      "code": "515330",
+      "tcode": "sh515330",
+      "name": "沪深300ETF天弘",
+      "index": "沪深300",
+      "group": "watch",
+      "price": 1.173,
+      "prev_close": 1.181,
+      "pct": -0.68,
+      "outer_lots": 6114150,
+      "inner_lots": 160493,
+      "amount_wan": 73773.0,
+      "amount_yi": 7.3773,
+      "turnover": 6.49,
+      "mktcap_yi": 113.41,
+      "shares_yi": 96.6837,
+      "shares": 9668370000,
+      "shares_date": "20261113",
+      "avg20_yi": 1.44,
+      "hist": [
+        {
+          "date": "2026-10-16",
+          "amount_yi": 0.1935,
+          "volume_lots": 158638
+        },
+        {
+          "date": "2026-10-19",
+          "amount_yi": 0.2148,
+          "volume_lots": 176216
+        },
+        {
+          "date": "2026-10-20",
+          "amount_yi": 0.1744,
+          "volume_lots": 144216
+        },
+        {
+          "date": "2026-10-21",
+          "amount_yi": 0.2193,
+          "volume_lots": 182005
+        },
+        {
+          "date": "2026-10-22",
+          "amount_yi": 0.2374,
+          "volume_lots": 200365
+        },
+        {
+          "date": "2026-10-23",
+          "amount_yi": 6.7628,
+          "volume_lots": 5657617
+        },
+        {
+          "date": "2026-10-26",
+          "amount_yi": 0.2716,
+          "volume_lots": 227571
+        },
+        {
+          "date": "2026-10-27",
+          "amount_yi": 0.767,
+          "volume_lots": 641985
+        },
+        {
+          "date": "2026-10-28",
+          "amount_yi": 0.326,
+          "volume_lots": 273499
+        },
+        {
+          "date": "2026-10-29",
+          "amount_yi": 0.2191,
+          "volume_lots": 185151
+        },
+        {
+          "date": "2026-10-30",
+          "amount_yi": 0.4758,
+          "volume_lots": 404675
+        },
+        {
+          "date": "2026-11-02",
+          "amount_yi": 1.2887,
+          "volume_lots": 1095133
+        },
+        {
+          "date": "2026-11-03",
+          "amount_yi": 0.6245,
+          "volume_lots": 532980
+        },
+        {
+          "date": "2026-11-04",
+          "amount_yi": 3.4812,
+          "volume_lots": 2911349
+        },
+        {
+          "date": "2026-11-05",
+          "amount_yi": 3.8254,
+          "volume_lots": 3179321
+        },
+        {
+          "date": "2026-11-06",
+          "amount_yi": 0.401,
+          "volume_lots": 338953
+        },
+        {
+          "date": "2026-11-09",
+          "amount_yi": 1.1483,
+          "volume_lots": 966707
+        },
+        {
+          "date": "2026-11-10",
+          "amount_yi": 0.1261,
+          "volume_lots": 105973
+        },
+        {
+          "date": "2026-11-11",
+          "amount_yi": 0.6566,
+          "volume_lots": 550786
+        },
+        {
+          "date": "2026-11-12",
+          "amount_yi": 0.2614,
+          "volume_lots": 219502
+        },
+        {
+          "date": "2026-11-13",
+          "amount_yi": 7.3773,
+          "volume_lots": 6274643
+        }
+      ],
+      "date": "20261113",
+      "ts": 1763017200,
+      "tail_ratio": 0.973,
+      "tail_ratio_base": 0.15
+    },
+    {
+      "code": "510360",
+      "tcode": "sh510360",
+      "name": "沪深300ETF广发",
+      "index": "沪深300",
+      "group": "watch",
+      "price": 1.565,
+      "prev_close": 1.574,
+      "pct": -0.57,
+      "outer_lots": 1840991,
+      "inner_lots": 305800,
+      "amount_wan": 33610.0,
+      "amount_yi": 3.361,
+      "turnover": 7.3,
+      "mktcap_yi": 46.0,
+      "shares_yi": 29.393,
+      "shares": 2939300000,
+      "shares_date": "20261113",
+      "avg20_yi": 1.62,
+      "hist": [
+        {
+          "date": "2026-10-16",
+          "amount_yi": 0.6828,
+          "volume_lots": 420180
+        },
+        {
+          "date": "2026-10-19",
+          "amount_yi": 0.5081,
+          "volume_lots": 313093
+        },
+        {
+          "date": "2026-10-20",
+          "amount_yi": 0.9046,
+          "volume_lots": 561709
+        },
+        {
+          "date": "2026-10-21",
+          "amount_yi": 0.8607,
+          "volume_lots": 535002
+        },
+        {
+          "date": "2026-10-22",
+          "amount_yi": 0.6928,
+          "volume_lots": 439271
+        },
+        {
+          "date": "2026-10-23",
+          "amount_yi": 5.2095,
+          "volume_lots": 3282283
+        },
+        {
+          "date": "2026-10-26",
+          "amount_yi": 1.4521,
+          "volume_lots": 913430
+        },
+        {
+          "date": "2026-10-27",
+          "amount_yi": 1.0183,
+          "volume_lots": 639816
+        },
+        {
+          "date": "2026-10-28",
+          "amount_yi": 0.6928,
+          "volume_lots": 436211
+        },
+        {
+          "date": "2026-10-29",
+          "amount_yi": 0.9133,
+          "volume_lots": 579412
+        },
+        {
+          "date": "2026-10-30",
+          "amount_yi": 0.6943,
+          "volume_lots": 445098
+        },
+        {
+          "date": "2026-11-02",
+          "amount_yi": 2.1826,
+          "volume_lots": 1393956
+        },
+        {
+          "date": "2026-11-03",
+          "amount_yi": 1.927,
+          "volume_lots": 1235089
+        },
+        {
+          "date": "2026-11-04",
+          "amount_yi": 5.4103,
+          "volume_lots": 3412218
+        },
+        {
+          "date": "2026-11-05",
+          "amount_yi": 3.5697,
+          "volume_lots": 2229443
+        },
+        {
+          "date": "2026-11-06",
+          "amount_yi": 0.9234,
+          "volume_lots": 585012
+        },
+        {
+          "date": "2026-11-09",
+          "amount_yi": 0.685,
+          "volume_lots": 432107
+        },
+        {
+          "date": "2026-11-10",
+          "amount_yi": 0.3397,
+          "volume_lots": 214208
+        },
+        {
+          "date": "2026-11-11",
+          "amount_yi": 0.4193,
+          "volume_lots": 264844
+        },
+        {
+          "date": "2026-11-12",
+          "amount_yi": 0.6251,
+          "volume_lots": 394609
+        },
+        {
+          "date": "2026-11-13",
+          "amount_yi": 3.361,
+          "volume_lots": 2146791
+        }
+      ],
+      "date": "20261113",
+      "ts": 1763017200,
+      "tail_ratio": 0.849,
+      "tail_ratio_base": 0.15
     }
   ],
   "shares_history": {
