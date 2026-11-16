@@ -598,7 +598,7 @@ function bootSnapshot(){
       return '<rect x="'+(i*bw).toFixed(1)+'" y="'+(h-bh).toFixed(1)+'" width="'+Math.max(1.2,bw-1).toFixed(1)+
              '" height="'+bh.toFixed(1)+'" fill="'+(last?'#ff4713':'#e0e0e0')+'"/>';
     }).join('');
-    return '<svg class="spark" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+" aria-label=\"\u8fd130\u65e5\u6210\u4ea4\u989d\">'+bars+'</svg>';
+    return '<svg class="spark" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" aria-label="近30日成交额">'+bars+'</svg>';
   }
 
   // ---------- 份额图表：每日份额变化 + 加仓指数 ----------
@@ -1775,14 +1775,20 @@ window.renderIntradayCharts = function(d) {
     var w = 1196, h = 240, padL = 55, padR = 65, padT = 20, padB = 30;
     var cW = w - padL - padR, cH = h - padT - padB;
     
-    // 左轴固定 10 亿满高（不再自适应），分钟量能柱被等比放大，放量/缩量一目了然
+    // 左轴固定 20 亿满高（不再自适应），分钟量能柱被等比放大，放量/缩量一目了然
     var maxMinAmt = 20.0;
     var cyPts = d.cy_points || [];
     var prevCloseCy = d.prev_close_cy || 2509.43;
 
-    // 右侧涨跌幅轴：严格固定 ±5%（昨收 0.00% 居中），不再自适应缩放
+    // 右侧涨跌幅轴：先计算实际波幅极值
+    var maxShPct = 0, maxCyPct = 0;
+    for (var i = 0; i < n; i++) {
+      if (shPts[i]) { var a1 = Math.abs((shPts[i] - prevClose) / prevClose * 100); if (a1 > maxShPct) maxShPct = a1; }
+      if (cyPts[i]) { var a2 = Math.abs((cyPts[i] - prevCloseCy) / prevCloseCy * 100); if (a2 > maxCyPct) maxCyPct = a2; }
+    }
+    // 自适应放大：根据实际波幅动态调整，让同样的波动占据更大画布空间
     var commonSpanPct = Math.max(maxShPct, maxCyPct, 0.8) * 1.1;
-    // 统计真实极值，用于判断是否超出 ±5% 并给出提示
+    // 统计真实极值，用于判断是否超出轴范围并给出提示
     var maxAbsPct = 0, extPct = 0;
     for (var i = 0; i < n; i++) {
       if (shPts[i]) { var a1 = (shPts[i] - prevClose) / prevClose * 100; if (Math.abs(a1) > maxAbsPct) { maxAbsPct = Math.abs(a1); extPct = a1; } }
