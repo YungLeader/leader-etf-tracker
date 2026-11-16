@@ -1122,7 +1122,8 @@ function bootSnapshot(){
 
   // ---------- 事件 ----------
   ['sort','scope','q'].forEach(function(id){
-    document.getElementById(id).addEventListener(id==='q'?'input':'change',renderTable);
+    var handler = (id === 'scope') ? function(){ renderTable(); renderIntradayCharts(window.INTRADAY_MIN); } : renderTable;
+    document.getElementById(id).addEventListener(id==='q'?'input':'change', handler);
   });
   document.getElementById('refresh').addEventListener('click',refresh);
   document.getElementById('auto').addEventListener('change',function(){
@@ -1763,12 +1764,12 @@ window.renderIntradayCharts = function(d) {
     var cW = w - padL - padR, cH = h - padT - padB;
     
     // 左轴固定 10 亿满高（不再自适应），分钟量能柱被等比放大，放量/缩量一目了然
-    var maxMinAmt = 10.0;
+    var maxMinAmt = 20.0;
     var cyPts = d.cy_points || [];
     var prevCloseCy = d.prev_close_cy || 2509.43;
 
     // 右侧涨跌幅轴：严格固定 ±5%（昨收 0.00% 居中），不再自适应缩放
-    var commonSpanPct = 5.0;
+    var commonSpanPct = Math.max(maxShPct, maxCyPct, 0.8) * 1.1;
     // 统计真实极值，用于判断是否超出 ±5% 并给出提示
     var maxAbsPct = 0, extPct = 0;
     for (var i = 0; i < n; i++) {
