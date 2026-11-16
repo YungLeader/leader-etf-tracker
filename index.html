@@ -343,7 +343,7 @@ footer code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:11px;
         <div style="font-size:12px;color:#888;" id="intradayUpdateTime">2026-11-16 15:00 收盘锁定</div>
       </div>
       <div id="chartMinWrap" style="position:relative;height:240px;width:100%;cursor:crosshair;">
-        <svg id="svgMinChart" viewBox="0 0 1196 240" style="width:100%;height:240px;display:block;"></svg>
+        <svg id="svgMinChart" viewBox="0 0 1196 360" style="width:100%;height:360px;display:block;"></svg>
         <div id="tipMin" class="chart-tip" style="position:absolute;display:none;z-index:10;background:rgba(255,255,255,0.96);padding:8px 12px;border:1px solid #005eb8;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,0.1);font-size:12px;pointer-events:none;"></div>
       </div>
     </div>
@@ -1772,7 +1772,7 @@ window.renderIntradayCharts = function(d) {
   var tipMin = document.getElementById('tipMin');
   var wrapMin = document.getElementById('chartMinWrap');
   if (svgMin) {
-    var w = 1196, h = 240, padL = 55, padR = 65, padT = 20, padB = 30;
+    var w = 1196, h = 360, padL = 55, padR = 65, padT = 20, padB = 30;
     var cW = w - padL - padR, cH = h - padT - padB;
     
     // 左轴固定 20 亿满高（不再自适应），分钟量能柱被等比放大，放量/缩量一目了然
@@ -1815,15 +1815,26 @@ window.renderIntradayCharts = function(d) {
     
     inner1.push('<text x="' + (padL - 8) + '" y="' + (padT + 10) + '" fill="#005eb8" font-size="11" text-anchor="end" font-family="monospace">' + maxMinAmt.toFixed(0) + '亿</text>');
     inner1.push('<text x="' + (padL - 8) + '" y="' + (h - padB) + '" fill="#005eb8" font-size="11" text-anchor="end" font-family="monospace">0</text>');
-    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (padT + 10) + '" fill="#ff7a00" font-size="11" font-family="monospace">+5%</text>');
-    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (h - padB) + '" fill="#ff7a00" font-size="11" font-family="monospace">-5%</text>');
-    // 半档参考线（±2.5%），提升读数精度
-    var halfSpan = 2.5;
-    var yQ1 = getYByPct(halfSpan), yQ3 = getYByPct(-halfSpan);
-    inner1.push('<line x1="' + padL + '" y1="' + yQ1.toFixed(1) + '" x2="' + (w - padR) + '" y2="' + yQ1.toFixed(1) + '" stroke="#f2f2f2" stroke-width="1"/>');
-    inner1.push('<line x1="' + padL + '" y1="' + yQ3.toFixed(1) + '" x2="' + (w - padR) + '" y2="' + yQ3.toFixed(1) + '" stroke="#f2f2f2" stroke-width="1"/>');
-    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (yQ1 + 4).toFixed(1) + '" fill="#c9a27a" font-size="10" font-family="monospace">+2.5%</text>');
-    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (yQ3 + 4).toFixed(1) + '" fill="#c9a27a" font-size="10" font-family="monospace">-2.5%</text>');
+    
+    // 右侧涨跌幅坐标：固定 0.5% 一档，档数根据实际波幅自适应
+    var stepPct = 0.5;
+    var gridCount = Math.ceil(commonSpanPct / stepPct);
+    for (var gi = -gridCount; gi <= gridCount; gi++) {
+      var gPct = gi * stepPct;
+      if (Math.abs(gPct) > commonSpanPct) continue;
+      var gy = getYByPct(gPct);
+      var isZero = (gi === 0);
+      if (isZero) continue;
+      var isMajor = (gi % 2 === 0);
+      if (isMajor) {
+        inner1.push('<line x1="' + padL + '" y1="' + gy.toFixed(1) + '" x2="' + (w - padR) + '" y2="' + gy.toFixed(1) + '" stroke="#e8e8e8" stroke-width="1"/>');
+        inner1.push('<text x="' + (w - padR + 6) + '" y="' + (gy + 4).toFixed(1) + '" fill="#999" font-size="10" font-family="monospace">' + (gPct > 0 ? '+' : '') + gPct.toFixed(1) + '%</text>');
+      } else {
+        inner1.push('<line x1="' + padL + '" y1="' + gy.toFixed(1) + '" x2="' + (w - padR) + '" y2="' + gy.toFixed(1) + '" stroke="#f5f5f5" stroke-width="0.5" stroke-dasharray="2,2"/>');
+      }
+    }
+    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (padT + 10) + '" fill="#ff7a00" font-size="11" font-family="monospace">+' + commonSpanPct.toFixed(1) + '%</text>');
+    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (h - padB) + '" fill="#ff7a00" font-size="11" font-family="monospace">-' + commonSpanPct.toFixed(1) + '%</text>');
     // 超出 ±5% 时贴边提示，折线本身在边界处削平，不篡改刻度
     if (maxAbsPct > 5.0) {
       inner1.push('<text x="' + (w - padR - 6) + '" y="' + (h - padB - 4) + '" fill="#d9001b" font-size="10.5" font-weight="bold" text-anchor="end">⚠ 日内极值 ' + (extPct >= 0 ? '+' : '') + extPct.toFixed(2) + '% 已超 ±5% 刻度，折线贴边显示</text>');
