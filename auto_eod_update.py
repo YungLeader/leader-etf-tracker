@@ -168,7 +168,7 @@ def compute_and_save_intraday_min(items, today_dash):
         prev_close_cy = 2509.43
 
     scope_20 = compute_scope(core_items)
-    scope_24 = compute_scope(items)
+    scope_26 = compute_scope(items)
 
     intraday_data = {
         "date": today_dash,
@@ -178,7 +178,7 @@ def compute_and_save_intraday_min(items, today_dash):
         "cy_points": cy_pts,
         "prev_close_cy": prev_close_cy,
         "scope_20": scope_20,
-        "scope_24": scope_24
+        "scope_26": scope_26
     }
 
     with open(INTRADAY_JSON, 'w', encoding='utf-8') as f:
