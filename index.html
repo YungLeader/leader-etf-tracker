@@ -249,7 +249,7 @@ footer code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:11px;
       </button>
       <span class="badge" id="badge"><i></i><span id="badgeText">载入中</span></span>
     </div>
-    <span class="stamp num" id="stamp">—</span>
+    <span class="stamp num" id="stamp" style="font-size:12px;color:var(--ink2);">最后更新：—</span>
   </div>
 </header>
 
@@ -488,6 +488,21 @@ function bootSnapshot(){
   "use strict";
   var S = window.SNAPSHOT;
   if(!S){ document.getElementById('vtitle').textContent='数据快照未加载'; return; }
+
+  // 更新最后数据时间戳显示
+  function updateLastUpdateTime() {
+    var genAt = S.generated_at; // "2026-11-16 19:08:27"
+    if (genAt) {
+      var parts = genAt.split(' ');
+      if (parts.length === 2) {
+        var datePart = parts[0].split('-'); // ["2026", "11", "16"]
+        var timePart = parts[1].substring(0, 5); // "19:08"
+        var display = datePart[1] + '-' + datePart[2] + ' ' + timePart; // "11-16 19:08"
+        document.getElementById('stamp').innerHTML = '<span style="color:var(--ink3);font-weight:400;">最后更新：</span>' + display;
+      }
+    }
+  }
+  updateLastUpdateTime();
 
   var byCode = {};
   S.items.forEach(function(it){ byCode[it.code] = it; });
@@ -1563,7 +1578,18 @@ window.forceReloadAll = function(triggerBtn) {
   });
 
   Promise.all([pMacro, pSnap]).then(function(){
-    // 3. 触发实时行情更新
+    // 3. 更新最后更新时间显示
+    if (window.SNAPSHOT && window.SNAPSHOT.generated_at) {
+      var genAt = window.SNAPSHOT.generated_at;
+      var parts = genAt.split(' ');
+      if (parts.length === 2) {
+        var datePart = parts[0].split('-');
+        var timePart = parts[1].substring(0, 5);
+        var display = datePart[1] + '-' + datePart[2] + ' ' + timePart;
+        document.getElementById('stamp').innerHTML = '<span style="color:var(--ink3);font-weight:400;">最后更新：</span>' + display;
+      }
+    }
+    // 4. 触发实时行情更新
     if (typeof window.__triggerLiveRefresh === 'function') {
       window.__triggerLiveRefresh();
     }
