@@ -1816,23 +1816,23 @@ window.renderIntradayCharts = function(d) {
     inner1.push('<text x="' + (padL - 8) + '" y="' + (padT + 10) + '" fill="#005eb8" font-size="11" text-anchor="end" font-family="monospace">' + maxMinAmt.toFixed(0) + '亿</text>');
     inner1.push('<text x="' + (padL - 8) + '" y="' + (h - padB) + '" fill="#005eb8" font-size="11" text-anchor="end" font-family="monospace">0</text>');
     
-    // 右侧涨跌幅坐标：固定 20 格（±5% 范围），每格 0.25%
-    var stepPct = 0.25;
-    for (var gi = -20; gi <= 20; gi++) {
+    // 右侧涨跌幅坐标：动态 20 格（根据实际波动自适应范围）
+    var stepPct = commonSpanPct * 2 / 20;
+    for (var gi = -10; gi <= 10; gi++) {
       var gPct = gi * stepPct;
       var gy = getYByPct(gPct);
-      var isZero = (gi === 0);
+      var isZero = Math.abs(gPct) < 0.01;
       if (isZero) continue;
-      var isMajor = (gi % 4 === 0);
+      var isMajor = (gi % 2 === 0);
       if (isMajor) {
         inner1.push('<line x1="' + padL + '" y1="' + gy.toFixed(1) + '" x2="' + (w - padR) + '" y2="' + gy.toFixed(1) + '" stroke="#e8e8e8" stroke-width="1"/>');
-        inner1.push('<text x="' + (w - padR + 6) + '" y="' + (gy + 4).toFixed(1) + '" fill="#999" font-size="10" font-family="monospace">' + (gPct > 0 ? '+' : '') + gPct.toFixed(1) + '%</text>');
+        inner1.push('<text x="' + (w - padR + 6) + '" y="' + (gy + 4).toFixed(1) + '" fill="#999" font-size="10" font-family="monospace">' + (gPct > 0 ? '+' : '') + gPct.toFixed(2) + '%</text>');
       } else {
         inner1.push('<line x1="' + padL + '" y1="' + gy.toFixed(1) + '" x2="' + (w - padR) + '" y2="' + gy.toFixed(1) + '" stroke="#f5f5f5" stroke-width="0.5" stroke-dasharray="2,2"/>');
       }
     }
-    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (padT + 10) + '" fill="#ff7a00" font-size="11" font-family="monospace">+' + commonSpanPct.toFixed(1) + '%</text>');
-    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (h - padB) + '" fill="#ff7a00" font-size="11" font-family="monospace">-' + commonSpanPct.toFixed(1) + '%</text>');
+    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (padT + 10) + '" fill="#ff7a00" font-size="11" font-family="monospace">+' + commonSpanPct.toFixed(2) + '%</text>');
+    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (h - padB) + '" fill="#ff7a00" font-size="11" font-family="monospace">-' + commonSpanPct.toFixed(2) + '%</text>');
     // 超出 ±5% 时贴边提示，折线本身在边界处削平，不篡改刻度
     if (maxAbsPct > 5.0) {
       inner1.push('<text x="' + (w - padR - 6) + '" y="' + (h - padB - 4) + '" fill="#d9001b" font-size="10.5" font-weight="bold" text-anchor="end">⚠ 日内极值 ' + (extPct >= 0 ? '+' : '') + extPct.toFixed(2) + '% 已超 ±5% 刻度，折线贴边显示</text>');
