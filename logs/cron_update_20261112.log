@@ -1,0 +1,22 @@
+=== [2026-11-12 15:35:01] 启动 ETF 看板自动更新 ===
+[main 0aaa4a2] auto: daily EOD ETF data & macro chart update 2026-11-12
+ Committer: Leader <leader@Leaders-Mac-mini.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly:
+
+    git config --global user.name "Your Name"
+    git config --global user.email you@example.com
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 3 files changed, 416 insertions(+), 413 deletions(-)
+fatal: could not read Username for 'https://github.com': Device not configured
+[2026-11-12 15:35:01] 🚀 开始执行国家队 ETF 自动化更新管线...
+✅ index.html 中的宏观 SVG 与当前比重 Badge 自动重绘完成！
+✅ 沪深300收盘点位 (4043.93) 及宏观曲线更新完成！
+✅ 数据物理写盘完成！今日成交额: 683.87亿，20日均底座: 720.85亿
+[ERROR] Git 提交/推送失败: Command '['git', 'push', 'origin', 'main']' returned non-zero exit status 128.
+=== [2026-11-12 15:35:02] 更新结束 ===

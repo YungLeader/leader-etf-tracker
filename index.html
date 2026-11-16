@@ -318,7 +318,7 @@ footer code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:11px;
         </h3>
         <div class="rng" id="intradayScopeRng" style="margin:0;">
           <button id="scopeBtn20" class="on" onclick="switchIntradayScope(20)">汇金核心 20 只</button>
-          <button id="scopeBtn24" onclick="switchIntradayScope(24)">全量观察 24 只</button>
+          <button id="scopeBtn24" onclick="switchIntradayScope(26)">全量观察 26 只</button>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:#666;flex-wrap:wrap;">
@@ -333,8 +333,10 @@ footer code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:11px;
         <div>
           <div id="titleMinChart" style="font-size:15px;font-weight:800;color:#222;">20只ETF分钟成交额与双指数(上证/创业板)分时叠加图</div>
           <div style="font-size:12px;color:#666;margin-top:4px;display:flex;gap:14px;flex-wrap:wrap;">
-            <span><span style="display:inline-block;width:10px;height:10px;background:#005eb8;margin-right:4px;border-radius:2px;vertical-align:middle;"></span>左轴柱状: 26只ETF分钟成交额合计 (亿元)</span>
+            <span><span style="display:inline-block;width:10px;height:10px;background:#005eb8;margin-right:4px;border-radius:2px;vertical-align:middle;"></span>左轴柱状: 26只ETF分钟成交额合计 (亿元，满高 10亿)</span>
             <span><span style="display:inline-block;width:12px;height:3px;background:#ff7a00;margin-right:4px;vertical-align:middle;"></span>右轴折线: 上证综指分时走势</span>
+            <span><span style="display:inline-block;width:12px;height:3px;background:#8e44ad;margin-right:4px;vertical-align:middle;"></span>右轴折线: 创业板指分时走势</span>
+            <span style="color:#c9a27a;">右轴刻度固定 ±5% (昨收 0.00%)</span>
             <span id="peakBadge" style="color:#d9001b;font-weight:700;">—</span>
           </div>
         </div>
@@ -469,7 +471,7 @@ footer code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:11px;
       <p><b>关于流传的规模数字</b>：券商与 Wind 口径的 1.3–1.4 万亿均为交叉测算，非官方披露，不可当作当前持仓规模引用。</p>
       <p><b>扩展观察</b>：规模或成交活跃，但 2025 年报未见汇金前十大持仓，仅作对照，不计入「上班」判断。</p>
       <h3 style="margin-top:14px">怎么保持最新</h3>
-      <p>收盘后运行 <code>python update_data.py</code>，会重算 20 日均额、日内成交额分布与尾盘占比，并累积每日份额。跑一次约 25 秒（24 只 × 日 K + 5 分钟 K 两份）。日 K 抓取失败时会沿用上一份快照的基准，不会把均额写成 0。页面本身双击即可打开，无需服务器；交易时段会自行向行情接口取实时数据。</p>
+      <p>收盘后运行 <code>python update_data.py</code>，会重算 20 日均额、日内成交额分布与尾盘占比，并累积每日份额。跑一次约 25 秒（26 只 × 日 K + 5 分钟 K 两份）。日 K 抓取失败时会沿用上一份快照的基准，不会把均额写成 0。页面本身双击即可打开，无需服务器；交易时段会自行向行情接口取实时数据。</p>
     </div>
   </div>
   <div class="disc">
@@ -490,7 +492,7 @@ function bootSnapshot(){
   var byCode = {};
   S.items.forEach(function(it){ byCode[it.code] = it; });
   var tcodes = S.items.map(function(it){ return it.tcode; });
-  var liveOK = false, lastLiveAt = 0, refreshing = false;
+  var liveOK = false, lastLiveAt = 0, refreshing = false, shareSynced = false;
 
   // ---------- 时间 / 交易状态 ----------
   function bjParts(){
@@ -783,7 +785,7 @@ function bootSnapshot(){
       '参考常见口径，日度份额变化均视为汪汪队操作，<b>实际也可能来自其他机构或个人投资者</b>；'+
       '沪市行情商份额存在未按日更新的情况（见表格脚注②），缺数期间本图偏低。此为近似推算，非官方披露数据。';
     en.innerHTML='<b>估算方法：</b>加仓指数 = 100 × 当日池内总份额 ÷ 区间首日（'+l0+'）总份额，区间 '+l0+' ~ '+l1+'。'+
-      '高于 100 = 这段区间估算净加仓，低于 100 = 净减仓。<b>不等于真实持仓比例</b>：定期报告已停止披露前十大持有人，'+
+      '高于 100 = 这段区间估算净加仓，低于 100 = 净减仓。末点为盘中实时快照，收盘后由 EOD 脚本覆写。<b>不等于真实持仓比例</b>：定期报告已停止披露前十大持有人，'+
       '期初持仓不可验证，比例锚定会失真，故用指数刻画变化方向与幅度。'+
       '份额源未日更的交易日按前值顺延（不产生假跳变）。此为近似推算，非官方披露数据。';
   }
@@ -1037,6 +1039,32 @@ function bootSnapshot(){
     return got;
   }
   window.__triggerLiveRefresh = refresh;
+
+  // ---------- 份额图表盘中/盘后实时同步 ----------
+  // 立即刷新按钮点下后，把今日实时份额（腾讯行情第 72 字段，单位：份）并入 shares_history，
+  // 使「汪汪队每日份额变化估算」与「加仓指数估算」同步推到今日，绝不卡在上一交易日。
+  function mergeLiveSharesToHistory(){
+    var b = bjParts();
+    var day = b.year + b.month + b.day;
+    var H = S.shares_history || (S.shares_history = {});
+    var core = S.items.filter(function(i){ return i.group === 'core'; });
+    var dateHit = 0, got = 0;
+    var row = {};
+    core.forEach(function(it){
+      // 只接受行情自带交易日与今日一致的数据，避免盘前把昨收份额误当成今日新值
+      if(it.date && it.date === day) dateHit++;
+      if(it.shares_yi > 0){
+        row[it.code] = Math.round(it.shares_yi * 10000) / 10000;
+        got++;
+      }
+    });
+    if(got < 10 || dateHit < 10) return false;
+    H[day] = row;
+    window.__shareLiveToday = day;
+    return true;
+  }
+  window.__mergeLiveShares = mergeLiveSharesToHistory;
+
   function refresh(){
     if(refreshing) return;
     refreshing=true;
@@ -1048,7 +1076,7 @@ function bootSnapshot(){
     function finish(ok){
       if(done) return; done=true;
       clearTimeout(timer);
-      if(ok){ var n=applyLive(); if(n>0){ liveOK=true; lastLiveAt=Date.now(); } }
+      if(ok){ var n=applyLive(); if(n>0){ liveOK=true; lastLiveAt=Date.now(); if(mergeLiveSharesToHistory()){ shareSynced=true; if(typeof window.__rerenderShareCharts === 'function') window.__rerenderShareCharts(); } } }
       else { liveOK=false; }
       refreshing=false; btn.textContent='立即刷新';
       renderAll();
@@ -1089,6 +1117,8 @@ function bootSnapshot(){
   }
 
   function renderAll(){ renderVerdict(verdict()); renderCharts(); renderTable(); renderStatus(); }
+  // 供实时份额同步后重绘两张份额图（每日份额变化 + 加仓指数）
+  window.__rerenderShareCharts = function(){ try{ renderCharts(); renderStatus(); }catch(e){} };
 
   // ---------- 事件 ----------
   ['sort','scope','q'].forEach(function(id){
@@ -1638,24 +1668,8 @@ window.forceReloadAll = function(triggerBtn) {
   tick();
 })();
 
-// ---------- 范围切换：汇金核心20只 vs 全量24只 ----------
+// ---------- 范围切换：汇金核心20只 vs 全量26只 ----------
 window.__curScopeCount = 20;
-window.switchIntradayScope = function(n) {
-  window.__curScopeCount = n;
-  var b20 = document.getElementById('scopeBtn20');
-  var b24 = document.getElementById('scopeBtn24');
-  if (n === 20) {
-    if (b20) b20.className = 'on';
-    if (b24) b24.className = '';
-  } else {
-    if (b20) b20.className = '';
-    if (b24) b24.className = 'on';
-  }
-  
-  if (window.__lastIntradayData) {
-    window.renderIntradayCharts(window.__lastIntradayData);
-  }
-};
 </script>
 
 
@@ -1668,7 +1682,8 @@ window.INTRADAY_MIN = {"date": "2026-11-13", "prev_close": 3655.83, "times": ["0
 window.__curScope = 'scope_20';
 
 window.switchIntradayScope = function(n) {
-  window.__curScope = (n === 20) ? 'scope_20' : 'scope_24';
+  window.__curScopeCount = n;
+  window.__curScope = (n === 20) ? 'scope_20' : 'scope_26';
   var b20 = document.getElementById('scopeBtn20');
   var b24 = document.getElementById('scopeBtn24');
   if (n === 20) {
@@ -1695,7 +1710,7 @@ window.renderIntradayCharts = function(d) {
 
   // 1. 动态刷新两大卡片的大标题
   var tMin = document.getElementById('titleMinChart');
-  if (tMin) tMin.textContent = countNum + '只ETF分钟成交额与上证综指分时叠加图';
+  if (tMin) tMin.textContent = countNum + '只ETF分钟成交额与双指数(上证/创业板)分时叠加图';
   
   var tCum = document.getElementById('titleCumChart');
   if (tCum) tCum.textContent = countNum + '只ETF当日分钟累计成交额 vs 20日均值曲线（剪刀差看板）';
@@ -1747,28 +1762,30 @@ window.renderIntradayCharts = function(d) {
     var w = 1196, h = 240, padL = 55, padR = 65, padT = 20, padB = 30;
     var cW = w - padL - padR, cH = h - padT - padB;
     
-    var maxMinAmt = Math.max(20.0, Math.ceil(Math.max.apply(null, minAmts) * 1.25));
+    // 左轴固定 10 亿满高（不再自适应），分钟量能柱被等比放大，放量/缩量一目了然
+    var maxMinAmt = 10.0;
     var cyPts = d.cy_points || [];
     var prevCloseCy = d.prev_close_cy || 2509.43;
 
-    // 计算双指数综合涨跌幅极值跨度，使 0% 昨收线在同一基准线上
-    var maxShPct = 0.5, maxCyPct = 0.5;
+    // 右侧涨跌幅轴：严格固定 ±5%（昨收 0.00% 居中），不再自适应缩放
+    var commonSpanPct = 5.0;
+    // 统计真实极值，用于判断是否超出 ±5% 并给出提示
+    var maxAbsPct = 0, extPct = 0;
     for (var i = 0; i < n; i++) {
-      if (shPts[i]) {
-        var pSh = Math.abs((shPts[i] - prevClose) / prevClose * 100);
-        if (pSh > maxShPct) maxShPct = pSh;
-      }
-      if (cyPts[i]) {
-        var pCy = Math.abs((cyPts[i] - prevCloseCy) / prevCloseCy * 100);
-        if (pCy > maxCyPct) maxCyPct = pCy;
-      }
+      if (shPts[i]) { var a1 = (shPts[i] - prevClose) / prevClose * 100; if (Math.abs(a1) > maxAbsPct) { maxAbsPct = Math.abs(a1); extPct = a1; } }
+      if (cyPts[i]) { var a2 = (cyPts[i] - prevCloseCy) / prevCloseCy * 100; if (Math.abs(a2) > maxAbsPct) { maxAbsPct = Math.abs(a2); extPct = a2; } }
     }
-    var commonSpanPct = Math.max(maxShPct, maxCyPct, 0.5) * 1.05;
 
     function getX(i){ return padL + (i / float_div(n - 1)) * cW; }
     function float_div(x){ return x <= 0 ? 1 : x; }
-    function getYMinAmt(v){ return padT + (1.0 - (v / maxMinAmt)) * cH; }
-    function getYByPct(pct){ return padT + (1.0 - (pct - (-commonSpanPct)) / (commonSpanPct * 2)) * cH; }
+    function getYMinAmt(v){
+      var yv = padT + (1.0 - (Math.min(v, maxMinAmt) / maxMinAmt)) * cH;
+      return Math.max(padT, yv);
+    }
+    function getYByPct(pct){
+      var yv = padT + (1.0 - (pct - (-commonSpanPct)) / (commonSpanPct * 2)) * cH;
+      return Math.max(padT, Math.min(padT + cH, yv));
+    }
     function getYSh(v){ return getYByPct(((v - prevClose) / prevClose) * 100); }
     function getYCy(v){ return getYByPct(((v - prevCloseCy) / prevCloseCy) * 100); }
     
@@ -1779,8 +1796,19 @@ window.renderIntradayCharts = function(d) {
     
     inner1.push('<text x="' + (padL - 8) + '" y="' + (padT + 10) + '" fill="#005eb8" font-size="11" text-anchor="end" font-family="monospace">' + maxMinAmt.toFixed(0) + '亿</text>');
     inner1.push('<text x="' + (padL - 8) + '" y="' + (h - padB) + '" fill="#005eb8" font-size="11" text-anchor="end" font-family="monospace">0</text>');
-    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (padT + 10) + '" fill="#ff7a00" font-size="11" font-family="monospace">+' + commonSpanPct.toFixed(2) + '%</text>');
-    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (h - padB) + '" fill="#ff7a00" font-size="11" font-family="monospace">-' + commonSpanPct.toFixed(2) + '%</text>');
+    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (padT + 10) + '" fill="#ff7a00" font-size="11" font-family="monospace">+5%</text>');
+    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (h - padB) + '" fill="#ff7a00" font-size="11" font-family="monospace">-5%</text>');
+    // 半档参考线（±2.5%），提升读数精度
+    var halfSpan = 2.5;
+    var yQ1 = getYByPct(halfSpan), yQ3 = getYByPct(-halfSpan);
+    inner1.push('<line x1="' + padL + '" y1="' + yQ1.toFixed(1) + '" x2="' + (w - padR) + '" y2="' + yQ1.toFixed(1) + '" stroke="#f2f2f2" stroke-width="1"/>');
+    inner1.push('<line x1="' + padL + '" y1="' + yQ3.toFixed(1) + '" x2="' + (w - padR) + '" y2="' + yQ3.toFixed(1) + '" stroke="#f2f2f2" stroke-width="1"/>');
+    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (yQ1 + 4).toFixed(1) + '" fill="#c9a27a" font-size="10" font-family="monospace">+2.5%</text>');
+    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (yQ3 + 4).toFixed(1) + '" fill="#c9a27a" font-size="10" font-family="monospace">-2.5%</text>');
+    // 超出 ±5% 时贴边提示，折线本身在边界处削平，不篡改刻度
+    if (maxAbsPct > 5.0) {
+      inner1.push('<text x="' + (w - padR - 6) + '" y="' + (h - padB - 4) + '" fill="#d9001b" font-size="10.5" font-weight="bold" text-anchor="end">⚠ 日内极值 ' + (extPct >= 0 ? '+' : '') + extPct.toFixed(2) + '% 已超 ±5% 刻度，折线贴边显示</text>');
+    }
 
     var timeMarkers = ['09:30', '10:00', '10:30', '11:00', '11:30', '13:30', '14:00', '14:30', '15:00'];
     for (var i = 0; i < n; i++) {
@@ -1800,7 +1828,12 @@ window.renderIntradayCharts = function(d) {
       var isPeak = (times[i] === curObj.peak_time);
       var barColor = isPeak ? '#d9001b' : (v >= 4.0 ? '#ff7a00' : '#4a90e2');
       inner1.push('<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + barW.toFixed(1) + '" height="' + Math.max(1, barH).toFixed(1) + '" fill="' + barColor + '"/>');
-      if (isPeak) {
+      if (v > maxMinAmt) {
+        // 超 10 亿满高顶格的极端脉冲分钟，柱顶画红色溢出箭头并标真实数值
+        inner1.push('<polygon points="' + (getX(i) - 4).toFixed(1) + ',' + (padT + 7).toFixed(1) + ' ' + (getX(i) + 4).toFixed(1) + ',' + (padT + 7).toFixed(1) + ' ' + getX(i).toFixed(1) + ',' + padT.toFixed(1) + '" fill="#d9001b"/>');
+        inner1.push('<text x="' + getX(i).toFixed(1) + '" y="' + (padT + 19).toFixed(1) + '" fill="#d9001b" font-size="10" font-weight="bold" text-anchor="middle">' + v.toFixed(1) + '亿</text>');
+      }
+      if (isPeak && !(v > maxMinAmt)) {
         inner1.push('<text x="' + getX(i).toFixed(1) + '" y="' + (y - 5).toFixed(1) + '" fill="#d9001b" font-size="10.5" font-weight="bold" text-anchor="middle">' + v.toFixed(2) + '亿</text>');
       }
     }
@@ -2009,8 +2042,17 @@ window.fetchLiveIntraday = function() {
     var rawSh = dSh.data.sh000001.data;
     var minListSh = rawSh.data || [];
     if (!minListSh.length) return;
-    
-    var prevCloseSh = parseFloat(rawSh.prev_close || (window.INTRADAY_MIN ? window.INTRADAY_MIN.prev_close : 3655.83));
+
+    // 昨收正确取数：腾讯分时接口的 prev_close 不在顶层，而埋在 qt.<code> 数组第 5 位（下标 4）。
+    // 取不到时会退回底座旧值（上一交易日昨收），会把今日涨跌幅算成 -8% 级别的假信号。
+    function pickPrevClose(node, code){
+      var v = node && node.qt && node.qt[code] ? parseFloat(node.qt[code][4]) : NaN;
+      if (isFinite(v) && v > 0) return v;
+      var v2 = node ? parseFloat(node.prev_close) : NaN;
+      return (isFinite(v2) && v2 > 0) ? v2 : NaN;
+    }
+    var prevCloseSh = pickPrevClose(dSh.data.sh000001, 'sh000001');
+    if (!isFinite(prevCloseSh)) prevCloseSh = (window.INTRADAY_MIN ? window.INTRADAY_MIN.prev_close : 3655.83);
     var times = [];
     var shPts = [];
     for (var i = 0; i < minListSh.length; i++) {
@@ -2026,7 +2068,9 @@ window.fetchLiveIntraday = function() {
     if (dCy && dCy.data && dCy.data.sz399006) {
       var rawCy = dCy.data.sz399006.data;
       var minListCy = rawCy.data || [];
-      prevCloseCy = parseFloat(rawCy.prev_close || (window.INTRADAY_MIN && window.INTRADAY_MIN.prev_close_cy ? window.INTRADAY_MIN.prev_close_cy : 2509.43));
+      var pcCy = pickPrevClose(dCy.data.sz399006, 'sz399006');
+      if (isFinite(pcCy)) prevCloseCy = pcCy;
+      else if (window.INTRADAY_MIN && window.INTRADAY_MIN.prev_close_cy) prevCloseCy = window.INTRADAY_MIN.prev_close_cy;
       for (var j = 0; j < minListCy.length; j++) {
         cyPts.push(parseFloat(minListCy[j].split(' ')[1]));
       }
