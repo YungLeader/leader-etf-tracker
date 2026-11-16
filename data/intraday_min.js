@@ -1450,7 +1450,7 @@ window.INTRADAY_MIN = {
       538.06
     ]
   },
-  "scope_24": {
+  "scope_26": {
     "count": 26,
     "total_today_amount": 664.28,
     "total_avg20_amount": 733.02,
