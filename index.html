@@ -1780,20 +1780,29 @@ window.renderIntradayCharts = function(d) {
     var cyPts = d.cy_points || [];
     var prevCloseCy = d.prev_close_cy || 2509.43;
 
-    // 右侧涨跌幅轴：先计算实际波幅极值
-    var maxShPct = 0, maxCyPct = 0;
+    // 右侧涨跌幅轴：计算实际最大最小值（不对称范围）
+    var minShPct = 0, maxShPct = 0, minCyPct = 0, maxCyPct = 0;
     for (var i = 0; i < n; i++) {
-      if (shPts[i]) { var a1 = Math.abs((shPts[i] - prevClose) / prevClose * 100); if (a1 > maxShPct) maxShPct = a1; }
-      if (cyPts[i]) { var a2 = Math.abs((cyPts[i] - prevCloseCy) / prevCloseCy * 100); if (a2 > maxCyPct) maxCyPct = a2; }
+      if (shPts[i]) {
+        var pct = (shPts[i] - prevClose) / prevClose * 100;
+        if (pct < minShPct) minShPct = pct;
+        if (pct > maxShPct) maxShPct = pct;
+      }
+      if (cyPts[i]) {
+        var pct = (cyPts[i] - prevCloseCy) / prevCloseCy * 100;
+        if (pct < minCyPct) minCyPct = pct;
+        if (pct > maxCyPct) maxCyPct = pct;
+      }
     }
-    // 自适应放大：根据实际波幅动态调整，让同样的波动占据更大画布空间
-    var commonSpanPct = Math.max(maxShPct, maxCyPct, 0.8) * 1.1;
-    // 统计真实极值，用于判断是否超出轴范围并给出提示
-    var maxAbsPct = 0, extPct = 0;
-    for (var i = 0; i < n; i++) {
-      if (shPts[i]) { var a1 = (shPts[i] - prevClose) / prevClose * 100; if (Math.abs(a1) > maxAbsPct) { maxAbsPct = Math.abs(a1); extPct = a1; } }
-      if (cyPts[i]) { var a2 = (cyPts[i] - prevCloseCy) / prevCloseCy * 100; if (Math.abs(a2) > maxAbsPct) { maxAbsPct = Math.abs(a2); extPct = a2; } }
-    }
+    // 取两个指数的极值
+    var minPct = Math.min(minShPct, minCyPct);
+    var maxPct = Math.max(maxShPct, maxCyPct);
+    // 自适应放大 10%，确保不会贴边
+    var spanUp = Math.max(maxPct * 1.1, 0.5);
+    var spanDown = Math.min(minPct * 1.1, -0.5);
+    // 保留 maxAbsPct 和 extPct 用于超出提示
+    var maxAbsPct = Math.max(Math.abs(minPct), Math.abs(maxPct));
+    var extPct = Math.abs(minPct) > Math.abs(maxPct) ? minPct : maxPct;
 
     function getX(i){ return padL + (i / float_div(n - 1)) * cW; }
     function float_div(x){ return x <= 0 ? 1 : x; }
@@ -1802,7 +1811,7 @@ window.renderIntradayCharts = function(d) {
       return Math.max(padT, yv);
     }
     function getYByPct(pct){
-      var yv = padT + (1.0 - (pct - (-commonSpanPct)) / (commonSpanPct * 2)) * cH;
+      var yv = padT + (1.0 - (pct - spanDown) / (spanUp - spanDown)) * cH;
       return Math.max(padT, Math.min(padT + cH, yv));
     }
     function getYSh(v){ return getYByPct(((v - prevClose) / prevClose) * 100); }
@@ -1816,14 +1825,15 @@ window.renderIntradayCharts = function(d) {
     inner1.push('<text x="' + (padL - 8) + '" y="' + (padT + 10) + '" fill="#005eb8" font-size="11" text-anchor="end" font-family="monospace">' + maxMinAmt.toFixed(0) + '亿</text>');
     inner1.push('<text x="' + (padL - 8) + '" y="' + (h - padB) + '" fill="#005eb8" font-size="11" text-anchor="end" font-family="monospace">0</text>');
     
-    // 右侧涨跌幅坐标：动态 20 格（根据实际波动自适应范围）
-    var stepPct = commonSpanPct * 2 / 20;
-    for (var gi = -10; gi <= 10; gi++) {
-      var gPct = gi * stepPct;
+    // 右侧涨跌幅坐标：不对称动态 20 格
+    var totalSpan = spanUp - spanDown;
+    var stepPct = totalSpan / 20;
+    for (var gi = 0; gi <= 20; gi++) {
+      var gPct = spanDown + gi * stepPct;
       var gy = getYByPct(gPct);
       var isZero = Math.abs(gPct) < 0.01;
       if (isZero) continue;
-      var isMajor = (gi % 2 === 0);
+      var isMajor = (gi % 4 === 0);
       if (isMajor) {
         inner1.push('<line x1="' + padL + '" y1="' + gy.toFixed(1) + '" x2="' + (w - padR) + '" y2="' + gy.toFixed(1) + '" stroke="#e8e8e8" stroke-width="1"/>');
         inner1.push('<text x="' + (w - padR + 6) + '" y="' + (gy + 4).toFixed(1) + '" fill="#999" font-size="10" font-family="monospace">' + (gPct > 0 ? '+' : '') + gPct.toFixed(2) + '%</text>');
@@ -1831,8 +1841,8 @@ window.renderIntradayCharts = function(d) {
         inner1.push('<line x1="' + padL + '" y1="' + gy.toFixed(1) + '" x2="' + (w - padR) + '" y2="' + gy.toFixed(1) + '" stroke="#f5f5f5" stroke-width="0.5" stroke-dasharray="2,2"/>');
       }
     }
-    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (padT + 10) + '" fill="#ff7a00" font-size="11" font-family="monospace">+' + commonSpanPct.toFixed(2) + '%</text>');
-    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (h - padB) + '" fill="#ff7a00" font-size="11" font-family="monospace">-' + commonSpanPct.toFixed(2) + '%</text>');
+    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (padT + 10) + '" fill="#ff7a00" font-size="11" font-family="monospace">' + (spanUp > 0 ? '+' : '') + spanUp.toFixed(2) + '%</text>');
+    inner1.push('<text x="' + (w - padR + 6) + '" y="' + (h - padB) + '" fill="#ff7a00" font-size="11" font-family="monospace">' + spanDown.toFixed(2) + '%</text>');
     // 超出 ±5% 时贴边提示，折线本身在边界处削平，不篡改刻度
     if (maxAbsPct > 5.0) {
       inner1.push('<text x="' + (w - padR - 6) + '" y="' + (h - padB - 4) + '" fill="#d9001b" font-size="10.5" font-weight="bold" text-anchor="end">⚠ 日内极值 ' + (extPct >= 0 ? '+' : '') + extPct.toFixed(2) + '% 已超 ±5% 刻度，折线贴边显示</text>');
