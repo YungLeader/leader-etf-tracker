@@ -82,6 +82,49 @@ def fetch_hs300_close():
         print(f"[ERROR] 抓取沪深300收盘价异常: {e}")
         return None
 
+
+
+def fetch_avg_price():
+    """抓取A股平均股价（来自乐咕乐股），用于26只ETF图表左轴
+    API: /stockdata/marketData/getHistoryData?marketId=10000, token=MD5(YYYY-MM-DD)
+    """
+    import hashlib, datetime as _dt
+    today_str = _dt.date.today().strftime('%Y-%m-%d')
+    token = hashlib.md5(today_str.encode()).hexdigest()
+    url = f'https://legulegu.com/stockdata/marketData/getHistoryData?marketId=10000&dataLength=5&token={token}'
+    headers_lg = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+        'Referer': 'https://legulegu.com/stockdata/market-analysis-average-price',
+        'Accept': 'application/json',
+    }
+    req = urllib.request.Request(url, headers=headers_lg)
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            d = json.loads(resp.read().decode('utf-8'))
+            items_list = d.get('aSharesDataList', [])
+            if items_list:
+                return float(items_list[0]['close'])  # 最新一日收盘值
+            return None
+    except Exception as e:
+        print(f'[ERROR] 抓取A股平均股价异常: {e}')
+        return None
+
+
+def calc_all26_ratio(items):
+    """计算26只ETF当日总市值占全A流通市值比重(%)
+    全A流通市值通过4只头部沪深300ETF市值反推"""
+    top4_codes = {'510300', '510310', '510330', '159919'}
+    top4_mktcap = sum(it.get('mktcap_yi', 0) for it in items if it['code'] in top4_codes)
+    total_26_mktcap = sum(it.get('mktcap_yi', 0) for it in items)
+    if top4_mktcap > 0:
+        # 4只ETF占比基准: 0.783% (每日使用头部4只/全A流通市值反推)
+        # 由于ratios_4固定为0.783，全A流通市值 = top4_mktcap/0.00783
+        all_a_mktcap = top4_mktcap / 0.00783
+        ratio_26 = round(total_26_mktcap / all_a_mktcap * 100, 3)
+    else:
+        ratio_26 = 0.0
+    return ratio_26
+
 def compute_and_save_intraday_min(items, today_dash):
     core_items = [it for it in items if it.get('group') == 'core']
     url_idx = 'https://quotes.sina.cn/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol=sh000001&scale=1&ma=no&datalen=245'
@@ -264,12 +307,90 @@ def rebuild_index_html(macro_data, intraday_data, today_dash):
     html = re.sub(r'<div id="macro-badge"[^>]*>.*?</div>', badge_html, html, flags=re.DOTALL)
 
     # 同步更新 window.MACRO_DAILY 内嵌 JSON，确保初始加载与 JSON 文件一致
-    macro_json_str = json.dumps({'dates': dates, 'hs300_points': pts, 'ratios': ratios, 'count': n}, ensure_ascii=False)
+    macro_json_str = json.dumps({
+        'dates': dates, 'hs300_points': pts, 'ratios': ratios, 'count': n,
+        'avg_price_points': macro_data.get('avg_price_points', []),
+        'ratios_all26': macro_data.get('ratios_all26', [])
+    }, ensure_ascii=False)
     html = re.sub(r'window\.MACRO_DAILY\s*=\s*\{.*?\};', f'window.MACRO_DAILY = {macro_json_str};', html, flags=re.DOTALL)
 
     intraday_json_str = json.dumps(intraday_data, ensure_ascii=False)
     html = re.sub(r'window\.INTRADAY_MIN\s*=\s*\{.*?\};\nwindow\.__curScope', f'window.INTRADAY_MIN = {intraday_json_str};\nwindow.__curScope', html, flags=re.DOTALL)
     html = re.sub(r'<div style="font-size:12px;color:#888;" id="intradayUpdateTime">.*?</div>', f'<div style="font-size:12px;color:#888;" id="intradayUpdateTime">{today_dash} 15:00 收盘锁定</div>', html)
+
+    # ---- 建第二图表 macro26Svg (A股平均股价 + 26只ETF占比) ----
+    avg_price_pts = macro_data.get('avg_price_points', [])
+    ratios_all26 = macro_data.get('ratios_all26', [])
+    n26 = n  # 与 dates 长度相同
+    if avg_price_pts and ratios_all26 and len(avg_price_pts) == n26 and len(ratios_all26) == n26:
+        # 左轴: A股平均股价 10~35元, 右轴: 26只ETF占比 0~7%
+        minAvg, maxAvg = 10.0, 35.0
+        minR26, maxR26 = 0.0, 7.0
+        padL26, padR26, padT26, padB26 = 70, 80, 30, 40
+        cW26 = w - padL26 - padR26
+        cH26 = h - padT26 - padB26
+
+        def gX26(idx): return padL26 + (idx / float(n26 <= 1 and 1 or n26 - 1)) * cW26
+        def gYAvg(v): return padT26 + (1.0 - (v - minAvg) / (maxAvg - minAvg)) * cH26
+        def gYR26(v): return padT26 + (1.0 - (v - minR26) / (maxR26 - minR26)) * cH26
+
+        path26Avg = f"M {gX26(0):.1f} {gYAvg(avg_price_pts[0]):.1f}"
+        path26Rt = f"M {gX26(0):.1f} {gYR26(ratios_all26[0]):.1f}"
+        for _j in range(1, n26):
+            path26Avg += f" L {gX26(_j):.1f} {gYAvg(avg_price_pts[_j]):.1f}"
+            path26Rt += f" L {gX26(_j):.1f} {gYR26(ratios_all26[_j]):.1f}"
+
+        si26 = []
+        # 8条网格线（平均股价左轴）
+        for _step in range(8):
+            _avgV = minAvg + _step * (maxAvg - minAvg) / 7.0
+            _r26V = minR26 + _step * (maxR26 - minR26) / 7.0
+            _y26 = gYAvg(_avgV)
+            si26.append(f'<line x1="{padL26}" y1="{_y26:.1f}" x2="{w - padR26}" y2="{_y26:.1f}" stroke="#f0f0f0" stroke-width="1"/>')
+            si26.append(f'<text x="{padL26 - 12}" y="{_y26 + 4:.1f}" fill="#005eb8" font-size="12" text-anchor="end" font-family="monospace">{_avgV:.0f}元</text>')
+            si26.append(f'<text x="{w - padR26 + 12}" y="{_y26 + 4:.1f}" fill="#28a745" font-size="12" text-anchor="start" font-family="monospace">{_r26V:.1f}%</text>')
+
+        for _idx, _d in enumerate(dates):
+            if _d[5:] == '01-02' or (_d[5:] in ['01-03','01-04','01-05','01-06'] and dates[_idx-1][:4] != _d[:4]):
+                _xd = gX26(_idx)
+                si26.append(f'<line x1="{_xd:.1f}" y1="{h - padB26}" x2="{_xd:.1f}" y2="{h - padB26 + 6}" stroke="#ccc"/>')
+                si26.append(f'<text x="{_xd:.1f}" y="{h - padB26 + 20}" fill="#888" font-size="12" text-anchor="middle">{_d[:4]}-01</text>')
+
+        _xL26 = gX26(n26 - 1)
+        si26.append(f'<line x1="{_xL26:.1f}" y1="{h - padB26}" x2="{_xL26:.1f}" y2="{h - padB26 + 6}" stroke="#ccc"/>')
+        si26.append(f'<text x="{_xL26:.1f}" y="{h - padB26 + 20}" fill="#888" font-size="12" text-anchor="middle">{dates[-1]}</text>')
+
+        si26.append(f'<path d="{path26Avg}" fill="none" stroke="#005eb8" stroke-width="2.0" stroke-linejoin="round"/>')
+        si26.append(f'<path d="{path26Rt}" fill="none" stroke="#28a745" stroke-width="2.6" stroke-linejoin="round"/>')
+
+        # 最新圆点标注
+        _lx26 = gX26(n26 - 1)
+        _lyAvg = gYAvg(avg_price_pts[-1])
+        _lyRt = gYR26(ratios_all26[-1])
+        si26.append(f'<circle cx="{_lx26:.1f}" cy="{_lyAvg:.1f}" r="5" fill="#005eb8"/>')
+        si26.append(f'<text x="{_lx26 - 42:.1f}" y="{_lyAvg - 10:.1f}" fill="#005eb8" font-size="12" font-weight="bold">{avg_price_pts[-1]:.2f}元</text>')
+        si26.append(f'<circle cx="{_lx26:.1f}" cy="{_lyRt:.1f}" r="5" fill="#28a745"/>')
+        si26.append(f'<text x="{_lx26 - 42:.1f}" y="{_lyRt - 10:.1f}" fill="#28a745" font-size="12" font-weight="bold">{ratios_all26[-1]:.3f}%</text>')
+
+        # 十字矄准线元素（全局隐藏，JS交互时显示）
+        si26.append(f'<g id="macro26Crosshair" style="display:none;">')
+        si26.append(f'<line id="macro26CrossLine" y1="{padT26}" y2="{h - padB26}" stroke="#666" stroke-width="1.2" stroke-dasharray="3,3"/>')
+        si26.append('<circle id="macro26HoverPt" r="5" fill="#005eb8" stroke="#fff" stroke-width="2"/>')
+        si26.append('<circle id="macro26HoverRt" r="5" fill="#28a745" stroke="#fff" stroke-width="2"/>')
+        si26.append('</g>')
+
+        new_svg26 = f'<svg id="macro26Svg" viewBox="0 0 {w} {h}" style="width:100%;height:{h}px;display:block;">' + ''.join(si26) + '</svg>'
+        html = re.sub(r'<svg id="macro26Svg"[^>]*>.*?</svg>', new_svg26, html, flags=re.DOTALL)
+
+        badge26_html = f'<div id="macro26-badge" style="background:#f0fff4;color:#28a745;padding:6px 16px;border-radius:20px;font-weight:800;font-size:14px;border:1px solid #c3e6cb;">\n        当前比重: {ratios_all26[-1]:.3f}% (分散持仓全口径)\n      </div>'
+        html = re.sub(r'<div id="macro26-badge"[^>]*>.*?</div>', badge26_html, html, flags=re.DOTALL)
+
+        # 更新左轴说明文字
+        html = html.replace(
+            '左轴：中证全指(000985) 收盘点位 · 右轴(绿线)：26只ETF总市値占全A流通市値',
+            'A股平均股价(来源:乐咕乐股) · 右轴(绿线)：26只ETF总市値占全A流通市値'
+        )
+    # ---- 第二图表结束 ----
 
     with open(HTML_PATH, 'w', encoding='utf-8') as f:
         f.write(html)
@@ -362,27 +483,51 @@ def main():
     with open(SNAPSHOT_PATH, 'w', encoding='utf-8') as f:
         f.write(f"window.SNAPSHOT = {json.dumps(snapshot, ensure_ascii=False, indent=2)};\n")
         
-    # 2. 更新宏观大底
+    # 2. 更新宏观大底（含中证全指 + 26只ETF占比）
     with open(MACRO_PATH, 'r', encoding='utf-8') as f:
         macro = json.load(f)
-        
+
     hs300_close = fetch_hs300_close()
+    avg_price = fetch_avg_price()
+    ratio_26 = calc_all26_ratio(items)
+
     if hs300_close:
         dates = macro['dates']
         pts = macro['hs300_points']
         ratios = macro['ratios']
         approx_ratio = round(0.783, 3)
+
+        # 确保扩展字段存在（avg_price_points 替换原 zs985_points）
+        avg_price_pts = macro.setdefault('avg_price_points', [0.0] * len(dates))
+        ratios_all26 = macro.setdefault('ratios_all26', [0.0] * len(dates))
+
         if today_dash not in dates:
             dates.append(today_dash)
             pts.append(hs300_close)
             ratios.append(approx_ratio)
+            avg_price_pts.append(round(avg_price, 2) if avg_price else (avg_price_pts[-1] if avg_price_pts else 0.0))
+            ratios_all26.append(ratio_26)
         else:
             idx = dates.index(today_dash)
             pts[idx] = hs300_close
             ratios[idx] = approx_ratio
+            if idx < len(avg_price_pts):
+                avg_price_pts[idx] = round(avg_price, 2) if avg_price else avg_price_pts[idx]
+                ratios_all26[idx] = ratio_26
+            else:
+                # 长度对齐（防止旧数据字段短）
+                while len(avg_price_pts) < len(dates):
+                    avg_price_pts.append(avg_price_pts[-1] if avg_price_pts else 0.0)
+                    ratios_all26.append(ratio_26)
+                avg_price_pts[idx] = round(avg_price, 2) if avg_price else avg_price_pts[idx]
+                ratios_all26[idx] = ratio_26
+
+        macro['avg_price_points'] = avg_price_pts
+        macro['ratios_all26'] = ratios_all26
         macro['count'] = len(dates)
         with open(MACRO_PATH, 'w', encoding='utf-8') as f:
             json.dump(macro, f, ensure_ascii=False, indent=2)
+        print(f"✅ 宏观大底更新: 沪深300={hs300_close} A股平均股价={avg_price} 26只ETF占比={ratio_26}%")
 
     # 3. 物理抓取并生成分时双口径数据
     print("⏳ 正在采集与核算今日上证指数与 24 只 ETF 分时数据...")
