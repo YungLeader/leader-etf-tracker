@@ -315,7 +315,8 @@ def rebuild_index_html(macro_data, intraday_data, today_dash):
     html = re.sub(r'window\.MACRO_DAILY\s*=\s*\{.*?\};', f'window.MACRO_DAILY = {macro_json_str};', html, flags=re.DOTALL)
 
     intraday_json_str = json.dumps(intraday_data, ensure_ascii=False)
-    html = re.sub(r'window\.INTRADAY_MIN\s*=\s*\{.*?\};\nwindow\.__curScope', f'window.INTRADAY_MIN = {intraday_json_str};\nwindow.__curScope', html, flags=re.DOTALL)
+    if intraday_data:  # 只有有实际数据时才替换，防止空对象覆盖分时数据
+        html = re.sub(r'window\.INTRADAY_MIN\s*=\s*\{.*?\};\nwindow\.__curScope', f'window.INTRADAY_MIN = {intraday_json_str};\nwindow.__curScope', html, flags=re.DOTALL)
     html = re.sub(r'<div style="font-size:12px;color:#888;" id="intradayUpdateTime">.*?</div>', f'<div style="font-size:12px;color:#888;" id="intradayUpdateTime">{today_dash} 15:00 收盘锁定</div>', html)
 
     # ---- 建第二图表 macro26Svg (A股平均股价 + 26只ETF占比) ----
