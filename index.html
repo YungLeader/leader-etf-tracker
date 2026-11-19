@@ -1801,8 +1801,22 @@ window.renderIntradayCharts = function(d) {
     var w = 1196, h = 240, padL = 55, padR = 65, padT = 20, padB = 30;
     var cW = w - padL - padR, cH = h - padT - padB;
     
-    // 左轴固定 20 亿满高（不再自适应），分钟量能柱被等比放大，放量/缩量一目了然
-    var maxMinAmt = 20.0;
+    // 左轴动态量能上限：基准 20 亿，若当日最大分钟量超过 20 亿则自动扩大档位
+    // 档位：20 → 30 → 40 → 50（每档 10 亿，向上取整到最近档位）
+    var maxRawAmt = 0;
+    for (var _i = 0; _i < minAmts.length; _i++) {
+      if (minAmts[_i] > maxRawAmt) maxRawAmt = minAmts[_i];
+    }
+    var maxMinAmt;
+    if (maxRawAmt <= 20.0) {
+      maxMinAmt = 20.0;
+    } else if (maxRawAmt <= 30.0) {
+      maxMinAmt = 30.0;
+    } else if (maxRawAmt <= 40.0) {
+      maxMinAmt = 40.0;
+    } else {
+      maxMinAmt = Math.ceil(maxRawAmt / 10) * 10;
+    }
     var cyPts = d.cy_points || [];
     var prevCloseCy = d.prev_close_cy || 2509.43;
 
@@ -1850,6 +1864,12 @@ window.renderIntradayCharts = function(d) {
     
     inner1.push('<text x="' + (padL - 8) + '" y="' + (padT + 10) + '" fill="#005eb8" font-size="11" text-anchor="end" font-family="monospace">' + maxMinAmt.toFixed(0) + '亿</text>');
     inner1.push('<text x="' + (padL - 8) + '" y="' + (h - padB) + '" fill="#005eb8" font-size="11" text-anchor="end" font-family="monospace">0</text>');
+    // 左轴中间刻度：每 10 亿一条水平网格线 + 标签，让 30/40 亿时更易读数
+    for (var _li = 10; _li < maxMinAmt; _li += 10) {
+      var _ly = padT + (1.0 - _li / maxMinAmt) * cH;
+      inner1.push('<line x1="' + padL + '" y1="' + _ly.toFixed(1) + '" x2="' + (w - padR) + '" y2="' + _ly.toFixed(1) + '" stroke="#f0f0f0" stroke-width="0.8" stroke-dasharray="4,4"/>');
+      inner1.push('<text x="' + (padL - 8) + '" y="' + (_ly + 4).toFixed(1) + '" fill="#aac4e8" font-size="10" text-anchor="end" font-family="monospace">' + _li + '</text>');
+    }
     
     // 右侧涨跌幅坐标：不对称动态 20 格（每格都绘制）
     var totalSpan = spanUp - spanDown;
