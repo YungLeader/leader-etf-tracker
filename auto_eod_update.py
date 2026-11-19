@@ -263,6 +263,10 @@ def rebuild_index_html(macro_data, intraday_data, today_dash):
     badge_html = f'<div id="macro-badge" style="background:#fff0ec;color:#ff4713;padding:6px 16px;border-radius:20px;font-weight:800;font-size:14px;border:1px solid #ffd8cf;">\n        当前比重: {ratios[-1]}% (估值大底回升区)\n      </div>'
     html = re.sub(r'<div id="macro-badge"[^>]*>.*?</div>', badge_html, html, flags=re.DOTALL)
 
+    # 同步更新 window.MACRO_DAILY 内嵌 JSON，确保初始加载与 JSON 文件一致
+    macro_json_str = json.dumps({'dates': dates, 'hs300_points': pts, 'ratios': ratios, 'count': n}, ensure_ascii=False)
+    html = re.sub(r'window\.MACRO_DAILY\s*=\s*\{.*?\};', f'window.MACRO_DAILY = {macro_json_str};', html, flags=re.DOTALL)
+
     intraday_json_str = json.dumps(intraday_data, ensure_ascii=False)
     html = re.sub(r'window\.INTRADAY_MIN\s*=\s*\{.*?\};\nwindow\.__curScope', f'window.INTRADAY_MIN = {intraday_json_str};\nwindow.__curScope', html, flags=re.DOTALL)
     html = re.sub(r'<div style="font-size:12px;color:#888;" id="intradayUpdateTime">.*?</div>', f'<div style="font-size:12px;color:#888;" id="intradayUpdateTime">{today_dash} 15:00 收盘锁定</div>', html)
