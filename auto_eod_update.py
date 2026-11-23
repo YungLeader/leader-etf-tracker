@@ -190,7 +190,7 @@ def compute_and_save_intraday_min(items, today_dash):
         base_cum = [round(tot_avg20 * ((i + 1) / float(n_pts)), 2) for i in range(n_pts)]
         peak_val = max(min_amt) if min_amt else 0.0
         peak_i = min_amt.index(peak_val) if min_amt else 0
-        peak_t = sh_times[peak_i] if sh_times else '09:31'
+        peak_t = sh_times[peak_i] if sh_times else '09:30'
         return {
             "count": len(target_items),
             "total_today_amount": tot_today,
