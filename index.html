@@ -1269,7 +1269,6 @@ function bootSnapshot(){
     return (d && d.dates && d.dates.length) ? d : null;
   }
   if (!getData()) return; // 无数据时退出，但不锁死闭包
-  var n = getData().dates.length; // 初始n，handleMove内再取最新
   
   var viewW = 1196, viewH = 400;
   var padL = 60, padR = 70, padT = 30, padB = 40;
@@ -1278,13 +1277,15 @@ function bootSnapshot(){
   var minPt = 3000.0, maxPt = 6000.0;
   var minRt = 0.0, maxRt = 3.0;
   
-  function getX(idx){ return padL + (idx / (n <= 1 ? 1 : (n - 1))) * chartW; }
+  // getX必须动态读n，因为refresh后数据条数可能增加
+  function getX(idx, n){ return padL + (idx / (n <= 1 ? 1 : (n - 1))) * chartW; }
   function getYPt(v){ return padT + (1.0 - (v - minPt) / (maxPt - minPt)) * chartH; }
   function getYRt(v){ return padT + (1.0 - (v - minRt) / (maxRt - minRt)) * chartH; }
   
   function handleMove(clientX, clientY){
     var _d = getData(); if(!_d) return;
-    var dates = _d.dates, pts = _d.hs300_points, rts = _d.ratios, n = dates.length;
+    var dates = _d.dates, pts = _d.hs300_points, rts = _d.ratios;
+    var n = dates.length;
     var pt = svg.createSVGPoint();
     pt.x = clientX;
     pt.y = clientY;
@@ -1297,7 +1298,7 @@ function bootSnapshot(){
     var idx = Math.round(ratio * (n - 1));
     idx = Math.max(0, Math.min(n - 1, idx));
     
-    var actualX = getX(idx);
+    var actualX = getX(idx, n);
     var curDate = dates[idx];
     var curPt = pts[idx];
     var curRt = rts[idx];
