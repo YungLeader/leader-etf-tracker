@@ -144,6 +144,14 @@ def compute_and_save_intraday_min(items, today_dash):
         filtered_sh.append(x)
     sh_today = filtered_sh
     sh_times = [x['day'][11:16] for x in sh_today]
+    # 新浪1分钟K线的时间戳是该跟K线的结束时间，转换为开始时间（减1分钟）再展示
+    def _shift_m1(t):
+        try:
+            from datetime import datetime as _dt, timedelta as _td
+            return (_dt.strptime(t, '%H:%M') - _td(minutes=1)).strftime('%H:%M')
+        except Exception:
+            return t
+    sh_times = [_shift_m1(t) for t in sh_times]
     sh_pts = [float(x['close']) for x in sh_today]
     n_pts = len(sh_times)
 
