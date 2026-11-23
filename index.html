@@ -1263,13 +1263,13 @@ function bootSnapshot(){
   dotRt.style.display = "none";
   svg.appendChild(dotRt);
 
-  var data = window.MACRO_DAILY;
-  if (!data || !data.dates) return;
-  var dates = data.dates;
-  var pts = data.hs300_points;
-  var rts = data.ratios;
-  var n = dates.length;
-  if (!n) return;
+  // 动态读取最新数据（支持refresh后自动更新）
+  function getData(){
+    var d = window.MACRO_DAILY;
+    return (d && d.dates && d.dates.length) ? d : null;
+  }
+  if (!getData()) return; // 无数据时退出，但不锁死闭包
+  var n = getData().dates.length; // 初始n，handleMove内再取最新
   
   var viewW = 1196, viewH = 400;
   var padL = 60, padR = 70, padT = 30, padB = 40;
@@ -1283,6 +1283,8 @@ function bootSnapshot(){
   function getYRt(v){ return padT + (1.0 - (v - minRt) / (maxRt - minRt)) * chartH; }
   
   function handleMove(clientX, clientY){
+    var _d = getData(); if(!_d) return;
+    var dates = _d.dates, pts = _d.hs300_points, rts = _d.ratios, n = dates.length;
     var pt = svg.createSVGPoint();
     pt.x = clientX;
     pt.y = clientY;
