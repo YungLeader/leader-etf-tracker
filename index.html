@@ -1530,10 +1530,12 @@ window.renderMacroChart = function(data) {
     var scale = w / rect.width;
     var xInSvg = rx * scale;
 
-    if (xInSvg < padL || xInSvg > (w - padR)) {
+    if (xInSvg < padL) {
       onLeave();
       return;
     }
+    // 右边界：超出时snap到最后一个数据点，不退出
+    if (xInSvg > (w - padR)) xInSvg = w - padR;
 
     var progress = (xInSvg - padL) / chartW;
     var idx = Math.round(progress * (n - 1));
