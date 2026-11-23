@@ -1299,6 +1299,8 @@ window.MACRO_DAILY = {"dates": ["2020-01-02", "2020-01-03", "2020-01-06", "2020-
     var p=sp.matrixTransform(ctm.inverse());
     var cx2=Math.max(padL,Math.min(viewW-padR,p.x));
     var idx=Math.max(0,Math.min(n-1,Math.round(((cx2-padL)/chartW)*(n-1))));
+    // 最右端数据点间距极小（<1px），snap到最新一条
+    if(idx >= n-3 && cx2 > padL + chartW * 0.995) idx = n-1;
     var ax=padL+(idx/(n<=1?1:n-1))*chartW;
     var ayPt=padT+(1-(pts[idx]-minPt)/(maxPt-minPt))*chartH;
     var ayRt=padT+(1-(rts[idx]-minRt)/(maxRt-minRt))*chartH;
