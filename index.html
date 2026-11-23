@@ -665,7 +665,10 @@ function bootSnapshot(){
       tot.push(s);
     });
     var deltas=[];
-    for(var i=1;i<wd.length;i++) deltas.push({date:wd[i], d:tot[i]-tot[i-1]});
+    for(var i=1;i<wd.length;i++){
+      var stale=(Math.abs(tot[i]-tot[i-1])<0.005 && tot[i]>0);
+      deltas.push({date:wd[i], d:tot[i]-tot[i-1], stale:stale});
+    }
     var base=tot[0]||1;
     var idx=wd.map(function(d,i){ return {date:d, v:100*tot[i]/base}; });
     return {dates:wd, deltas:deltas, idx:idx, bars:deltas.length};
@@ -733,7 +736,7 @@ function bootSnapshot(){
       var cx=pl+sx*(i+0.5);
       g+='<rect x="'+(cx-bw/2).toFixed(1)+'" y="'+(v>=0?y0-h:y0).toFixed(1)+
          '" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'"'+(bw>=3?' rx="1.5"':'')+
-         ' fill="'+(v>=0?'#ff4713':'#00875a')+'"/>';
+         ' fill="'+(x.stale?'#cccccc':v>=0?'#ff4713':'#00875a')+'"/>';
     });
     // 命中区（透明列）
     data.deltas.forEach(function(x,i){
@@ -747,7 +750,7 @@ function bootSnapshot(){
     box.querySelectorAll('.hit').forEach(function(r){
       var i=+r.getAttribute('data-i'), x=data.deltas[i];
       function show(ev){
-        tray(box, tip, '<b>'+x.date.slice(0,4)+'-'+dShort(x.date)+'</b><br>份额变化 <span class="'+(x.d>=0?'tu':'td')+'">'+signed(x.d)+' 亿份</span>', ev);
+        tray(box, tip, '<b>'+x.date.slice(0,4)+'-'+dShort(x.date)+'</b><br>'+(x.stale?'<span style="color:#aaa">⚠️ 份额源未日更（行情商数据停滞）</span>':'份额变化 <span class="'+(x.d>=0?'tu':'td')+'">')+signed(x.d)+' 亿份</span>', ev);
       }
       r.addEventListener('mousemove',show);
       r.addEventListener('touchstart',show,{passive:true});
