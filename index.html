@@ -2361,6 +2361,13 @@ window.fetchLiveIntraday = function() {
   document.head.appendChild(s);
 };
 
+// 页面加载完成后立即用静态MACRO_DAILY初始化宏观大底图事件绑定（无需等待实时接口）
+(function initMacroHover(){
+  if (window.MACRO_DAILY && typeof window.renderMacroChart === 'function') {
+    window.renderMacroChart(window.MACRO_DAILY);
+  }
+})();
+
 // 页面首屏以及每次刷新时，自动触发实时分时与宏观实时追加
 (function bootLiveWatch(){
   window.fetchLiveIntraday();
