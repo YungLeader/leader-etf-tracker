@@ -1635,7 +1635,17 @@ window.forceReloadAll = function(triggerBtn) {
     document.head.appendChild(s);
   });
 
-  Promise.all([pMacro, pSnap]).then(function(){
+  // 拉取最新 intraday_min.json（盘中由 intraday_live_update.py 每2分钟更新）
+  var pIntraday = fetch('data/intraday_min.json?t=' + ts, {cache: 'no-store'})
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      window.INTRADAY_MIN = data;
+      if (typeof window.renderIntradayCharts === 'function') {
+        window.renderIntradayCharts(data);
+      }
+    }).catch(function(e){ console.warn('Intraday reload err:', e); });
+
+  Promise.all([pMacro, pSnap, pIntraday]).then(function(){
     // 3. 更新最后更新时间显示
     if (window.SNAPSHOT && window.SNAPSHOT.generated_at) {
       var genAt = window.SNAPSHOT.generated_at;
