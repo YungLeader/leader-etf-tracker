@@ -127,7 +127,7 @@ def calc_all26_ratio(items):
 
 def compute_and_save_intraday_min(items, today_dash):
     core_items = [it for it in items if it.get('group') == 'core']
-    url_idx = 'https://quotes.sina.cn/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol=sh000001&scale=1&ma=no&datalen=245'
+    url_idx = 'https://quotes.sina.cn/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol=sh000001&scale=1&ma=no&datalen=250'
     req = urllib.request.Request(url_idx, headers={'User-Agent': 'Mozilla/5.0'})
     with urllib.request.urlopen(req) as resp:
         sh_raw = json.loads(resp.read().decode('gbk'))
@@ -135,28 +135,32 @@ def compute_and_save_intraday_min(items, today_dash):
     sh_today = [x for x in sh_raw if x['day'].startswith(today_dash)]
     if not sh_today:
         sh_today = sh_raw[-240:]
-    # 清洗非连续竞价杂点（如 14:58），对齐标准连续交易时段
-    filtered_sh = []
-    for x in sh_today:
-        t = x['day'][11:16]
-        if t in ['14:58', '14:59']:
-            continue
-        filtered_sh.append(x)
-    sh_today = filtered_sh
-    sh_times = [x['day'][11:16] for x in sh_today]
-    # 新浪1分钟K线的时间戳是该跟K线的结束时间，转换为开始时间（减1分钟）再展示
+    # 过滤 15:00+ 的场外竞价时段异常行，保留完整交易时段（含 14:57-14:59）
+    sh_today = [x for x in sh_today if x['day'][11:16] < '15:00']
+    sh_times_raw = [x['day'][11:16] for x in sh_today]
+    # 新浪1分K时间戳为K线结束时间，减1分钟转为开始时间展示
+    # 注意：14:58 shift后=14:57，会与已有14:57冲突，只对原始时间 <= '14:57' 做shift
     def _shift_m1(t):
         try:
             from datetime import datetime as _dt, timedelta as _td
             return (_dt.strptime(t, '%H:%M') - _td(minutes=1)).strftime('%H:%M')
         except Exception:
             return t
-    sh_times = [_shift_m1(t) for t in sh_times]
+    sh_times = [_shift_m1(t) if t <= '14:57' else t for t in sh_times_raw]
+    # 去重：shift后如有重复时间槽，保留最后一条（时间更晚的那根K线）
+    seen, dedup_idx = set(), []
+    for i in range(len(sh_times) - 1, -1, -1):
+        if sh_times[i] not in seen:
+            seen.add(sh_times[i])
+            dedup_idx.append(i)
+    dedup_idx = sorted(dedup_idx)
+    sh_today = [sh_today[i] for i in dedup_idx]
+    sh_times = [sh_times[i] for i in dedup_idx]
     sh_pts = [float(x['close']) for x in sh_today]
     n_pts = len(sh_times)
 
     def fetch_etf_min(tc):
-        url = f'https://quotes.sina.cn/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol={tc}&scale=1&ma=no&datalen=245'
+        url = f'https://quotes.sina.cn/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol={tc}&scale=1&ma=no&datalen=250'
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         try:
             with urllib.request.urlopen(req, timeout=4) as resp:
@@ -204,12 +208,12 @@ def compute_and_save_intraday_min(items, today_dash):
         }
 
     # 同时拉取创业板指 (sz399006) 分时数据
-    url_cy = 'https://quotes.sina.cn/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol=sz399006&scale=1&ma=no&datalen=245'
+    url_cy = 'https://quotes.sina.cn/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol=sz399006&scale=1&ma=no&datalen=250'
     req_cy = urllib.request.Request(url_cy, headers={'User-Agent': 'Mozilla/5.0'})
     try:
         with urllib.request.urlopen(req_cy, timeout=4) as resp:
             cy_raw = json.loads(resp.read().decode('gbk'))
-            cy_today = [x for x in cy_raw if x['day'].startswith(today_dash) and x['day'][11:16] not in ['14:58', '14:59']]
+            cy_today = [x for x in cy_raw if x['day'].startswith(today_dash) and x['day'][11:16] < '15:00']
             cy_map = {x['day'][11:16]: float(x['close']) for x in cy_today}
             cy_pts = [cy_map.get(t, float(cy_today[-1]['close']) if cy_today else 2426.08) for t in sh_times]
             prev_close_cy = float(cy_today[0]['open']) if cy_today else 2509.43
@@ -446,6 +450,25 @@ def main():
             it['inner_lots'] = q['inner_lots']
             it['turnover'] = q['turnover']
             it['mktcap_yi'] = round(q['mktcap_yi'], 2)
+            # 腾讯第72字段返回总份数（单位：份），转换为亿份
+            if q.get('shares', 0) > 0:
+                new_shares_yi = round(q['shares'] / 1e8, 4)
+                old_shares_yi = it.get('shares_yi', 0.0)
+                # 检测腾讯份额字段是否停更（变化 < 0.1%）
+                if old_shares_yi > 0 and abs(new_shares_yi - old_shares_yi) < old_shares_yi * 0.001:
+                    # 腾讯停更，用换手率法 Fallback：份额 = 成交额(亿) / 换手率 / 当日清算单位净值
+                    if q.get('turnover', 0) > 0 and q.get('amount_yi', 0) > 0:
+                        nav_fallback = it.get('nav', q.get('price', new_shares_yi))  # 優先用清算单位净值
+                        price = q.get('price', 0)
+                        if price > 0 and q['turnover'] > 0:
+                            scale_yi = q['amount_yi'] / (q['turnover'] / 100.0)
+                            fb_shares = round(scale_yi / price, 4)
+                            if fb_shares > old_shares_yi * 0.5:  # 合理性检查
+                                it['shares_yi'] = fb_shares
+                                print(f"  [Fallback] {it.get('code')} 腾讯停更，用换手率推算份额: {old_shares_yi}亿→{fb_shares}亿")
+                    # 如果 fallback 也失败则保留旧值
+                else:
+                    it['shares_yi'] = new_shares_yi
             it['ts'] = q['ts']
             it['date'] = today_str
             

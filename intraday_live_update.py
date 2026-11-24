@@ -4,7 +4,7 @@
 功能：每次运行时重新采集今日 ETF + 指数分钟 K 线，更新 intraday_min.json / intraday_min.js
       同步写入 index.html 内嵌的 window.INTRADAY_MIN，并 git push 到 GitHub Pages
 用法：
-  - 由 cron 在交易时段（9:35~15:05）每 2 分钟调用一次
+  - 由 cron 在交易时段（9:35~15:10）每 2 分钟调用一次
   - 或者用户点击「立即刷新」时手动触发
 """
 import os, sys, json, urllib.request, time, re, subprocess
@@ -29,8 +29,9 @@ def compute_and_push():
     today_dash = now.strftime('%Y-%m-%d')
     hh = now.hour * 60 + now.minute
 
-    # 交易时段外直接退出
-    if not ((9*60+30 <= hh <= 11*60+30) or (13*60 <= hh <= 15*60+5)):
+    # 交易时段外直接退出（设置 FORCE_RUN=1 可绕过）
+    import os
+    if not os.environ.get('FORCE_RUN') and not ((9*60+30 <= hh <= 11*60+30) or (13*60 <= hh <= 15*60+10)):
         print(f"[{now.strftime('%H:%M')}] 非交易时段，跳过")
         return
 
@@ -45,7 +46,7 @@ def compute_and_push():
 
     headers = {'User-Agent': 'Mozilla/5.0'}
 
-    def fetch_min_kline(symbol, datalen=245):
+    def fetch_min_kline(symbol, datalen=250):
         url = f'https://quotes.sina.cn/cn/api/json_v2.php/CN_MarketDataService.getKLineData?symbol={symbol}&scale=1&ma=no&datalen={datalen}'
         req = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(req, timeout=6) as resp:
@@ -54,12 +55,22 @@ def compute_and_push():
     # 1. 上证指数分时
     sh_raw = fetch_min_kline('sh000001')
     sh_today = [x for x in sh_raw if x['day'].startswith(today_dash)
-                and x['day'][11:16] not in ['14:58','14:59']]
+                and x['day'][11:16] < '15:00']
     if not sh_today:
         sh_today = sh_raw[-240:]
 
     sh_times_raw = [x['day'][11:16] for x in sh_today]
-    sh_times = [_shift_m1(t) for t in sh_times_raw]
+    # 只对 <= 14:57 的原始时间做 shift，14:58 保持原样防止与14:57冲突
+    sh_times = [_shift_m1(t) if t <= '14:57' else t for t in sh_times_raw]
+    # 去重：保留每个时间槽最后一条K线
+    seen, dedup_idx = set(), []
+    for i in range(len(sh_times) - 1, -1, -1):
+        if sh_times[i] not in seen:
+            seen.add(sh_times[i])
+            dedup_idx.append(i)
+    dedup_idx = sorted(dedup_idx)
+    sh_today = [sh_today[i] for i in dedup_idx]
+    sh_times = [sh_times[i] for i in dedup_idx]
     sh_pts   = [float(x['close']) for x in sh_today]
     n_pts    = len(sh_times)
 
@@ -73,7 +84,7 @@ def compute_and_push():
     try:
         cy_raw   = fetch_min_kline('sz399006')
         cy_today = [x for x in cy_raw if x['day'].startswith(today_dash)
-                    and x['day'][11:16] not in ['14:58','14:59']]
+                    and x['day'][11:16] < '15:00']
         cy_map   = {_shift_m1(x['day'][11:16]): float(x['close']) for x in cy_today}
         cy_pts   = [cy_map.get(t, float(cy_today[-1]['close']) if cy_today else 2426.08) for t in sh_times]
         prev_close_cy = float(cy_today[0]['open']) if cy_today else 2509.43
