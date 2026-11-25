@@ -133,6 +133,21 @@ def compute_and_push():
     scope_20 = compute_scope(core_items)
     scope_26 = compute_scope(items)
 
+    # 裁剪尾部指数有、ETF成交额为0的空柱
+    tail_cut = 0
+    while (tail_cut < len(scope_26['min_amount'])
+           and scope_26['min_amount'][-(tail_cut+1)] == 0.0):
+        tail_cut += 1
+    if tail_cut > 0:
+        keep = len(sh_times) - tail_cut
+        sh_times = sh_times[:keep]
+        sh_pts   = sh_pts[:keep]
+        cy_pts   = cy_pts[:keep]
+        for sc in (scope_20, scope_26):
+            sc['min_amount']      = sc['min_amount'][:keep]
+            sc['cum_amount']      = sc['cum_amount'][:keep]
+            sc['base_cum_amount'] = sc['base_cum_amount'][:keep]
+
     intraday_data = {
         "date": today_dash,
         "prev_close": round(prev_close_sh, 2),
