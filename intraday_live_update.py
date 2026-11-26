@@ -17,6 +17,55 @@ INTRADAY_JS   = os.path.join(DATA_DIR, 'intraday_min.js')
 HTML_PATH     = os.path.join(REPO_DIR, 'index.html')
 SNAPSHOT_PATH = os.path.join(DATA_DIR, 'snapshot.js')
 
+# 盘中分时历史归档（滚动保留最近 N 个交易日）
+INTRADAY_HIST_JSON = os.path.join(DATA_DIR, 'intraday_history.json')
+INTRADAY_HIST_JS = os.path.join(DATA_DIR, 'intraday_history.js')
+INTRADAY_HIST_KEEP_DAYS = 20
+
+
+# ---------- 原子写盘工具：与 EOD 脚本保持同一序列化口径（UTF-8 / indent=2 / 末尾换行） ----------
+def atomic_write_text(path, text):
+    tmp = path + '.tmp'
+    with open(tmp, 'w', encoding='utf-8', newline='\n') as f:
+        f.write(text)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, path)
+
+
+def atomic_write_json(path, obj):
+    atomic_write_text(path, json.dumps(obj, ensure_ascii=False, indent=2) + '\n')
+
+
+def atomic_write_js(path, var_name, obj):
+    atomic_write_text(path, f"window.{var_name} = {json.dumps(obj, ensure_ascii=False, indent=2)};\n")
+
+
+def archive_intraday_min(intraday_data, keep_days=INTRADAY_HIST_KEEP_DAYS):
+    """把当日盘中分时快照写入滚动归档（保留最近 keep_days 个交易日）"""
+    hist = {}
+    if os.path.exists(INTRADAY_HIST_JSON):
+        try:
+            with open(INTRADAY_HIST_JSON, 'r', encoding='utf-8') as f:
+                hist = json.load(f) or {}
+        except Exception as e:
+            print(f"[WARN] 分时归档读取失败，将重建: {e}")
+            hist = {}
+    days = hist.get('days') or {}
+    days[intraday_data['date']] = intraday_data
+    ordered = sorted(days.keys())[-keep_days:]
+    payload = {
+        'generated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'keep_days': keep_days,
+        'dates': ordered,
+        'days': {d: days[d] for d in ordered},
+        'notes': '按交易日归档的盘中分时快照，滚动保留最近 keep_days 个交易日，供前端日期回溯与多日对比。',
+    }
+    atomic_write_json(INTRADAY_HIST_JSON, payload)
+    atomic_write_js(INTRADAY_HIST_JS, 'INTRADAY_HISTORY', payload)
+    return payload
+
+
 def _shift_m1(t):
     """新浪1分K时间戳是结束时，转为开始时（-1分钟）"""
     try:
@@ -159,27 +208,45 @@ def compute_and_push():
         "scope_26": scope_26
     }
 
-    # 4. 写 JSON 文件
-    with open(INTRADAY_JSON, 'w', encoding='utf-8') as f:
-        json.dump(intraday_data, f, ensure_ascii=False, separators=(',', ':'))
+    # 4. 写 JSON 文件（原子写 + 与 EOD 统一 indent=2 口径）
+    atomic_write_json(INTRADAY_JSON, intraday_data)
+    atomic_write_js(INTRADAY_JS, 'INTRADAY_MIN', intraday_data)
 
-    js_str = 'window.INTRADAY_MIN=' + json.dumps(intraday_data, ensure_ascii=False, separators=(',', ':')) + ';'
-    with open(INTRADAY_JS, 'w', encoding='utf-8') as f:
-        f.write(js_str)
+    # 4b. 归档当日盘中分时（本地滚动 20 交易日；不随盘中 push 上传，由 EOD 统一提交）
+    try:
+        archive_intraday_min(intraday_data)
+    except Exception as e:
+        print(f"[WARN] 分时历史归档失败: {e}")
 
     print(f"✅ 分时数据写入完成: {n_pts}条, 累计{scope_20['total_today_amount']:.1f}亿(20只)")
 
-    # 5. Git push（只推 data/ 文件，不更新 index.html）
+    # 5. Git push（只推 data/ 下的分钟数据，不更新 index.html）
     os.chdir(REPO_DIR)
-    subprocess.run(['git', 'add', 'data/intraday_min.json', 'data/intraday_min.js'], check=True)
-    result = subprocess.run(['git', 'diff', '--cached', '--quiet'])
-    if result.returncode != 0:
+    env = os.environ.copy()
+    env.setdefault('https_proxy', 'http://127.0.0.1:2080')
+    env.setdefault('http_proxy', 'http://127.0.0.1:2080')
+    env['PATH'] = f"/opt/homebrew/bin:/usr/local/bin:{env.get('PATH', '')}"
+    try:
+        subprocess.run(['git', 'add', 'data/intraday_min.json', 'data/intraday_min.js'],
+                       check=True, capture_output=True, text=True)
+        staged = subprocess.run(['git', 'diff', '--cached', '--name-only'],
+                                capture_output=True, text=True)
+        if not staged.stdout.strip():
+            print("⏭️  分钟数据无变化，跳过 push")
+            return
         subprocess.run(['git', 'commit', '-m',
-                        f'live: intraday update {now.strftime("%H:%M")} n={n_pts}'], check=True)
-        subprocess.run(['git', 'push', 'origin', 'main'], timeout=60)
-        print(f"✅ GitHub Pages 已推送")
-    else:
-        print("⏭️  数据无变化，跳过 push")
+                        f'live: intraday update {now.strftime("%H:%M")} n={n_pts}'],
+                       check=True, capture_output=True, text=True)
+        push_res = subprocess.run(['git', 'push', 'origin', 'main'],
+                                  env=env, timeout=120, capture_output=True, text=True)
+        if push_res.returncode == 0:
+            print("✅ GitHub Pages 已推送")
+        else:
+            print(f"[ERROR] GitHub Pages 推送失败 (code={push_res.returncode})")
+            print(f"        stderr: {(push_res.stderr or '').strip()[:500]}")
+    except subprocess.CalledProcessError as e:
+        print(f"[ERROR] 盘中 Git 提交/推送失败: {e}")
+        print(f"        stderr: {(getattr(e, 'stderr', '') or '').strip()[:500]}")
 
 if __name__ == '__main__':
     compute_and_push()

@@ -231,6 +231,53 @@ footer code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:11px;
   transform: scale(0.98);
 }
 
+
+/* ===== 新增：Tab 分视图 / 常显状态条 / 资金矩阵 / 红绿色阶 ===== */
+.statusbar{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:8px 14px;margin:0 0 12px;background:rgba(255,255,255,.97);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border:1px solid var(--line);border-radius:10px;font-size:12px;color:var(--ink2);box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.statusbar .sb-item{display:inline-flex;align-items:center;gap:5px}
+.statusbar .sb-item>b{font-weight:700;color:var(--ink3);font-size:11px;letter-spacing:.3px}
+.statusbar .num{font-variant-numeric:tabular-nums;font-weight:800;color:var(--ink)}
+.sb-btn{border:1px solid var(--line);background:#fff;border-radius:7px;padding:4px 11px;font-size:12px;cursor:pointer;
+  color:var(--ink);font-weight:700;font-family:inherit;transition:.15s;white-space:nowrap}
+.sb-btn:hover{border-color:var(--blue);color:var(--blue)}
+.sb-btn.on{background:#fff5f2;border-color:#ffdec9;color:var(--orange)}
+.sb-market{margin-left:auto;font-weight:800;padding:2px 10px;border-radius:999px;background:#f5f7fa;color:var(--ink2);font-size:11.5px}
+.sb-market.live{background:#fff1ec;color:var(--orange)}
+.sb-market.closed{background:#f2f4f7;color:var(--ink3)}
+.tabs{display:flex;gap:2px;overflow-x:auto;margin:0 0 16px;border-bottom:1px solid var(--line);
+  -webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.tabs .tab{flex:0 0 auto;border:0;background:none;padding:10px 15px;font-size:14px;font-weight:800;color:var(--ink3);
+  cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-family:inherit;transition:.15s}
+.tabs .tab:hover{color:var(--blue)}
+.tabs .tab.on{color:var(--blue);border-bottom-color:var(--blue);background:#f0f7ff}
+.tabpanel[hidden]{display:none!important}
+/* 资金矩阵 */
+.mthead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:6px 0 10px}
+.mthead h3{margin:0;font-size:19px;font-weight:900;display:flex;align-items:center;gap:8px}
+.mnote{font-size:12px;color:var(--ink2);margin-bottom:12px;line-height:1.75;background:#fafafa;border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.mwrap{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:auto;max-height:70vh}
+table.mtx{border-collapse:separate;border-spacing:0;width:100%;min-width:780px;font-size:12.5px;margin:0}
+table.mtx th,table.mtx td{padding:6px 9px;text-align:right;border-bottom:1px solid #f2f2f2;white-space:nowrap;font-variant-numeric:tabular-nums}
+table.mtx th{position:sticky;top:0;background:#fafafa;color:var(--ink3);font-weight:800;font-size:11.5px;z-index:2;border-bottom:1px solid var(--line)}
+table.mtx th:first-child,table.mtx td:first-child{position:sticky;left:0;text-align:left;z-index:1;background:#fff;box-shadow:1px 0 0 #f0f0f0;font-weight:700}
+table.mtx th:first-child{z-index:3;background:#fafafa}
+table.mtx tr.stalerow td{opacity:.72}
+table.mtx td.totalcol{font-weight:800;border-left:1px solid var(--line)}
+table.mtx th:last-child{border-left:1px solid var(--line)}
+/* 色阶：红=正（净申购），绿=负（净赎回），保留 A 股红涨绿跌口径 */
+.hcu1{background:#fff2ed}.hcu2{background:#ffe0d5}.hcu3{background:#ffc7b4}.hcu4{background:#ff9f7d;color:#6b1500;font-weight:800}
+.hcd1{background:#eefaf4}.hcd2{background:#d9f2e8}.hcd3{background:#b9e8d5}.hcd4{background:#8ed8bd;color:#03382a;font-weight:800}
+@media(max-width:760px){
+  .statusbar{position:static;gap:8px;padding:8px 10px}
+  .sb-market{margin-left:0}
+  .tabs .tab{padding:9px 11px;font-size:13px}
+  .mthead h3{font-size:16px}
+  table.mtx{min-width:700px;font-size:12px}
+  .mwrap{max-height:none}
+  .statusbar .sb-btn{padding:4px 9px;font-size:11.5px}
+}
 </style>
 </head>
 <body>
@@ -253,6 +300,23 @@ footer code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:11px;
   </div>
 </header>
 
+<div class="statusbar" id="statusBar">
+  <span class="sb-item"><b>更新于</b><span class="num" id="sbUpdated">—</span></span>
+  <span class="sb-item"><b>下次更新</b><span class="num" id="sbNext">—</span></span>
+  <button class="sb-btn" id="sbRefresh" onclick="forceReloadAll(this)">立即刷新</button>
+  <button class="sb-btn" id="sbPause" type="button">暂停自动刷新</button>
+  <span class="sb-market" id="sbMarket">状态检测中</span>
+</div>
+
+<nav class="tabs" id="tabNav">
+  <button class="tab on" type="button" data-tab="intraday">盘中观测</button>
+  <button class="tab" type="button" data-tab="matrix">资金矩阵</button>
+  <button class="tab" type="button" data-tab="shares">份额趋势</button>
+  <button class="tab" type="button" data-tab="detail">个股明细</button>
+  <button class="tab" type="button" data-tab="notes">口径说明</button>
+</nav>
+
+<div class="tabpanel" id="panel-intraday">
 <section class="verdict" id="verdict">
   <div class="vhead">
     <div>
@@ -266,6 +330,102 @@ footer code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:11px;
     </div>
   </div>
   
+  <!-- 吸收进阶实战：盘中分钟级大资金共振观测看板 (双轴分时柱线图 + 累计剪刀差曲线) -->
+  <div style="margin-top:24px;margin-bottom:24px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <h3 style="margin:0;font-size:18px;font-weight:900;display:flex;align-items:center;gap:8px;">
+          <span style="width:6px;height:18px;background:#005eb8;border-radius:3px;display:inline-block;"></span>
+          盘中分钟级大资金共振观测
+        </h3>
+        <div class="rng" id="intradayScopeRng" style="margin:0;">
+          <button id="scopeBtn20" class="on" onclick="switchIntradayScope(20)">汇金核心 20 只</button>
+          <button id="scopeBtn24" onclick="switchIntradayScope(26)">全量观察 26 只</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:12px;color:var(--ink3);font-weight:700;">回溯日期</span>
+          <select id="intradayDateSel" style="font-family:inherit;font-size:12px;padding:5px 8px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink);font-weight:600;cursor:pointer;">
+            <option value="live">最新（当日 / 实时）</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:#666;flex-wrap:wrap;">
+        <span class="badge" id="sourceBadge" style="padding:4px 10px;font-size:11px;">数据源: 腾讯主线 (备用:新浪物理直连)</span>
+        <span id="nextRefreshCountdown" style="font-family:monospace;color:var(--orange);font-weight:700;background:#fff5f2;padding:4px 10px;border-radius:6px;border:1px solid #ffdec9;">正在检测交易状态…</span>
+      </div>
+    </div>
+
+    <!-- 卡片 1: 26只ETF分钟成交额与上证综指分时 -->
+    <div class="card" style="border:1px solid var(--line);box-shadow:var(--shadow);border-radius:12px;padding:20px;background:#fff;margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div>
+          <div id="titleMinChart" style="font-size:15px;font-weight:800;color:#222;">20只ETF分钟成交额与双指数(上证/创业板)分时叠加图</div>
+          <div style="font-size:12px;color:#666;margin-top:4px;display:flex;gap:14px;flex-wrap:wrap;">
+            <span><span style="display:inline-block;width:10px;height:10px;background:#005eb8;margin-right:4px;border-radius:2px;vertical-align:middle;"></span>左轴柱状: 26只ETF分钟成交额合计 (亿元，满高 10亿)</span>
+            <span><span style="display:inline-block;width:12px;height:3px;background:#ff7a00;margin-right:4px;vertical-align:middle;"></span>右轴折线: 上证综指分时走势</span>
+            <span><span style="display:inline-block;width:12px;height:3px;background:#8e44ad;margin-right:4px;vertical-align:middle;"></span>右轴折线: 创业板指分时走势</span>
+            <span style="color:#c9a27a;">右轴刻度固定 ±5% (昨收 0.00%)</span>
+            <span id="peakBadge" style="color:#d9001b;font-weight:700;">—</span>
+          </div>
+        </div>
+        <div style="font-size:12px;color:#888;" id="intradayUpdateTime">2026-11-26 15:00 收盘锁定</div>
+      </div>
+      <div id="chartMinWrap" style="position:relative;height:240px;width:100%;cursor:crosshair;">
+        <svg id="svgMinChart" viewBox="0 0 1196 240" style="width:100%;height:240px;display:block;"></svg>
+        <div id="tipMin" class="chart-tip" style="position:absolute;display:none;z-index:10;background:rgba(255,255,255,0.96);padding:8px 12px;border:1px solid #005eb8;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,0.1);font-size:12px;pointer-events:none;"></div>
+      </div>
+    </div>
+
+    <!-- 卡片 2: 当日分钟累计成交额 vs 20日均值 (剪刀差走势) -->
+    <div class="card" style="border:1px solid var(--line);box-shadow:var(--shadow);border-radius:12px;padding:20px;background:#fff;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div>
+          <div id="titleCumChart" style="font-size:15px;font-weight:800;color:#222;">20只ETF当日分钟累计成交额 vs 20日均值曲线（剪刀差看板）</div>
+          <div style="font-size:12px;color:#666;margin-top:4px;display:flex;gap:14px;flex-wrap:wrap;">
+            <span><span style="display:inline-block;width:14px;height:3px;background:#d9001b;margin-right:4px;vertical-align:middle;"></span>今日实际累计成交额 (亿元)</span>
+            <span><span style="display:inline-block;width:14px;height:2px;border-top:2px dashed #005eb8;margin-right:4px;vertical-align:middle;"></span>近20日均值分钟基准底座 (亿元)</span>
+          </div>
+        </div>
+        <div id="scissorsStatus" style="font-size:13px;font-weight:800;color:#666;">—</div>
+      </div>
+      <div id="chartCumWrap" style="position:relative;height:220px;width:100%;cursor:crosshair;">
+        <svg id="svgCumChart" viewBox="0 0 1196 220" style="width:100%;height:220px;display:block;"></svg>
+        <div id="tipCum" class="chart-tip" style="position:absolute;display:none;z-index:10;background:rgba(255,255,255,0.96);padding:8px 12px;border:1px solid #d9001b;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,0.1);font-size:12px;pointer-events:none;"></div>
+      </div>
+    </div>
+  </div>
+
+
+<div class="mgrid" id="mgrid"></div>
+  <div class="caveat" id="caveat">
+    名单为 2025 年报历史标签，非当前持仓；所有结论均为量价推测。<a href="#notes">完整口径与合规说明 ↓</a>
+  </div>
+</section>
+</div>
+
+<div class="tabpanel" id="panel-matrix" hidden>
+  <div class="mthead">
+    <h3><span style="width:6px;height:19px;background:var(--blue);border-radius:3px;display:inline-block;"></span>最近一段，大类宽基 ETF 日度净流入（亿元）</h3>
+    <div class="rng" id="matrixRng" style="margin:0;">
+      <button type="button" class="on" data-n="21">近1月</button>
+      <button type="button" data-n="63">近3月</button>
+      <button type="button" data-n="250">近1年</button>
+    </div>
+  </div>
+  <div class="mnote">
+    <b>口径：</b>净流入 = 当日份额 − 上一交易日份额（亿份）× 当日收盘价（元），单位为亿元；
+    <b style="color:var(--up)">红 = 净申购</b> / <b style="color:var(--down)">绿 = 净赎回</b>（沿用 A 股红涨绿跌，底色深浅按幅度分级）；
+    「—」= 该日无任何可比标的或该标的尚无份额序列（属数据可得性限制，非 0 流入）；
+    整行变淡 = 当日 ≥70% 标的份额未变动，判定份额源未日更，数值不作为结论依據。
+    名单口径、份额与申赎的局限见「口径说明」Tab，同一套口径，不另立标准。
+  </div>
+  <div class="mwrap">
+    <table class="mtx" id="matrixTable"><thead></thead><tbody></tbody></table>
+  </div>
+  <div style="font-size:11.5px;color:var(--ink3);margin-top:10px;line-height:1.7" id="matrixMeta">—</div>
+</div>
+
+<div class="tabpanel" id="panel-shares" hidden>
   <!-- 国家队宏观大底指标 · 头部4只沪深300 ETF 占流通市值比重 (单图同图原版双轴版) -->
   <div class="card" style="margin-top:20px;margin-bottom:20px;border:1px solid #ff4713;box-shadow:0 4px 14px rgba(255,71,19,0.08);border-radius:12px;padding:24px;background:#fff;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
@@ -332,72 +492,6 @@ footer code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:11px;
   </div>
 
 
-  <!-- 吸收进阶实战：盘中分钟级大资金共振观测看板 (双轴分时柱线图 + 累计剪刀差曲线) -->
-  <div style="margin-top:24px;margin-bottom:24px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-        <h3 style="margin:0;font-size:18px;font-weight:900;display:flex;align-items:center;gap:8px;">
-          <span style="width:6px;height:18px;background:#005eb8;border-radius:3px;display:inline-block;"></span>
-          盘中分钟级大资金共振观测
-        </h3>
-        <div class="rng" id="intradayScopeRng" style="margin:0;">
-          <button id="scopeBtn20" class="on" onclick="switchIntradayScope(20)">汇金核心 20 只</button>
-          <button id="scopeBtn24" onclick="switchIntradayScope(26)">全量观察 26 只</button>
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:#666;flex-wrap:wrap;">
-        <span class="badge" id="sourceBadge" style="padding:4px 10px;font-size:11px;">数据源: 腾讯主线 (备用:新浪物理直连)</span>
-        <span id="nextRefreshCountdown" style="font-family:monospace;color:var(--orange);font-weight:700;background:#fff5f2;padding:4px 10px;border-radius:6px;border:1px solid #ffdec9;">正在检测交易状态…</span>
-      </div>
-    </div>
-
-    <!-- 卡片 1: 26只ETF分钟成交额与上证综指分时 -->
-    <div class="card" style="border:1px solid var(--line);box-shadow:var(--shadow);border-radius:12px;padding:20px;background:#fff;margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-        <div>
-          <div id="titleMinChart" style="font-size:15px;font-weight:800;color:#222;">20只ETF分钟成交额与双指数(上证/创业板)分时叠加图</div>
-          <div style="font-size:12px;color:#666;margin-top:4px;display:flex;gap:14px;flex-wrap:wrap;">
-            <span><span style="display:inline-block;width:10px;height:10px;background:#005eb8;margin-right:4px;border-radius:2px;vertical-align:middle;"></span>左轴柱状: 26只ETF分钟成交额合计 (亿元，满高 10亿)</span>
-            <span><span style="display:inline-block;width:12px;height:3px;background:#ff7a00;margin-right:4px;vertical-align:middle;"></span>右轴折线: 上证综指分时走势</span>
-            <span><span style="display:inline-block;width:12px;height:3px;background:#8e44ad;margin-right:4px;vertical-align:middle;"></span>右轴折线: 创业板指分时走势</span>
-            <span style="color:#c9a27a;">右轴刻度固定 ±5% (昨收 0.00%)</span>
-            <span id="peakBadge" style="color:#d9001b;font-weight:700;">—</span>
-          </div>
-        </div>
-        <div style="font-size:12px;color:#888;" id="intradayUpdateTime">2026-11-26 15:00 收盘锁定</div>
-      </div>
-      <div id="chartMinWrap" style="position:relative;height:240px;width:100%;cursor:crosshair;">
-        <svg id="svgMinChart" viewBox="0 0 1196 240" style="width:100%;height:240px;display:block;"></svg>
-        <div id="tipMin" class="chart-tip" style="position:absolute;display:none;z-index:10;background:rgba(255,255,255,0.96);padding:8px 12px;border:1px solid #005eb8;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,0.1);font-size:12px;pointer-events:none;"></div>
-      </div>
-    </div>
-
-    <!-- 卡片 2: 当日分钟累计成交额 vs 20日均值 (剪刀差走势) -->
-    <div class="card" style="border:1px solid var(--line);box-shadow:var(--shadow);border-radius:12px;padding:20px;background:#fff;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-        <div>
-          <div id="titleCumChart" style="font-size:15px;font-weight:800;color:#222;">20只ETF当日分钟累计成交额 vs 20日均值曲线（剪刀差看板）</div>
-          <div style="font-size:12px;color:#666;margin-top:4px;display:flex;gap:14px;flex-wrap:wrap;">
-            <span><span style="display:inline-block;width:14px;height:3px;background:#d9001b;margin-right:4px;vertical-align:middle;"></span>今日实际累计成交额 (亿元)</span>
-            <span><span style="display:inline-block;width:14px;height:2px;border-top:2px dashed #005eb8;margin-right:4px;vertical-align:middle;"></span>近20日均值分钟基准底座 (亿元)</span>
-          </div>
-        </div>
-        <div id="scissorsStatus" style="font-size:13px;font-weight:800;color:#666;">—</div>
-      </div>
-      <div id="chartCumWrap" style="position:relative;height:220px;width:100%;cursor:crosshair;">
-        <svg id="svgCumChart" viewBox="0 0 1196 220" style="width:100%;height:220px;display:block;"></svg>
-        <div id="tipCum" class="chart-tip" style="position:absolute;display:none;z-index:10;background:rgba(255,255,255,0.96);padding:8px 12px;border:1px solid #d9001b;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,0.1);font-size:12px;pointer-events:none;"></div>
-      </div>
-    </div>
-  </div>
-
-
-<div class="mgrid" id="mgrid"></div>
-  <div class="caveat" id="caveat">
-    名单为 2025 年报历史标签，非当前持仓；所有结论均为量价推测。<a href="#notes">完整口径与合规说明 ↓</a>
-  </div>
-</section>
-
 <section class="charts">
   <div class="chartcard">
     <div class="chead">
@@ -426,13 +520,15 @@ footer code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:11px;
     <div class="chart-note" id="chartIndexNote"></div>
   </div>
 </section>
+</div>
 
+<div class="tabpanel" id="panel-detail" hidden>
 <div class="controls">
   <div class="grp">
     <span class="muted" style="font-size:12px">排序</span>
     <select id="sort">
+      <option value="amount" selected>今日成交额（默认·降序）</option>
       <option value="huijin">汇金历史持仓 → 规模优先</option>
-      <option value="amount">今日成交额</option>
       <option value="ratio">放量倍数</option>
       <option value="net">主动净买入</option>
       <option value="mktcap">最新规模</option>
@@ -460,7 +556,7 @@ footer code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:11px;
       <th title="外盘−内盘 逐笔主动买卖推算，非资金流向、非申赎、不含大宗">主动净买入<sup>①</sup></th>
       <th>涨跌</th>
       <th title="腾讯行情场内份额，下方为与上一份快照的份额变化估值">份额(亿份)<sup>②</sup></th>
-      <th>近30日成交额</th><th>汇金持仓(25年报·亿份)</th>
+      <th title="48 点日内成交额分布，红色柱为尾盘 14:30-15:00 时段">日内成交额分布<span class="tail-legend"><i></i>尾盘</span></th><th>汇金持仓(25年报·亿份)</th>
     </tr></thead>
     <tbody id="tbody"></tbody>
   </table>
@@ -471,6 +567,9 @@ footer code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:11px;
   <b>为什么有的是 0：</b>2026-11-03 实测，沪市 15 只 ETF 份额全部与上一快照一模一样，深市 9 只里 8 只有变化——这种「整片市场同时不动」不可能反映真实申赎，是行情商的份额字段对沪市未按日更新。页面因此加了自检：<b>同一市场 ≥70% 标的两日份额完全相同时，该市场一律标「份额源未日更」而不给数字</b>，避免把数据源滞后说成「没有申赎」。只有差异化的市场才显示具体申赎值。任何情况下都以基金公司公告为准。</div>
 </div>
 
+</div>
+
+<div class="tabpanel" id="panel-notes" hidden>
 <footer>
   <div class="lead" id="notes">
     <h3>重要说明 · 名单与口径</h3>
@@ -503,6 +602,7 @@ footer code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:11px;
   </div>
   <div class="sign" id="footerSign">—</div>
 </footer>
+</div>
 
 </div>
 
@@ -638,6 +738,38 @@ function bootSnapshot(){
              '" height="'+bh.toFixed(1)+'" fill="'+(last?'#ff4713':'#e0e0e0')+'"/>';
     }).join('');
     return '<svg class="spark" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" aria-label="近30日成交额">'+bars+'</svg>';
+  }
+
+  // 涨跌幅 / 净流入分级色阶：红=正、绿=负（A 股口径），幅度越大底色越深
+  function heatCls(v){
+    if(v===null||v===undefined||isNaN(v)||Math.abs(v)<1e-9) return '';
+    var a=Math.abs(v), lv = a<3?1:(a<10?2:(a<30?3:4));
+    return (v>0?'hcu':'hcd')+lv;
+  }
+  // 日内成交额分布迷你柱（48 点）：用 items[].shape 的累计占比序列反解每分钟成交额，
+  // 尾盘 14:30-15:00 时段用主色高亮，便于一眼看出资金是否尾盘发力。
+  function sparkShape(shape, st){
+    if(!shape || !shape.length) return '<span class="muted" style="font-size:11px">无日内分布</span>';
+    var n=shape.length, w=112, h=26, times=[], cum=[];
+    for(var i=0;i<n;i++){
+      var it2=shape[i];
+      times.push(String(it2[0]||'').replace(':',''));
+      cum.push(Number(it2[1])||0);
+    }
+    var incs=[];
+    for(var k=0;k<n;k++) incs.push(Math.max(0, cum[k]-(k>0?cum[k-1]:0)));
+    var mx=Math.max.apply(null,incs)||1, bw=w/n;
+    var bars=incs.map(function(v,i){
+      var bh=Math.max(0.9, v/mx*h);
+      var tail = times[i] >= '1430';
+      var last = (i===n-1);
+      var base = tail ? '#ff4713' : '#005eb8';
+      var op = tail ? 1 : (0.45+0.5*(v/mx));
+      return '<rect x="'+(i*bw).toFixed(1)+'" y="'+(h-bh).toFixed(1)+'" width="'+Math.max(1,bw-0.7).toFixed(1)+
+             '" height="'+bh.toFixed(1)+'" fill="'+base+'" fill-opacity="'+op.toFixed(2)+'"'+
+             (last?' stroke="#ff4713" stroke-width="0.8"':'')+'/>';
+    }).join('');
+    return '<svg class="spark" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" aria-label="日内48点成交额分布（尾盘高亮）">'+bars+'</svg>';
   }
 
   // ---------- 份额图表：每日份额变化 + 加仓指数 ----------
@@ -1039,9 +1171,9 @@ function bootSnapshot(){
         '<td><div class="ratio num '+rCls+'">'+fmt(c.ratio,2)+'<b>×</b></div>'+ratioSub+
              '<div class="mini"><span style="width:'+hb.toFixed(1)+'%"></span></div></td>'+
         '<td class="num '+netCls+'" style="font-weight:700">'+signed(c.net)+'</td>'+
-        '<td class="num '+pctCls+'" style="font-weight:700">'+signed(it.pct)+'%</td>'+
+        '<td class="num '+pctCls+' '+heatCls(it.pct)+'" style="font-weight:700">'+signed(it.pct)+'%</td>'+
         '<td><div class="num">'+fmt(it.shares_yi,1)+'</div>'+subscrCell(it)+'</td>'+
-        '<td>'+spark(it.hist, it.amount_yi, it.date||st.date)+'</td>'+
+        '<td>'+sparkShape(it.shape, st)+'</td>'+
         '<td class="num '+(it.huijin_yi?'':'muted')+'">'+(it.huijin_yi?fmt(it.huijin_yi,1):'—')+'</td>'+
       '</tr>';
     });
@@ -1176,7 +1308,7 @@ function bootSnapshot(){
 
   // ---------- 事件 ----------
   ['sort','scope','q'].forEach(function(id){
-    var handler = (id === 'scope') ? function(){ renderTable(); renderIntradayCharts(window.INTRADAY_MIN); } : renderTable;
+    var handler = (id === 'scope') ? function(){ renderTable(); (window.__renderIntradayCurrent||function(){renderIntradayCharts(window.INTRADAY_MIN);})(); } : renderTable;
     document.getElementById(id).addEventListener(id==='q'?'input':'change', handler);
   });
   document.getElementById('refresh').addEventListener('click',refresh);
@@ -1643,12 +1775,14 @@ window.forceReloadAll = function(triggerBtn) {
     .then(function(r){ return r.json(); })
     .then(function(data){
       window.INTRADAY_MIN = data;
-      if (typeof window.renderIntradayCharts === 'function') {
+      if (typeof window.__renderIntradayCurrent === 'function') {
+        window.__renderIntradayCurrent();
+      } else if (typeof window.renderIntradayCharts === 'function') {
         window.renderIntradayCharts(data);
       }
     }).catch(function(e){ console.warn('Intraday reload err:', e); });
 
-  Promise.all([pMacro, pSnap, pIntraday]).then(function(){
+  Promise.all([pMacro, pSnap, pIntraday, (typeof window.__reloadDashData === 'function' ? window.__reloadDashData() : Promise.resolve())]).then(function(){
     // 3. 更新最后更新时间显示
     if (window.SNAPSHOT && window.SNAPSHOT.generated_at) {
       var genAt = window.SNAPSHOT.generated_at;
@@ -1803,14 +1937,18 @@ window.switchIntradayScope = function(n) {
     if (b20) b20.className = '';
     if (b24) b24.className = 'on';
   }
-  if (window.INTRADAY_MIN) {
+  if (typeof window.__renderIntradayCurrent === 'function') {
+    window.__renderIntradayCurrent();
+  } else if (window.INTRADAY_MIN) {
     window.renderIntradayCharts(window.INTRADAY_MIN);
   }
 };
 
 window.renderIntradayCharts = function(d) {
   if (!d || !d.times || !d.times.length) return;
-  window.INTRADAY_MIN = d;
+  // 回溯历史日期时不得覆盖实时底座数据
+  if (!window.__intradayHistDate) window.INTRADAY_MIN = d;
+  window.__intradayCurDay = d;
   
   var scopeKey = window.__curScope || 'scope_20';
   var curObj = d[scopeKey] || d.scope_20 || d;
@@ -2250,7 +2388,9 @@ window.fetchLiveIntraday = function() {
         window.INTRADAY_MIN.prev_close_cy = prevCloseCy;
       }
       
-      if (typeof window.renderIntradayCharts === 'function') {
+      if (typeof window.__renderIntradayCurrent === 'function') {
+        window.__renderIntradayCurrent();
+      } else if (typeof window.renderIntradayCharts === 'function') {
         window.renderIntradayCharts(window.INTRADAY_MIN);
       }
     }
@@ -2313,6 +2453,201 @@ window.fetchLiveIntraday = function() {
     if (typeof oldTrigger === 'function') oldTrigger();
     window.fetchLiveIntraday();
   };
+})();
+</script>
+
+<script>
+/* ============ Tab 分视图 / 常显状态条 / 资金矩阵 / 日期回溯 ============ */
+(function(){
+  var fmt1 = function(v){ if(v===null||v===undefined||isNaN(v)) return '—'; var s=Math.abs(v).toFixed(2); return (v>0?'+':(v<0?'-':''))+s; };
+  window.heatCls = function(v){
+    if(v===null||v===undefined||isNaN(v)||Math.abs(v)<1e-9) return '';
+    var a=Math.abs(v), lv = a<3?1:(a<10?2:(a<30?3:4));
+    return (v>0?'hcu':'hcd')+lv;
+  };
+  function heatCls(v){ return window.heatCls(v); }
+
+  /* ---- Tab 切换 ---- */
+  var nav=document.getElementById('tabNav');
+  function showTab(name){
+    var ps=document.querySelectorAll('.tabpanel');
+    for(var i=0;i<ps.length;i++) ps[i].hidden = (ps[i].id !== 'panel-'+name);
+    var bs=nav.querySelectorAll('.tab');
+    for(var j=0;j<bs.length;j++) bs[j].className='tab'+(bs[j].getAttribute('data-tab')===name?' on':'');
+    if(name==='matrix') renderMatrix();
+    if(name==='intraday' && typeof window.__renderIntradayCurrent==='function'){
+      try{ window.__renderIntradayCurrent(); }catch(e){}
+    }
+    try{ if(window.history && history.replaceState) history.replaceState(null,'','#'+name); }catch(e){}
+  }
+  window.__showTab=showTab;
+  nav.addEventListener('click',function(e){
+    var n=e.target;
+    while(n && n!==nav && !(n.getAttribute && n.getAttribute('data-tab'))) n=n.parentNode;
+    if(n && n.getAttribute && n.getAttribute('data-tab')) showTab(n.getAttribute('data-tab'));
+  });
+  var h=(location.hash||'').replace('#','');
+  if(h && document.getElementById('panel-'+h)) showTab(h);
+
+  /* ---- 资金矩阵 ---- */
+  window.__matrixRange = window.__matrixRange || 21;
+  function renderMatrix(){
+    var tb=document.getElementById('matrixTable');
+    if(!tb) return;
+    var D=window.WIDEBASE_NETFLOW;
+    var thead=tb.tHead||tb.createTHead(), tbody=tb.tBodies[0]||tb.createTBody();
+    if(!D || !D.rows || !D.rows.length){
+      thead.innerHTML='<tr><th>日期</th></tr>';
+      tbody.innerHTML='<tr><td class="zero">宽基净流入数据加载中…（若持续为空请点「立即刷新」）</td></tr>';
+      return;
+    }
+    var cols=D.columns||[], n=window.__matrixRange||21;
+    var rows=(D.rows||[]).slice(0,n);
+    var head='<tr><th>日期</th>';
+    cols.forEach(function(c){ head+='<th>'+c.label+'</th>'; });
+    head+='<th>合计</th></tr>';
+    thead.innerHTML=head;
+    tbody.innerHTML=rows.map(function(r){
+      var d=String(r.date||'');
+      if(d.length===8) d=d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6,8);
+      var cells='';
+      cols.forEach(function(c){
+        var v=r[c.key];
+        if(v===null||v===undefined) cells+='<td class="zero">—</td>';
+        else cells+='<td class="'+heatCls(v)+'">'+fmt1(v)+'</td>';
+      });
+      var tv=r.total;
+      cells+='<td class="totalcol '+(tv===null||tv===undefined?'zero':heatCls(tv))+'">'+(tv===null||tv===undefined?'—':fmt1(tv))+'</td>';
+      return '<tr'+(r.stale?' class="stalerow"':'')+'><td>'+d+(r.stale?' <span style="font-size:10px;color:var(--ink3);font-weight:400">份额源未日更</span>':'')+'</td>'+cells+'</tr>';
+    }).join('');
+    var meta=document.getElementById('matrixMeta');
+    if(meta){
+      var c0=D.columns&&D.columns.length?D.columns.length:0;
+      var cs=D.column_start||{};
+      var latest=(D.rows&&D.rows[0])?String(D.rows[0].date).replace(/(\d{4})(\d{2})(\d{2})/,'$1-$2-$3'):'—';
+      meta.innerHTML='共 '+(D.count||D.rows.length)+' 个交易日 · 当前展示近 '+rows.length+' 日（截取至 '+latest+'） · '+c0+' 个大类宽基 + 合计列'+
+        ' · 生成于 '+(D.generated_at||'—')+
+        ' · 最早可比起点：'+(cs.hs300? String(cs.hs300).replace(/(\d{4})(\d{2})(\d{2})/,'$1-$2-$3'):'—');
+    }
+  }
+  window.__renderMatrix=renderMatrix;
+
+  var rng=document.getElementById('matrixRng');
+  if(rng){
+    rng.addEventListener('click',function(e){
+      var n=e.target;
+      while(n && n!==rng && !(n.getAttribute && n.getAttribute('data-n'))) n=n.parentNode;
+      if(!n || !n.getAttribute || !n.getAttribute('data-n')) return;
+      window.__matrixRange=parseInt(n.getAttribute('data-n'),10)||21;
+      var bs=rng.getElementsByTagName('button');
+      for(var i=0;i<bs.length;i++) bs[i].className=(bs[i]===n?'on':'');
+      renderMatrix();
+    });
+  }
+
+  /* ---- 盘中共振图：日期回溯 ---- */
+  window.__renderIntradayCurrent=function(){
+    var day=null;
+    if(window.__intradayHistDate && window.INTRADAY_HIST && window.INTRADAY_HIST.days){
+      day=window.INTRADAY_HIST.days[window.__intradayHistDate];
+    }
+    if(!day) day=window.INTRADAY_MIN;
+    if(day && typeof window.renderIntradayCharts==='function') window.renderIntradayCharts(day);
+  };
+  function fillIntradayDates(){
+    var sel=document.getElementById('intradayDateSel');
+    if(!sel) return;
+    var H=window.INTRADAY_HIST, cur=sel.value||'live';
+    var opts='<option value="live">最新（当日 / 实时）</option>';
+    var ds=(H&&H.dates)?H.dates.slice():[];
+    ds.reverse().forEach(function(d){ opts+='<option value="'+d+'">'+d+' 回溯</option>'; });
+    sel.innerHTML=opts;
+    sel.value = (cur && (cur==='live' || ds.indexOf(cur)>=0)) ? cur : 'live';
+  }
+  var dsel=document.getElementById('intradayDateSel');
+  if(dsel){
+    dsel.addEventListener('change',function(){
+      var v=this.value;
+      window.__intradayHistDate = (v==='live') ? null : v;
+      var badge=document.getElementById('intradayUpdateTime');
+      if(badge) badge.textContent = window.__intradayHistDate ? (window.__intradayHistDate+' 历史回溯（收盘锁定数据）') : badge.textContent;
+      window.__renderIntradayCurrent();
+    });
+  }
+
+  /* ---- 新数据加载 ---- */
+  window.__reloadDashData=function(){
+    var ts=Date.now();
+    var p1=fetch('data/widebase_netflow.json?t='+ts,{cache:'no-store'})
+      .then(function(r){ return r.json(); })
+      .then(function(d){ window.WIDEBASE_NETFLOW=d; renderMatrix(); })
+      .catch(function(e){ console.warn('widebase load err',e); });
+    var p2=fetch('data/intraday_history.json?t='+ts,{cache:'no-store'})
+      .then(function(r){ return r.json(); })
+      .then(function(d){ window.INTRADAY_HIST=d; fillIntradayDates(); if(window.__intradayHistDate) window.__renderIntradayCurrent(); })
+      .catch(function(e){ console.warn('intraday history load err',e); });
+    return Promise.all([p1,p2]);
+  };
+
+  /* ---- 状态条四件套 ---- */
+  var sbU=document.getElementById('sbUpdated'), sbN=document.getElementById('sbNext'),
+      sbM=document.getElementById('sbMarket'), sbP=document.getElementById('sbPause');
+  var lastTs=Date.now();
+  var origReset=window.resetRefreshCountdown;
+  if(typeof origReset==='function'){
+    window.resetRefreshCountdown=function(){ lastTs=Date.now(); return origReset.apply(this,arguments); };
+  }
+  function bjNow(){
+    var n=new Date();
+    try{ return new Date(n.toLocaleString('en-US',{timeZone:'Asia/Shanghai'})); }catch(e){ return n; }
+  }
+  function marketInfo(){
+    var d=bjNow(), wd=d.getDay(), m=d.getHours()*60+d.getMinutes();
+    if(wd===0||wd===6) return {live:false,label:'休市 · 周末'};
+    if(m>=570 && m<690) return {live:true,label:'交易中 · 上午盘'};
+    if(m>=690 && m<780) return {live:false,label:'午间休市'};
+    if(m>=780 && m<900) return {live:true,label:'交易中 · 下午盘'};
+    if(m<570) return {live:false,label:'休市 · 等待开盘'};
+    return {live:false,label:'已收盘'};
+  }
+  function tickSb(){
+    if(window.SNAPSHOT && window.SNAPSHOT.generated_at){
+      var g=String(window.SNAPSHOT.generated_at), mm=g.match(/(\d{2}:\d{2}:\d{2})/);
+      if(sbU) sbU.textContent = mm ? mm[1] : g;
+    }
+    var info=marketInfo();
+    if(sbM){ sbM.textContent=info.label; sbM.className='sb-market '+(info.live?'live':'closed'); }
+    var chk=document.getElementById('auto');
+    var autoOn = chk ? chk.checked : true;
+    if(!autoOn){
+      if(sbN) sbN.textContent='已暂停';
+      if(sbP){ sbP.className='sb-btn on'; sbP.textContent='恢复自动刷新'; }
+    }else{
+      if(sbP){ sbP.className='sb-btn'; sbP.textContent='暂停自动刷新'; }
+      if(sbN){
+        if(info.live){
+          var remain=Math.max(0,20-Math.round((Date.now()-lastTs)/1000));
+          sbN.textContent=remain+'s';
+        }else sbN.textContent='— 休市不轮询';
+      }
+    }
+  }
+  if(sbP){
+    sbP.addEventListener('click',function(){
+      var chk=document.getElementById('auto');
+      if(!chk) return;
+      chk.checked=!chk.checked;
+      chk.dispatchEvent(new Event('change'));
+      lastTs=Date.now();
+      tickSb();
+    });
+  }
+  setInterval(tickSb,1000);
+  tickSb();
+
+  /* ---- 启动 ---- */
+  renderMatrix();
+  window.__reloadDashData();
 })();
 </script>
 

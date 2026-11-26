@@ -29,6 +29,194 @@ INTRADAY_JSON = os.path.join(DATA_DIR, 'intraday_min.json')
 INTRADAY_JS = os.path.join(DATA_DIR, 'intraday_min.js')
 HTML_PATH = os.path.join(REPO_DIR, 'index.html')
 
+# ================= 新增数据层产物（宽基净流入矩阵 + 盘中分时历史归档） =================
+WIDEBASE_JSON = os.path.join(DATA_DIR, 'widebase_netflow.json')
+WIDEBASE_JS = os.path.join(DATA_DIR, 'widebase_netflow.js')
+INTRADAY_HIST_JSON = os.path.join(DATA_DIR, 'intraday_history.json')
+INTRADAY_HIST_JS = os.path.join(DATA_DIR, 'intraday_history.js')
+INTRADAY_HIST_KEEP_DAYS = 20
+
+# 大类宽基列定义（顺序即前端展示顺序）
+WIDEBASE_COLUMNS = [
+    ('hs300', '沪深300'),
+    ('csi1000', '中证1000'),
+    ('csi500', '中证500'),
+    ('star50', '科创50'),
+    ('csia500', '中证A500'),
+    ('chinext', '创业板指'),
+    ('sse50', '上证50'),
+    ('other', '其他宽基'),
+]
+
+# 跟踪指数 -> 宽基大类
+INDEX_TO_COLUMN = {
+    '沪深300': 'hs300',
+    '中证1000': 'csi1000',
+    '中证500': 'csi500',
+    '科创50': 'star50',
+    '中证A500': 'csia500',
+    '创业板指': 'chinext',
+    '上证50': 'sse50',
+    '上证180': 'other',
+    '上证180金融': 'other',
+    '中证800': 'other',
+    '深证100': 'other',
+}
+
+
+# ---------- 原子写盘工具：统一序列化格式（UTF-8 / indent=2 / 末尾换行 / 临时文件+rename） ----------
+def atomic_write_text(path, text):
+    tmp = path + '.tmp'
+    with open(tmp, 'w', encoding='utf-8', newline='\n') as f:
+        f.write(text)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, path)
+
+
+def atomic_write_json(path, obj):
+    atomic_write_text(path, json.dumps(obj, ensure_ascii=False, indent=2) + '\n')
+
+
+def atomic_write_js(path, var_name, obj):
+    atomic_write_text(path, f"window.{var_name} = {json.dumps(obj, ensure_ascii=False, indent=2)};\n")
+
+
+def fetch_daily_closes(tcode, datalen=400):
+    """拉取单只 ETF 日线收盘价，返回 {'YYYYMMDD': close}"""
+    url = ('https://quotes.sina.cn/cn/api/json_v2.php/CN_MarketDataService.getKLineData'
+           f'?symbol={tcode}&scale=240&ma=no&datalen={datalen}')
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+    out = {}
+    try:
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            raw = json.loads(resp.read().decode('gbk'))
+        for x in raw:
+            d = str(x.get('day', ''))[:10].replace('-', '')
+            try:
+                out[d] = float(x.get('close', 0))
+            except Exception:
+                continue
+    except Exception as e:
+        print(f"  [WARN] {tcode} 日线拉取失败: {e}")
+    return out
+
+
+def build_widebase_netflow(items, shares_history, today_str):
+    """生成 交易日 × 大类宽基 的净流入矩阵（净流入 = 份额变化(亿份) × 当日收盘价(元)，单位亿元）"""
+    code_col = {}
+    for it in items:
+        code_col[it['code']] = INDEX_TO_COLUMN.get(it.get('index', ''), 'other')
+
+    price_hist = {}
+    for it in items:
+        price_hist[it['code']] = fetch_daily_closes(it['tcode'])
+        time.sleep(0.01)
+
+    dates = sorted(shares_history.keys())
+    rows = []
+    prev_date, prev_row = None, None
+    for d in dates:
+        cur = shares_history.get(d) or {}
+        if prev_row is None:
+            prev_date, prev_row = d, cur
+            continue
+        acc = {k: 0.0 for k, _ in WIDEBASE_COLUMNS}
+        col_compared = {k: 0 for k, _ in WIDEBASE_COLUMNS}
+        compared = 0
+        changed = 0
+        missing_price = 0
+        for code, s in cur.items():
+            if code not in prev_row or code not in code_col:
+                continue
+            compared += 1
+            col = code_col[code]
+            col_compared[col] += 1
+            ds = s - prev_row[code]
+            # 份额变动阈值 0.01 亿份（100 万份），过滤浮点噪声，仅用于“份额源是否日更”的判定
+            if abs(ds) < 0.01:
+                continue
+            changed += 1
+            px = price_hist.get(code, {}).get(d) or price_hist.get(code, {}).get(prev_date)
+            if not px:
+                missing_price += 1
+                continue
+            acc[col] += ds * px
+        prev_date, prev_row = d, cur
+        if compared == 0:
+            continue
+        stale = (changed / float(compared)) < 0.30
+        row = {'date': d}
+        if stale:
+            # 份额源未日更：整行置空，避免产生假的净流入跳变
+            row['stale'] = True
+            for k, _ in WIDEBASE_COLUMNS:
+                row[k] = None
+            row['total'] = None
+        else:
+            row['stale'] = False
+            for k, _ in WIDEBASE_COLUMNS:
+                # 该大类当日无任何可比标的（如观察池标的尚未纳入历史序列）时置 null，不用 0 冒充
+                row[k] = round(acc[k], 2) if col_compared[k] else None
+            row['total'] = round(sum(v for v in (row[k] for k, _ in WIDEBASE_COLUMNS) if v is not None), 2)
+        if missing_price:
+            row['missing_price_count'] = missing_price
+        rows.append(row)
+
+    first_date = {}
+    for row in rows:
+        if row.get('stale'):
+            continue
+        for k, _ in WIDEBASE_COLUMNS:
+            if k not in first_date and row.get(k) is not None:
+                first_date[k] = row['date']
+
+    payload = {
+        'generated_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'trade_date': today_str,
+        'unit': '亿元',
+        'columns': [{'key': k, 'label': v} for k, v in WIDEBASE_COLUMNS],
+        'rows': list(reversed(rows)),   # 最新交易日在最前，与看板表格一致
+        'count': len(rows),
+        'column_start': first_date,     # 各宽基列首个有效数据日（null 表示该列历史不可得）
+        'notes': ('净流入 = 当日份额 − 上一交易日份额（亿份）× 当日收盘价（元）；份额源为 snapshot.shares_history，'
+                  '收盘价源为新浪日线；某日 ≥70% 标的份额变动不足 0.01 亿份时判定份额源未日更，该行数值置空并标 stale=true；'
+                  '某列当日无任何可比标的时该单元格为 null（前端显示「—」）；'
+                  '“其他宽基”含上证180、上证180金融、中证800、深证100；中证A500 等观察池标的纳入份额序列较晚，'
+                  '其历史单元格为 null，属数据可得性限制而非 0 流入。'),
+    }
+    atomic_write_json(WIDEBASE_JSON, payload)
+    atomic_write_js(WIDEBASE_JS, 'WIDEBASE_NETFLOW', payload)
+    print(f"✅ 宽基净流入矩阵已生成: {payload['count']} 个交易日 × {len(WIDEBASE_COLUMNS)} 个宽基大类")
+    return payload
+
+
+def archive_intraday_min(intraday_data, keep_days=INTRADAY_HIST_KEEP_DAYS):
+    """把当日分时快照写入滚动归档，保留最近 keep_days 个交易日"""
+    hist = {}
+    if os.path.exists(INTRADAY_HIST_JSON):
+        try:
+            with open(INTRADAY_HIST_JSON, 'r', encoding='utf-8') as f:
+                hist = json.load(f) or {}
+        except Exception as e:
+            print(f"[WARN] 分时归档读取失败，将重建: {e}")
+            hist = {}
+    days = hist.get('days') or {}
+    days[intraday_data['date']] = intraday_data
+    ordered = sorted(days.keys())[-keep_days:]
+    payload = {
+        'generated_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'keep_days': keep_days,
+        'dates': ordered,
+        'days': {d: days[d] for d in ordered},
+        'notes': '按交易日归档的盘中分时快照，滚动保留最近 keep_days 个交易日，供前端日期回溯与多日对比。',
+    }
+    atomic_write_json(INTRADAY_HIST_JSON, payload)
+    atomic_write_js(INTRADAY_HIST_JS, 'INTRADAY_HISTORY', payload)
+    print(f"✅ 分时历史归档更新: 保留 {len(ordered)} 个交易日 ({ordered[0] if ordered else '-'} ~ {ordered[-1] if ordered else '-'})")
+    return payload
+
+
 def fetch_quotes(tcodes):
     url = f"https://qt.gtimg.cn/q={','.join(tcodes)}"
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -253,11 +441,11 @@ def compute_and_save_intraday_min(items, today_dash):
         "scope_26": scope_26
     }
 
-    with open(INTRADAY_JSON, 'w', encoding='utf-8') as f:
-        json.dump(intraday_data, f, ensure_ascii=False, indent=2)
+    atomic_write_json(INTRADAY_JSON, intraday_data)
+    atomic_write_js(INTRADAY_JS, 'INTRADAY_MIN', intraday_data)
 
-    with open(INTRADAY_JS, 'w', encoding='utf-8') as f:
-        f.write(f"window.INTRADAY_MIN = {json.dumps(intraday_data, ensure_ascii=False, indent=2)};\n")
+    # 归档当日分时（滚动保留最近 20 个交易日）
+    archive_intraday_min(intraday_data)
 
     return intraday_data
 
@@ -422,8 +610,7 @@ def rebuild_index_html(macro_data, intraday_data, today_dash):
         )
     # ---- 第二图表结束 ----
 
-    with open(HTML_PATH, 'w', encoding='utf-8') as f:
-        f.write(html)
+    atomic_write_text(HTML_PATH, html)
     return html
 
 def main():
@@ -512,26 +699,39 @@ def main():
                 total_avg20_amount += new_avg20
 
     
-    # 自动将今日 20 只汇金核心 ETF 的最新份额记录追加到 shares_history (保证份额图表永不停更)
+    # 自动将今日全部标的的最新份额记录追加到 shares_history（core 20 只 + 观察池，供宽基矩阵按大类聚合）
     sh_hist = snapshot.get('shares_history', {})
     core_day_shares = {}
+    watch_day_shares = {}
     for it in items:
-        if it.get('group') == 'core':
-            c = it['code']
-            s_yi = it.get('shares_yi', 0.0)
-            if s_yi > 0:
+        c = it['code']
+        s_yi = it.get('shares_yi', 0.0)
+        if s_yi > 0:
+            if it.get('group') == 'core':
                 core_day_shares[c] = round(s_yi, 4)
+            else:
+                watch_day_shares[c] = round(s_yi, 4)
     if core_day_shares:
         sh_hist[today_str] = core_day_shares
+    if watch_day_shares:
+        merged = dict(sh_hist.get(today_str) or {})
+        merged.update(watch_day_shares)
+        sh_hist[today_str] = merged
+    if core_day_shares:
         snapshot['shares_history'] = sh_hist
-        print(f"✅ shares_history 自动追加今日 ({today_str}) 最新份额 (共 {len(core_day_shares)} 只)！")
+        print(f"✅ shares_history 自动追加今日 ({today_str}) 最新份额 (核心 {len(core_day_shares)} 只 + 观察 {len(watch_day_shares)} 只)！")
 
     snapshot['trade_date'] = today_str
     snapshot['generated_at'] = now_str
-    
-    with open(SNAPSHOT_PATH, 'w', encoding='utf-8') as f:
-        f.write(f"window.SNAPSHOT = {json.dumps(snapshot, ensure_ascii=False, indent=2)};\n")
-        
+
+    atomic_write_js(SNAPSHOT_PATH, 'SNAPSHOT', snapshot)
+
+    # 生成大类宽基逐日净流入矩阵（独立数据文件，供前端矩阵表使用）
+    try:
+        build_widebase_netflow(items, sh_hist, today_str)
+    except Exception as e:
+        print(f"[ERROR] 宽基净流入矩阵生成失败: {e}")
+
     # 2. 更新宏观大底（含中证全指 + 26只ETF占比）
     with open(MACRO_PATH, 'r', encoding='utf-8') as f:
         macro = json.load(f)
@@ -574,8 +774,7 @@ def main():
         macro['avg_price_points'] = avg_price_pts
         macro['ratios_all26'] = ratios_all26
         macro['count'] = len(dates)
-        with open(MACRO_PATH, 'w', encoding='utf-8') as f:
-            json.dump(macro, f, ensure_ascii=False, indent=2)
+        atomic_write_json(MACRO_PATH, macro)
         print(f"✅ 宏观大底更新: 沪深300={hs300_close} A股平均股价={avg_price} 26只ETF占比={ratio_26}%")
 
     # 3. 物理抓取并生成分时双口径数据
@@ -594,14 +793,19 @@ def main():
         env['PATH'] = f"/opt/homebrew/bin:/usr/local/bin:{env.get('PATH', '')}"
         
         subprocess.run(['git', 'add', 'data/', 'index.html'], cwd=REPO_DIR, check=True)
-        status_res = subprocess.run(['git', 'status', '--porcelain'], cwd=REPO_DIR, capture_output=True, text=True)
-        if status_res.stdout.strip():
+        # 只检查真正纳入版本管理的产物是否有变更，避免 logs/ 等未跟踪目录导致误判
+        status_res = subprocess.run(['git', 'status', '--porcelain', '--', 'data', 'index.html'],
+                                    cwd=REPO_DIR, capture_output=True, text=True)
+        staged_res = subprocess.run(['git', 'diff', '--cached', '--name-only'],
+                                    cwd=REPO_DIR, capture_output=True, text=True)
+        has_changes = bool(status_res.stdout.strip()) or bool(staged_res.stdout.strip())
+        if has_changes:
             msg = f"auto: daily EOD update {today_dash} with dual-scope intraday minute and macro data"
             subprocess.run(['git', 'commit', '-m', msg], cwd=REPO_DIR, check=True)
             subprocess.run(['git', 'push', 'origin', 'main'], cwd=REPO_DIR, env=env, check=True)
             print("🚀 GitHub Pages 远程代码库推送成功！")
         else:
-            print("ℹ️ 数据无新增物理变更，跳过提交。")
+            print("ℹ️ data/ 与 index.html 无实际变更，跳过提交。")
     except Exception as e:
         print(f"[ERROR] Git 提交/推送失败: {e}")
 
