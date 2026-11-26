@@ -1,5 +1,5 @@
 window.WIDEBASE_NETFLOW = {
-  "generated_at": "2026-11-26 16:15:21",
+  "generated_at": "2026-11-26 16:17:30",
   "trade_date": "20261126",
   "unit": "亿元",
   "columns": [
@@ -40,15 +40,15 @@ window.WIDEBASE_NETFLOW = {
     {
       "date": "20261126",
       "stale": false,
-      "hs300": -9.86,
-      "csi1000": -2.27,
-      "csi500": -0.83,
-      "star50": 0.0,
-      "csia500": 0.0,
-      "chinext": 8.33,
-      "sse50": 0.0,
-      "other": 0.9,
-      "total": -3.73
+      "hs300": 10.11,
+      "csi1000": -1.68,
+      "csi500": 6.18,
+      "star50": 7.49,
+      "csia500": null,
+      "chinext": 14.46,
+      "sse50": 1.74,
+      "other": 1.47,
+      "total": 39.77
     },
     {
       "date": "20261125",
@@ -57,7 +57,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 7.0,
       "csi500": 68.39,
       "star50": 45.42,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 16.35,
       "sse50": 29.67,
       "other": 0.22,
@@ -70,7 +70,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 61.17,
       "csi500": 40.1,
       "star50": 14.49,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 43.12,
       "sse50": 9.47,
       "other": 0.31,
@@ -79,15 +79,15 @@ window.WIDEBASE_NETFLOW = {
     {
       "date": "20261123",
       "stale": false,
-      "hs300": 222.22,
+      "hs300": 222.25,
       "csi1000": -31.12,
       "csi500": -26.24,
       "star50": -14.35,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 38.62,
       "sse50": 1.52,
       "other": 1.73,
-      "total": 192.38
+      "total": 192.41
     },
     {
       "date": "20261120",
@@ -96,7 +96,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 80.9,
       "csi500": 95.52,
       "star50": 43.88,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 35.53,
       "sse50": 216.18,
       "other": -0.28,
@@ -109,7 +109,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 47.15,
       "csi500": 80.89,
       "star50": 95.64,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 51.86,
       "sse50": 2.87,
       "other": -0.19,
@@ -122,11 +122,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -1.21,
       "csi500": -10.52,
       "star50": -10.11,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 7.97,
       "sse50": 1.75,
       "other": 0.82,
-      "total": 113.7
+      "total": 113.69
     },
     {
       "date": "20261117",
@@ -135,11 +135,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 0.86,
       "csi500": 19.33,
       "star50": -1.67,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 11.47,
       "sse50": -3.08,
       "other": -2.73,
-      "total": 124.59
+      "total": 124.58
     },
     {
       "date": "20261116",
@@ -148,7 +148,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -95.95,
       "csi500": -51.96,
       "star50": 40.3,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 10.62,
       "sse50": 4.73,
       "other": 1.32,
@@ -161,7 +161,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 36.26,
       "csi500": 43.74,
       "star50": -4.77,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 17.61,
       "sse50": -2.03,
       "other": -2.16,
@@ -174,7 +174,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -49.39,
       "csi500": -36.98,
       "star50": -6.04,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 5.58,
       "sse50": -9.06,
       "other": -0.0,
@@ -187,11 +187,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 22.04,
       "csi500": 10.0,
       "star50": 2.56,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -26.86,
       "sse50": -3.06,
-      "other": -0.05,
-      "total": -22.1
+      "other": -0.06,
+      "total": -22.12
     },
     {
       "date": "20261110",
@@ -200,11 +200,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -4.36,
       "csi500": -9.25,
       "star50": 7.09,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -10.3,
       "sse50": 5.05,
       "other": 0.54,
-      "total": -29.63
+      "total": -29.61
     },
     {
       "date": "20261109",
@@ -213,11 +213,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -5.17,
       "csi500": -8.26,
       "star50": 0.98,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 12.5,
       "sse50": 9.19,
       "other": 1.68,
-      "total": 10.48
+      "total": 10.49
     },
     {
       "date": "20261106",
@@ -226,7 +226,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 6.03,
       "csi500": 1.53,
       "star50": 3.66,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 10.69,
       "sse50": 3.94,
       "other": -0.49,
@@ -237,13 +237,13 @@ window.WIDEBASE_NETFLOW = {
       "stale": false,
       "hs300": 11.39,
       "csi1000": -19.75,
-      "csi500": -4.25,
+      "csi500": -4.28,
       "star50": 11.24,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 4.9,
       "sse50": -4.19,
-      "other": 0.88,
-      "total": 0.21
+      "other": 0.86,
+      "total": 0.17
     },
     {
       "date": "20261104",
@@ -252,7 +252,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 124.17,
       "csi500": 94.04,
       "star50": -3.72,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 55.3,
       "sse50": -3.71,
       "other": 0.11,
@@ -265,11 +265,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 67.53,
       "csi500": 57.52,
       "star50": 4.43,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 92.95,
       "sse50": 103.67,
       "other": 1.08,
-      "total": 664.27
+      "total": 664.28
     },
     {
       "date": "20261102",
@@ -278,11 +278,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 92.06,
       "csi500": 69.91,
       "star50": 3.01,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 31.13,
       "sse50": 15.63,
       "other": 0.6,
-      "total": 353.56
+      "total": 353.57
     },
     {
       "date": "20261030",
@@ -291,7 +291,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 5.36,
       "csi500": 6.61,
       "star50": 4.09,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 44.78,
       "sse50": 0.05,
       "other": 0.35,
@@ -304,11 +304,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -23.57,
       "csi500": -23.93,
       "star50": 6.22,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 44.37,
       "sse50": -6.8,
-      "other": 0.27,
-      "total": 83.83
+      "other": 0.25,
+      "total": 83.8
     },
     {
       "date": "20261028",
@@ -317,7 +317,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 20.14,
       "csi500": 6.99,
       "star50": -3.1,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -6.6,
       "sse50": -6.73,
       "other": -0.39,
@@ -330,11 +330,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 15.6,
       "csi500": -1.54,
       "star50": 3.62,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 15.44,
       "sse50": 3.84,
       "other": -0.06,
-      "total": 93.0
+      "total": 93.01
     },
     {
       "date": "20261026",
@@ -343,7 +343,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 3.72,
       "csi500": -19.36,
       "star50": 5.27,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 25.9,
       "sse50": -9.66,
       "other": 0.41,
@@ -356,11 +356,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 49.62,
       "csi500": 64.71,
       "star50": 9.95,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 70.86,
       "sse50": 0.28,
-      "other": 1.0,
-      "total": 421.34
+      "other": 0.96,
+      "total": 421.31
     },
     {
       "date": "20261022",
@@ -369,11 +369,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 31.31,
       "csi500": 25.73,
       "star50": 5.98,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 61.04,
       "sse50": 45.18,
       "other": 0.77,
-      "total": 406.1
+      "total": 406.11
     },
     {
       "date": "20261021",
@@ -382,7 +382,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 0.98,
       "csi500": -1.08,
       "star50": -2.45,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 52.98,
       "sse50": 6.55,
       "other": -0.16,
@@ -395,7 +395,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -31.76,
       "csi500": -18.96,
       "star50": -1.47,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 20.51,
       "sse50": 44.33,
       "other": 0.38,
@@ -408,7 +408,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 37.19,
       "csi500": 46.94,
       "star50": 7.56,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 20.33,
       "sse50": 20.31,
       "other": 0.9,
@@ -421,11 +421,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 4.19,
       "csi500": 7.89,
       "star50": 4.85,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 17.25,
       "sse50": 37.63,
-      "other": -0.38,
-      "total": 214.01
+      "other": -0.36,
+      "total": 214.02
     },
     {
       "date": "20261015",
@@ -434,37 +434,37 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 11.16,
       "csi500": 3.88,
       "star50": 2.01,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 63.25,
       "sse50": 8.25,
       "other": 1.16,
-      "total": 314.06
+      "total": 314.07
     },
     {
       "date": "20261014",
       "stale": false,
-      "hs300": -9.48,
+      "hs300": -9.52,
       "csi1000": -19.83,
       "csi500": -12.91,
       "star50": 2.31,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 19.28,
       "sse50": 0.49,
-      "other": 0.13,
-      "total": -20.01
+      "other": 0.11,
+      "total": -20.07
     },
     {
       "date": "20261013",
       "stale": false,
       "hs300": 19.6,
       "csi1000": 8.23,
-      "csi500": 2.43,
+      "csi500": 2.39,
       "star50": 2.91,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 27.98,
       "sse50": 5.22,
       "other": 0.75,
-      "total": 67.12
+      "total": 67.08
     },
     {
       "date": "20261012",
@@ -473,11 +473,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 2.23,
       "csi500": -4.23,
       "star50": 3.62,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 7.56,
       "sse50": -0.08,
-      "other": 0.25,
-      "total": 15.31
+      "other": 0.23,
+      "total": 15.28
     },
     {
       "date": "20261009",
@@ -486,11 +486,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 26.5,
       "csi500": 14.77,
       "star50": 8.65,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 24.88,
       "sse50": 5.46,
-      "other": 0.13,
-      "total": 99.56
+      "other": 0.11,
+      "total": 99.53
     },
     {
       "date": "20261008",
@@ -499,11 +499,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 10.85,
       "csi500": -1.71,
       "star50": 9.31,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 22.92,
       "sse50": -0.11,
       "other": -0.71,
-      "total": 39.44
+      "total": 39.43
     },
     {
       "date": "20260930",
@@ -512,11 +512,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 9.21,
       "csi500": -0.4,
       "star50": 9.15,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -4.04,
       "sse50": -9.1,
       "other": 0.15,
-      "total": 19.54
+      "total": 19.55
     },
     {
       "date": "20260929",
@@ -525,11 +525,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -0.99,
       "csi500": 8.2,
       "star50": 4.38,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -2.51,
       "sse50": -3.37,
       "other": -0.2,
-      "total": 7.99
+      "total": 7.98
     },
     {
       "date": "20260928",
@@ -538,7 +538,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 27.46,
       "csi500": 2.64,
       "star50": 9.3,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 31.99,
       "sse50": 5.73,
       "other": 0.29,
@@ -551,11 +551,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -8.77,
       "csi500": -28.51,
       "star50": 3.22,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 13.51,
       "sse50": -6.28,
-      "other": 0.63,
-      "total": -32.08
+      "other": 0.65,
+      "total": -32.07
     },
     {
       "date": "20260923",
@@ -564,11 +564,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 4.09,
       "csi500": 6.17,
       "star50": -1.31,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 2.68,
       "sse50": -2.89,
-      "other": 0.34,
-      "total": 47.63
+      "other": 0.32,
+      "total": 47.61
     },
     {
       "date": "20260922",
@@ -577,7 +577,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 17.51,
       "csi500": 10.27,
       "star50": -3.38,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -0.28,
       "sse50": -6.43,
       "other": -0.41,
@@ -588,13 +588,13 @@ window.WIDEBASE_NETFLOW = {
       "stale": false,
       "hs300": 4.15,
       "csi1000": -8.05,
-      "csi500": -9.39,
+      "csi500": -9.36,
       "star50": -0.61,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -8.85,
       "sse50": -8.13,
       "other": -1.47,
-      "total": -32.35
+      "total": -32.32
     },
     {
       "date": "20260918",
@@ -603,23 +603,23 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -3.08,
       "csi500": 4.11,
       "star50": -3.03,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -4.51,
       "sse50": 5.06,
-      "other": 0.31,
-      "total": -3.3
+      "other": 0.33,
+      "total": -3.28
     },
     {
       "date": "20260917",
       "stale": false,
-      "hs300": -4.97,
+      "hs300": -4.93,
       "csi1000": -2.69,
       "csi500": -1.2,
       "star50": 0.61,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -13.02,
       "sse50": 5.88,
-      "other": -0.1,
+      "other": -0.14,
       "total": -15.49
     },
     {
@@ -629,7 +629,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 33.78,
       "csi500": 20.68,
       "star50": -6.11,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -0.22,
       "sse50": 11.96,
       "other": 0.23,
@@ -642,7 +642,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -0.38,
       "csi500": 19.36,
       "star50": -6.77,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 20.33,
       "sse50": 4.23,
       "other": 0.9,
@@ -655,7 +655,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -8.21,
       "csi500": 4.56,
       "star50": 3.65,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 2.35,
       "sse50": 0.46,
       "other": 0.49,
@@ -668,7 +668,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -11.69,
       "csi500": -21.2,
       "star50": 11.04,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 10.16,
       "sse50": 9.34,
       "other": 0.82,
@@ -681,24 +681,24 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -0.05,
       "csi500": 4.73,
       "star50": 2.37,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 3.99,
       "sse50": -3.88,
-      "other": 0.35,
-      "total": 6.78
+      "other": 0.33,
+      "total": 6.77
     },
     {
       "date": "20260909",
       "stale": false,
       "hs300": -15.02,
       "csi1000": -10.59,
-      "csi500": -9.5,
+      "csi500": -9.47,
       "star50": 4.31,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -1.18,
-      "sse50": -0.03,
+      "sse50": 0.0,
       "other": -0.6,
-      "total": -32.61
+      "total": -32.55
     },
     {
       "date": "20260908",
@@ -707,11 +707,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -6.71,
       "csi500": -3.43,
       "star50": 4.5,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 1.59,
       "sse50": -5.16,
       "other": -0.22,
-      "total": -24.51
+      "total": -24.52
     },
     {
       "date": "20260907",
@@ -720,11 +720,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 11.34,
       "csi500": 29.52,
       "star50": -4.73,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -28.55,
       "sse50": 6.27,
       "other": -0.21,
-      "total": 35.41
+      "total": 35.4
     },
     {
       "date": "20260904",
@@ -733,7 +733,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 23.11,
       "csi500": 12.73,
       "star50": 7.43,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 10.84,
       "sse50": 7.6,
       "other": -0.25,
@@ -746,7 +746,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 4.3,
       "csi500": -0.18,
       "star50": 3.74,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 12.21,
       "sse50": 2.67,
       "other": 0.07,
@@ -759,11 +759,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -8.14,
       "csi500": -13.2,
       "star50": 2.88,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 13.61,
       "sse50": -1.85,
-      "other": 0.25,
-      "total": -9.94
+      "other": 0.29,
+      "total": -9.91
     },
     {
       "date": "20260901",
@@ -772,7 +772,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -18.5,
       "csi500": -21.36,
       "star50": 4.19,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 6.48,
       "sse50": -7.95,
       "other": 0.03,
@@ -785,11 +785,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -3.25,
       "csi500": 5.14,
       "star50": 1.6,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 5.0,
       "sse50": -0.99,
-      "other": 0.12,
-      "total": 21.62
+      "other": 0.08,
+      "total": 21.58
     },
     {
       "date": "20260828",
@@ -798,11 +798,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -5.78,
       "csi500": -7.54,
       "star50": 0.12,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -2.67,
       "sse50": -2.54,
-      "other": -0.22,
-      "total": -34.94
+      "other": -0.18,
+      "total": -34.9
     },
     {
       "date": "20260827",
@@ -811,11 +811,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 5.88,
       "csi500": 19.78,
       "star50": -6.57,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 2.3,
       "sse50": -10.23,
       "other": 0.03,
-      "total": -8.91
+      "total": -8.9
     },
     {
       "date": "20260826",
@@ -824,11 +824,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -12.04,
       "csi500": -0.24,
       "star50": -3.54,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -8.47,
       "sse50": -11.66,
-      "other": 0.4,
-      "total": -44.71
+      "other": 0.35,
+      "total": -44.75
     },
     {
       "date": "20260825",
@@ -837,11 +837,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 18.36,
       "csi500": 24.78,
       "star50": 3.47,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 26.06,
       "sse50": 3.35,
       "other": -0.22,
-      "total": 91.77
+      "total": 91.76
     },
     {
       "date": "20260824",
@@ -850,11 +850,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -5.15,
       "csi500": -11.45,
       "star50": 5.76,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 21.59,
       "sse50": 5.82,
-      "other": -0.04,
-      "total": 38.39
+      "other": 0.01,
+      "total": 38.45
     },
     {
       "date": "20260821",
@@ -863,11 +863,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -10.55,
       "csi500": -2.24,
       "star50": 2.1,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -16.47,
       "sse50": 1.0,
-      "other": -0.81,
-      "total": -50.61
+      "other": -0.79,
+      "total": -50.6
     },
     {
       "date": "20260820",
@@ -876,11 +876,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -40.88,
       "csi500": -9.58,
       "star50": 4.04,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -10.7,
       "sse50": 10.51,
       "other": -0.03,
-      "total": -47.7
+      "total": -47.71
     },
     {
       "date": "20260819",
@@ -889,11 +889,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 69.4,
       "csi500": 23.4,
       "star50": 17.31,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 47.08,
       "sse50": 7.1,
       "other": 0.99,
-      "total": 241.08
+      "total": 241.1
     },
     {
       "date": "20260818",
@@ -902,7 +902,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -27.7,
       "csi500": -20.46,
       "star50": 2.48,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 3.06,
       "sse50": -6.58,
       "other": -1.57,
@@ -915,11 +915,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 1.04,
       "csi500": 3.22,
       "star50": -7.08,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -15.13,
       "sse50": -4.94,
-      "other": -0.52,
-      "total": -53.26
+      "other": -0.48,
+      "total": -53.22
     },
     {
       "date": "20260814",
@@ -928,7 +928,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -8.31,
       "csi500": -5.31,
       "star50": 2.74,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -8.72,
       "sse50": 3.48,
       "other": 0.28,
@@ -941,11 +941,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -21.7,
       "csi500": -11.41,
       "star50": -2.88,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -10.94,
       "sse50": -1.15,
-      "other": 0.18,
-      "total": -79.15
+      "other": 0.16,
+      "total": -79.17
     },
     {
       "date": "20260812",
@@ -954,11 +954,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -34.18,
       "csi500": -3.45,
       "star50": -2.27,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -5.8,
       "sse50": -4.33,
       "other": 0.01,
-      "total": -90.61
+      "total": -90.6
     },
     {
       "date": "20260811",
@@ -967,7 +967,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -12.93,
       "csi500": -4.99,
       "star50": 0.47,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -14.77,
       "sse50": 11.19,
       "other": -0.0,
@@ -980,11 +980,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -50.95,
       "csi500": -20.97,
       "star50": 1.01,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 9.13,
       "sse50": -3.57,
       "other": -0.46,
-      "total": -82.38
+      "total": -82.39
     },
     {
       "date": "20260807",
@@ -993,11 +993,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -79.22,
       "csi500": -14.95,
       "star50": -6.04,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -16.53,
       "sse50": -6.54,
       "other": 0.03,
-      "total": -159.97
+      "total": -159.96
     },
     {
       "date": "20260806",
@@ -1006,11 +1006,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -82.44,
       "csi500": -34.2,
       "star50": -3.51,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -8.16,
       "sse50": -1.2,
       "other": 0.12,
-      "total": -139.79
+      "total": -139.78
     },
     {
       "date": "20260805",
@@ -1019,11 +1019,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -21.91,
       "csi500": -12.38,
       "star50": -10.73,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -13.84,
       "sse50": -14.78,
       "other": -0.03,
-      "total": -113.44
+      "total": -113.43
     },
     {
       "date": "20260804",
@@ -1032,11 +1032,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 26.98,
       "csi500": -4.1,
       "star50": -3.52,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -37.94,
       "sse50": -1.26,
-      "other": -0.36,
-      "total": -53.92
+      "other": -0.38,
+      "total": -53.93
     },
     {
       "date": "20260803",
@@ -1045,7 +1045,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 19.23,
       "csi500": 11.24,
       "star50": 13.26,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -1.4,
       "sse50": 13.86,
       "other": 0.87,
@@ -1058,11 +1058,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 17.14,
       "csi500": 15.82,
       "star50": -13.72,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -61.7,
       "sse50": 2.1,
       "other": -0.58,
-      "total": -38.29
+      "total": -38.3
     },
     {
       "date": "20260730",
@@ -1071,11 +1071,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 21.52,
       "csi500": -19.9,
       "star50": 17.23,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 72.35,
       "sse50": -5.91,
-      "other": 0.71,
-      "total": 123.21
+      "other": 0.69,
+      "total": 123.19
     },
     {
       "date": "20260729",
@@ -1084,7 +1084,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 100.06,
       "csi500": 55.34,
       "star50": 18.08,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 39.62,
       "sse50": -5.77,
       "other": -0.28,
@@ -1097,7 +1097,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -17.13,
       "csi500": -44.2,
       "star50": 8.13,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 75.21,
       "sse50": -2.67,
       "other": 0.58,
@@ -1110,11 +1110,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 42.77,
       "csi500": 42.01,
       "star50": 2.64,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 13.08,
       "sse50": 5.47,
-      "other": 0.81,
-      "total": 128.03
+      "other": 0.83,
+      "total": 128.05
     },
     {
       "date": "20260724",
@@ -1123,11 +1123,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -8.76,
       "csi500": -3.24,
       "star50": 0.48,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 3.4,
       "sse50": -11.89,
       "other": 1.01,
-      "total": 7.7
+      "total": 7.71
     },
     {
       "date": "20260723",
@@ -1136,11 +1136,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -0.45,
       "csi500": -3.76,
       "star50": 12.39,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 2.79,
       "sse50": 10.94,
-      "other": 2.16,
-      "total": 29.1
+      "other": 2.17,
+      "total": 29.12
     },
     {
       "date": "20260722",
@@ -1149,11 +1149,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -95.62,
       "csi500": -34.52,
       "star50": -2.75,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -15.18,
-      "sse50": -0.03,
+      "sse50": 0.0,
       "other": -0.92,
-      "total": -164.77
+      "total": -164.74
     },
     {
       "date": "20260721",
@@ -1162,11 +1162,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 13.31,
       "csi500": -2.95,
       "star50": -0.12,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -22.6,
       "sse50": -26.05,
-      "other": 0.17,
-      "total": -43.66
+      "other": 0.19,
+      "total": -43.65
     },
     {
       "date": "20260720",
@@ -1175,11 +1175,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 27.33,
       "csi500": 16.51,
       "star50": 12.41,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 96.18,
       "sse50": 2.54,
       "other": 2.38,
-      "total": 314.21
+      "total": 314.2
     },
     {
       "date": "20260717",
@@ -1188,11 +1188,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 43.0,
       "csi500": 11.77,
       "star50": 15.66,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 76.29,
       "sse50": 2.56,
-      "other": 5.13,
-      "total": 319.94
+      "other": 5.14,
+      "total": 319.97
     },
     {
       "date": "20260716",
@@ -1201,7 +1201,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 66.45,
       "csi500": 40.23,
       "star50": 4.55,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 22.53,
       "sse50": 26.74,
       "other": 0.01,
@@ -1214,7 +1214,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -22.87,
       "csi500": -0.39,
       "star50": 7.41,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -0.02,
       "sse50": 12.49,
       "other": -0.3,
@@ -1227,11 +1227,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 17.54,
       "csi500": 23.31,
       "star50": 6.63,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 4.35,
       "sse50": 5.64,
-      "other": 0.32,
-      "total": 78.69
+      "other": 0.34,
+      "total": 78.71
     },
     {
       "date": "20260713",
@@ -1240,7 +1240,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 117.59,
       "csi500": 72.71,
       "star50": 2.0,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 22.53,
       "sse50": 7.8,
       "other": 1.64,
@@ -1249,15 +1249,15 @@ window.WIDEBASE_NETFLOW = {
     {
       "date": "20260710",
       "stale": false,
-      "hs300": 0.44,
+      "hs300": 0.48,
       "csi1000": -51.37,
       "csi500": -17.55,
       "star50": 10.56,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 0.72,
       "sse50": -5.45,
       "other": -0.24,
-      "total": -62.88
+      "total": -62.85
     },
     {
       "date": "20260709",
@@ -1266,7 +1266,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 6.71,
       "csi500": 10.4,
       "star50": 1.72,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 2.89,
       "sse50": -0.28,
       "other": 0.19,
@@ -1279,11 +1279,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 63.51,
       "csi500": 14.3,
       "star50": 0.33,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 8.28,
       "sse50": 1.54,
       "other": -0.33,
-      "total": 96.37
+      "total": 96.36
     },
     {
       "date": "20260707",
@@ -1292,11 +1292,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 51.87,
       "csi500": 9.67,
       "star50": 6.72,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 19.92,
       "sse50": 4.2,
       "other": 1.24,
-      "total": 106.56
+      "total": 106.57
     },
     {
       "date": "20260706",
@@ -1305,7 +1305,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 25.27,
       "csi500": 1.5,
       "star50": 3.41,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 4.58,
       "sse50": -4.03,
       "other": 0.7,
@@ -1316,13 +1316,13 @@ window.WIDEBASE_NETFLOW = {
       "stale": false,
       "hs300": -194.89,
       "csi1000": 4.75,
-      "csi500": -3.14,
+      "csi500": -3.1,
       "star50": 5.48,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -4.22,
       "sse50": -4.19,
       "other": -3.73,
-      "total": -199.93
+      "total": -199.9
     },
     {
       "date": "20260702",
@@ -1331,11 +1331,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 12.25,
       "csi500": 31.29,
       "star50": 14.62,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 20.8,
       "sse50": 8.62,
       "other": -0.35,
-      "total": 60.45
+      "total": 60.44
     },
     {
       "date": "20260701",
@@ -1344,7 +1344,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -34.18,
       "csi500": -4.39,
       "star50": 5.99,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -0.72,
       "sse50": -0.11,
       "other": -1.06,
@@ -1357,11 +1357,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -11.1,
       "csi500": 0.68,
       "star50": -5.92,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -8.71,
       "sse50": 2.83,
       "other": -1.46,
-      "total": -197.64
+      "total": -197.63
     },
     {
       "date": "20260629",
@@ -1370,7 +1370,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 45.38,
       "csi500": -4.17,
       "star50": -0.68,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -2.88,
       "sse50": -2.69,
       "other": -5.05,
@@ -1383,11 +1383,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 16.15,
       "csi500": -13.32,
       "star50": -0.38,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 2.43,
       "sse50": -2.4,
       "other": -0.48,
-      "total": 3.07
+      "total": 3.06
     },
     {
       "date": "20260625",
@@ -1396,7 +1396,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -8.28,
       "csi500": 1.88,
       "star50": 4.3,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -6.95,
       "sse50": -9.97,
       "other": -5.85,
@@ -1409,11 +1409,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -5.52,
       "csi500": 1.94,
       "star50": -3.81,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -8.8,
       "sse50": -16.63,
       "other": -2.94,
-      "total": -294.31
+      "total": -294.32
     },
     {
       "date": "20260623",
@@ -1422,11 +1422,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 6.52,
       "csi500": -12.82,
       "star50": -3.25,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 23.9,
       "sse50": -2.22,
       "other": -3.66,
-      "total": -238.96
+      "total": -238.97
     },
     {
       "date": "20260622",
@@ -1435,11 +1435,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 0.56,
       "csi500": -13.91,
       "star50": -1.57,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 10.93,
       "sse50": -8.72,
       "other": -2.48,
-      "total": -70.85
+      "total": -70.84
     },
     {
       "date": "20260618",
@@ -1448,11 +1448,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 3.43,
       "csi500": 1.15,
       "star50": -9.2,
-      "csia500": 0.0,
-      "chinext": 0.93,
+      "csia500": null,
+      "chinext": 0.97,
       "sse50": -1.82,
       "other": -0.81,
-      "total": -98.13
+      "total": -98.08
     },
     {
       "date": "20260617",
@@ -1461,7 +1461,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 9.4,
       "csi500": -1.73,
       "star50": -1.96,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 5.02,
       "sse50": -17.2,
       "other": -2.42,
@@ -1474,11 +1474,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -19.0,
       "csi500": -12.97,
       "star50": 1.53,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -4.66,
       "sse50": 1.24,
       "other": -2.93,
-      "total": -137.47
+      "total": -137.46
     },
     {
       "date": "20260615",
@@ -1487,7 +1487,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -1.19,
       "csi500": 23.43,
       "star50": -3.47,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -7.55,
       "sse50": 3.76,
       "other": -4.65,
@@ -1500,11 +1500,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 10.35,
       "csi500": 12.27,
       "star50": -0.83,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -3.67,
       "sse50": 12.69,
       "other": -0.52,
-      "total": 9.95
+      "total": 9.96
     },
     {
       "date": "20260611",
@@ -1513,11 +1513,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 8.11,
       "csi500": 2.11,
       "star50": 0.8,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 6.24,
       "sse50": 6.75,
-      "other": 1.97,
-      "total": 40.06
+      "other": 1.93,
+      "total": 40.03
     },
     {
       "date": "20260610",
@@ -1526,11 +1526,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -5.04,
       "csi500": -4.98,
       "star50": -2.98,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 7.69,
       "sse50": -3.43,
       "other": 0.28,
-      "total": 2.8
+      "total": 2.79
     },
     {
       "date": "20260609",
@@ -1539,7 +1539,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -59.35,
       "csi500": -21.32,
       "star50": -1.5,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -18.04,
       "sse50": -14.28,
       "other": -0.85,
@@ -1552,11 +1552,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 47.76,
       "csi500": 10.05,
       "star50": 5.38,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 6.91,
       "sse50": 13.16,
-      "other": 0.19,
-      "total": 144.53
+      "other": 0.15,
+      "total": 144.5
     },
     {
       "date": "20260605",
@@ -1565,7 +1565,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -6.88,
       "csi500": -18.19,
       "star50": 3.3,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 14.92,
       "sse50": -5.61,
       "other": 0.5,
@@ -1578,11 +1578,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -17.07,
       "csi500": -1.25,
       "star50": -4.19,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 10.87,
       "sse50": -8.91,
       "other": -1.63,
-      "total": -42.1
+      "total": -42.09
     },
     {
       "date": "20260603",
@@ -1591,11 +1591,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -46.13,
       "csi500": -4.56,
       "star50": -7.85,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -8.17,
       "sse50": -10.25,
       "other": -3.55,
-      "total": -101.98
+      "total": -101.99
     },
     {
       "date": "20260602",
@@ -1604,7 +1604,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 4.84,
       "csi500": 13.46,
       "star50": -1.77,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -16.62,
       "sse50": 1.29,
       "other": -1.73,
@@ -1617,7 +1617,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 57.88,
       "csi500": 27.58,
       "star50": 2.11,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 3.05,
       "sse50": 19.02,
       "other": 1.1,
@@ -1630,11 +1630,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 33.36,
       "csi500": -2.66,
       "star50": 2.47,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 1.36,
       "sse50": -4.5,
       "other": -3.49,
-      "total": 24.22
+      "total": 24.23
     },
     {
       "date": "20260528",
@@ -1643,7 +1643,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -5.17,
       "csi500": -4.61,
       "star50": -3.4,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -4.63,
       "sse50": 4.51,
       "other": -3.96,
@@ -1656,7 +1656,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -4.05,
       "csi500": 3.27,
       "star50": 2.77,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -22.62,
       "sse50": -15.51,
       "other": -8.03,
@@ -1669,11 +1669,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 3.78,
       "csi500": -0.41,
       "star50": -1.71,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -12.06,
       "sse50": -7.73,
       "other": -9.92,
-      "total": -104.41
+      "total": -104.42
     },
     {
       "date": "20260525",
@@ -1682,11 +1682,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -32.35,
       "csi500": -43.05,
       "star50": -12.72,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -18.9,
       "sse50": -30.74,
       "other": -10.06,
-      "total": -366.42
+      "total": -366.41
     },
     {
       "date": "20260522",
@@ -1695,11 +1695,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -1.97,
       "csi500": 26.08,
       "star50": 1.17,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -14.71,
       "sse50": -6.15,
       "other": -8.52,
-      "total": -83.6
+      "total": -83.61
     },
     {
       "date": "20260521",
@@ -1708,7 +1708,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 34.71,
       "csi500": 10.97,
       "star50": -5.98,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -5.95,
       "sse50": -7.65,
       "other": -5.2,
@@ -1721,11 +1721,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -26.75,
       "csi500": -30.68,
       "star50": -5.09,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -1.89,
       "sse50": -29.17,
       "other": -5.86,
-      "total": -167.68
+      "total": -167.69
     },
     {
       "date": "20260519",
@@ -1734,7 +1734,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -0.95,
       "csi500": -41.42,
       "star50": -4.28,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 8.66,
       "sse50": -36.9,
       "other": -5.14,
@@ -1747,11 +1747,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -3.88,
       "csi500": -9.13,
       "star50": -5.19,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -8.64,
       "sse50": 9.77,
       "other": -1.22,
-      "total": -24.25
+      "total": -24.26
     },
     {
       "date": "20260515",
@@ -1760,7 +1760,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 12.55,
       "csi500": 15.55,
       "star50": -6.82,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -8.38,
       "sse50": 5.85,
       "other": -3.46,
@@ -1773,11 +1773,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -19.47,
       "csi500": -31.78,
       "star50": -3.39,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 4.9,
       "sse50": -12.26,
       "other": -1.69,
-      "total": -134.62
+      "total": -134.63
     },
     {
       "date": "20260513",
@@ -1786,11 +1786,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 7.71,
       "csi500": -9.1,
       "star50": -7.59,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 4.53,
       "sse50": -9.64,
       "other": -4.74,
-      "total": -99.44
+      "total": -99.45
     },
     {
       "date": "20260512",
@@ -1799,11 +1799,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -12.09,
       "csi500": -31.1,
       "star50": -7.97,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -6.91,
       "sse50": -16.73,
       "other": -5.26,
-      "total": -174.16
+      "total": -174.15
     },
     {
       "date": "20260511",
@@ -1812,7 +1812,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -45.82,
       "csi500": -51.03,
       "star50": -7.53,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -3.19,
       "sse50": -35.39,
       "other": -3.19,
@@ -1825,11 +1825,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -23.68,
       "csi500": -74.16,
       "star50": -4.06,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 2.56,
       "sse50": -39.13,
-      "other": -1.0,
-      "total": -240.18
+      "other": -1.04,
+      "total": -240.21
     },
     {
       "date": "20260507",
@@ -1838,7 +1838,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -9.73,
       "csi500": -70.79,
       "star50": -12.44,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -3.32,
       "sse50": -29.74,
       "other": -2.42,
@@ -1851,11 +1851,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 27.07,
       "csi500": 7.15,
       "star50": -20.87,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -8.86,
       "sse50": -28.12,
-      "other": -0.75,
-      "total": -99.82
+      "other": -0.73,
+      "total": -99.79
     },
     {
       "date": "20260430",
@@ -1864,7 +1864,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -55.86,
       "csi500": -74.34,
       "star50": -14.41,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 0.72,
       "sse50": -39.68,
       "other": -1.11,
@@ -1877,7 +1877,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 16.77,
       "csi500": 21.32,
       "star50": -2.53,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -3.15,
       "sse50": -22.85,
       "other": 0.92,
@@ -1890,11 +1890,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -14.26,
       "csi500": -45.87,
       "star50": -1.25,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -3.58,
       "sse50": -26.4,
-      "other": 0.86,
-      "total": -137.45
+      "other": 0.82,
+      "total": -137.49
     },
     {
       "date": "20260427",
@@ -1903,11 +1903,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -34.99,
       "csi500": -32.28,
       "star50": -7.58,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 5.71,
       "sse50": -19.63,
-      "other": 0.02,
-      "total": -137.23
+      "other": 0.04,
+      "total": -137.21
     },
     {
       "date": "20260424",
@@ -1916,11 +1916,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -0.51,
       "csi500": -12.8,
       "star50": -8.08,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 8.52,
       "sse50": -11.76,
       "other": -0.22,
-      "total": -41.34
+      "total": -41.35
     },
     {
       "date": "20260423",
@@ -1929,7 +1929,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 9.0,
       "csi500": -48.24,
       "star50": -3.1,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -11.39,
       "sse50": -27.77,
       "other": -1.23,
@@ -1942,7 +1942,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -15.96,
       "csi500": -27.55,
       "star50": -4.63,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -27.29,
       "sse50": -11.03,
       "other": 0.86,
@@ -1955,11 +1955,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -17.37,
       "csi500": -29.21,
       "star50": 0.87,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -19.38,
       "sse50": -9.98,
       "other": -0.79,
-      "total": -107.45
+      "total": -107.46
     },
     {
       "date": "20260420",
@@ -1968,7 +1968,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -17.23,
       "csi500": -36.8,
       "star50": -4.43,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -19.48,
       "sse50": -1.87,
       "other": -0.8,
@@ -1981,11 +1981,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -8.34,
       "csi500": -17.14,
       "star50": -2.39,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -22.77,
       "sse50": 6.28,
       "other": -0.58,
-      "total": -71.95
+      "total": -71.96
     },
     {
       "date": "20260416",
@@ -1994,11 +1994,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 2.22,
       "csi500": 5.97,
       "star50": -4.61,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -9.41,
       "sse50": 6.16,
       "other": 0.5,
-      "total": -10.02
+      "total": -10.01
     },
     {
       "date": "20260415",
@@ -2007,7 +2007,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 8.61,
       "csi500": 9.1,
       "star50": -4.41,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -8.8,
       "sse50": -2.76,
       "other": -0.39,
@@ -2020,7 +2020,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -10.89,
       "csi500": -18.14,
       "star50": -4.55,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 4.93,
       "sse50": -4.29,
       "other": 0.86,
@@ -2033,7 +2033,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -19.69,
       "csi500": -27.68,
       "star50": -3.65,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -6.75,
       "sse50": -2.62,
       "other": -0.27,
@@ -2046,7 +2046,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -7.64,
       "csi500": 8.8,
       "star50": -3.04,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -12.52,
       "sse50": -5.11,
       "other": -1.46,
@@ -2059,7 +2059,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -38.75,
       "csi500": -43.01,
       "star50": 1.81,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -0.49,
       "sse50": -5.59,
       "other": -0.57,
@@ -2072,7 +2072,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 55.12,
       "csi500": 96.55,
       "star50": -6.57,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -12.51,
       "sse50": 4.4,
       "other": -1.67,
@@ -2085,11 +2085,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 7.41,
       "csi500": 18.94,
       "star50": -2.18,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -7.01,
       "sse50": 0.84,
       "other": 0.79,
-      "total": 29.44
+      "total": 29.45
     },
     {
       "date": "20260403",
@@ -2098,11 +2098,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 9.82,
       "csi500": 11.41,
       "star50": 1.63,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -2.71,
       "sse50": 3.29,
-      "other": -0.06,
-      "total": 30.94
+      "other": -0.08,
+      "total": 30.92
     },
     {
       "date": "20260402",
@@ -2111,11 +2111,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -18.45,
       "csi500": -28.11,
       "star50": 2.88,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 3.45,
       "sse50": -4.32,
       "other": -0.35,
-      "total": -56.16
+      "total": -56.17
     },
     {
       "date": "20260401",
@@ -2124,11 +2124,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -1.02,
       "csi500": 14.67,
       "star50": -4.09,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -11.29,
       "sse50": -0.37,
-      "other": 0.14,
-      "total": -5.91
+      "other": 0.17,
+      "total": -5.89
     },
     {
       "date": "20260331",
@@ -2137,11 +2137,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 14.94,
       "csi500": 5.21,
       "star50": 0.48,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 9.79,
       "sse50": -7.0,
-      "other": -0.18,
-      "total": 11.41
+      "other": -0.2,
+      "total": 11.4
     },
     {
       "date": "20260330",
@@ -2150,11 +2150,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -13.94,
       "csi500": -20.94,
       "star50": 0.76,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 5.74,
       "sse50": -5.18,
-      "other": 0.27,
-      "total": -48.51
+      "other": 0.29,
+      "total": -48.49
     },
     {
       "date": "20260327",
@@ -2163,11 +2163,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 7.12,
       "csi500": 12.6,
       "star50": 0.27,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -2.43,
       "sse50": -1.99,
-      "other": 0.42,
-      "total": 18.41
+      "other": 0.4,
+      "total": 18.4
     },
     {
       "date": "20260326",
@@ -2176,11 +2176,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -10.72,
       "csi500": -10.39,
       "star50": 3.25,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 3.94,
       "sse50": 0.47,
       "other": 1.15,
-      "total": -17.49
+      "total": -17.5
     },
     {
       "date": "20260325",
@@ -2189,11 +2189,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -24.95,
       "csi500": -6.63,
       "star50": -2.22,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -16.84,
       "sse50": -22.18,
       "other": -0.99,
-      "total": -97.33
+      "total": -97.34
     },
     {
       "date": "20260324",
@@ -2202,11 +2202,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 1.72,
       "csi500": 0.44,
       "star50": 4.57,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 2.62,
       "sse50": -4.33,
       "other": 3.43,
-      "total": 9.83
+      "total": 9.84
     },
     {
       "date": "20260323",
@@ -2215,7 +2215,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 9.26,
       "csi500": -4.65,
       "star50": 4.04,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 12.31,
       "sse50": 15.75,
       "other": -2.49,
@@ -2228,7 +2228,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 18.6,
       "csi500": 28.49,
       "star50": 2.57,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -26.78,
       "sse50": 16.79,
       "other": -0.71,
@@ -2241,11 +2241,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -7.28,
       "csi500": -3.83,
       "star50": 1.92,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 7.18,
       "sse50": 0.11,
-      "other": -2.33,
-      "total": 16.52
+      "other": -2.35,
+      "total": 16.51
     },
     {
       "date": "20260318",
@@ -2254,7 +2254,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 4.16,
       "csi500": 11.7,
       "star50": -6.69,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -12.59,
       "sse50": 4.67,
       "other": -1.15,
@@ -2267,7 +2267,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 6.06,
       "csi500": -1.43,
       "star50": 0.46,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 7.28,
       "sse50": -2.0,
       "other": -0.46,
@@ -2280,7 +2280,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 0.32,
       "csi500": 13.69,
       "star50": 1.74,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -2.89,
       "sse50": 10.9,
       "other": 0.56,
@@ -2293,11 +2293,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 7.6,
       "csi500": 3.0,
       "star50": 0.59,
-      "csia500": 0.0,
-      "chinext": -0.34,
+      "csia500": null,
+      "chinext": -0.31,
       "sse50": 6.69,
       "other": -0.07,
-      "total": 15.94
+      "total": 15.97
     },
     {
       "date": "20260312",
@@ -2306,7 +2306,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -11.64,
       "csi500": -21.42,
       "star50": 0.75,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 4.43,
       "sse50": -9.46,
       "other": 0.49,
@@ -2319,11 +2319,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -15.09,
       "csi500": -24.6,
       "star50": -1.4,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -14.35,
       "sse50": -3.25,
-      "other": -0.51,
-      "total": -91.05
+      "other": -0.49,
+      "total": -91.02
     },
     {
       "date": "20260310",
@@ -2332,11 +2332,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -2.69,
       "csi500": 12.47,
       "star50": -4.17,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -25.97,
       "sse50": 7.77,
-      "other": -0.94,
-      "total": -20.95
+      "other": -0.92,
+      "total": -20.93
     },
     {
       "date": "20260309",
@@ -2345,7 +2345,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -3.6,
       "csi500": -0.72,
       "star50": 1.35,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -1.72,
       "sse50": -6.16,
       "other": -0.54,
@@ -2356,26 +2356,26 @@ window.WIDEBASE_NETFLOW = {
       "stale": false,
       "hs300": 1.4,
       "csi1000": 0.8,
-      "csi500": 3.27,
+      "csi500": 3.23,
       "star50": -1.44,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 0.89,
       "sse50": 12.51,
       "other": -0.01,
-      "total": 17.41
+      "total": 17.38
     },
     {
       "date": "20260305",
       "stale": false,
-      "hs300": -18.67,
+      "hs300": -18.62,
       "csi1000": -31.92,
       "csi500": -35.82,
       "star50": -5.45,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -26.75,
       "sse50": -9.22,
       "other": -0.97,
-      "total": -128.8
+      "total": -128.75
     },
     {
       "date": "20260304",
@@ -2384,11 +2384,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 8.24,
       "csi500": 11.2,
       "star50": 1.46,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 8.8,
       "sse50": 6.18,
       "other": -1.32,
-      "total": 59.84
+      "total": 59.86
     },
     {
       "date": "20260303",
@@ -2397,7 +2397,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 2.32,
       "csi500": -29.33,
       "star50": 5.74,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -0.75,
       "sse50": -8.81,
       "other": -0.16,
@@ -2410,11 +2410,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -43.54,
       "csi500": -47.5,
       "star50": -0.82,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -21.74,
       "sse50": -23.09,
       "other": -1.18,
-      "total": -199.72
+      "total": -199.71
     },
     {
       "date": "20260227",
@@ -2423,11 +2423,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -18.67,
       "csi500": -12.5,
       "star50": -2.74,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -4.38,
       "sse50": -1.35,
       "other": 0.06,
-      "total": -39.93
+      "total": -39.92
     },
     {
       "date": "20260226",
@@ -2436,7 +2436,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -52.88,
       "csi500": -59.5,
       "star50": -3.32,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 3.33,
       "sse50": -5.38,
       "other": -0.4,
@@ -2445,28 +2445,28 @@ window.WIDEBASE_NETFLOW = {
     {
       "date": "20260225",
       "stale": false,
-      "hs300": 4.53,
+      "hs300": 4.49,
       "csi1000": 0.16,
       "csi500": 15.98,
       "star50": -4.96,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -18.41,
       "sse50": 3.13,
       "other": 0.12,
-      "total": 0.55
+      "total": 0.51
     },
     {
       "date": "20260224",
       "stale": false,
-      "hs300": -11.79,
+      "hs300": -11.84,
       "csi1000": -9.58,
       "csi500": 2.66,
       "star50": 0.09,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -8.5,
       "sse50": -2.78,
-      "other": -0.12,
-      "total": -30.02
+      "other": -0.16,
+      "total": -30.11
     },
     {
       "date": "20260213",
@@ -2475,7 +2475,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -38.02,
       "csi500": -62.48,
       "star50": -3.59,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -0.64,
       "sse50": -15.3,
       "other": -1.17,
@@ -2488,24 +2488,24 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 15.41,
       "csi500": 14.54,
       "star50": -2.3,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -11.66,
       "sse50": 0.74,
-      "other": -0.45,
-      "total": 7.93
+      "other": -0.43,
+      "total": 7.95
     },
     {
       "date": "20260211",
       "stale": false,
-      "hs300": -8.54,
+      "hs300": -8.58,
       "csi1000": 7.46,
-      "csi500": 4.43,
+      "csi500": 4.47,
       "star50": -0.4,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 10.67,
       "sse50": -4.76,
-      "other": -0.05,
-      "total": 8.82
+      "other": -0.07,
+      "total": 8.79
     },
     {
       "date": "20260210",
@@ -2514,24 +2514,24 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -5.13,
       "csi500": -14.78,
       "star50": -2.36,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 1.09,
       "sse50": -7.79,
       "other": -0.19,
-      "total": -53.84
+      "total": -53.85
     },
     {
       "date": "20260209",
       "stale": false,
-      "hs300": -0.18,
+      "hs300": -0.22,
       "csi1000": 24.46,
       "csi500": 27.01,
       "star50": -1.97,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -13.13,
       "sse50": -8.31,
-      "other": -0.46,
-      "total": 27.41
+      "other": -0.48,
+      "total": 27.36
     },
     {
       "date": "20260206",
@@ -2540,7 +2540,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 12.14,
       "csi500": 24.96,
       "star50": 1.41,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 1.36,
       "sse50": -3.31,
       "other": 0.63,
@@ -2553,11 +2553,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -5.14,
       "csi500": -32.43,
       "star50": 2.32,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 1.71,
       "sse50": 4.23,
       "other": 1.2,
-      "total": -14.41
+      "total": -14.43
     },
     {
       "date": "20260204",
@@ -2566,7 +2566,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -31.64,
       "csi500": -17.92,
       "star50": 2.12,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 5.7,
       "sse50": -7.05,
       "other": 0.13,
@@ -2579,7 +2579,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 13.92,
       "csi500": 38.24,
       "star50": 5.86,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 5.71,
       "sse50": 1.26,
       "other": 0.71,
@@ -2592,11 +2592,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -35.61,
       "csi500": -129.18,
       "star50": 2.09,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 6.99,
       "sse50": -11.67,
       "other": 0.16,
-      "total": -241.12
+      "total": -241.13
     },
     {
       "date": "20260130",
@@ -2605,7 +2605,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 3.99,
       "csi500": -70.3,
       "star50": -1.22,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -18.06,
       "sse50": -11.67,
       "other": -0.39,
@@ -2618,11 +2618,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -31.71,
       "csi500": -66.09,
       "star50": 3.59,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -27.07,
       "sse50": -74.5,
-      "other": 1.01,
-      "total": -511.97
+      "other": 0.97,
+      "total": -512.01
     },
     {
       "date": "20260128",
@@ -2631,11 +2631,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -155.5,
       "csi500": -145.16,
       "star50": 2.34,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -25.61,
       "sse50": -153.75,
       "other": 0.27,
-      "total": -1452.75
+      "total": -1452.76
     },
     {
       "date": "20260127",
@@ -2644,11 +2644,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -62.57,
       "csi500": -9.32,
       "star50": -2.69,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -20.11,
       "sse50": -51.57,
-      "other": -0.17,
-      "total": -531.1
+      "other": -0.15,
+      "total": -531.09
     },
     {
       "date": "20260126",
@@ -2657,11 +2657,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -206.98,
       "csi500": -102.64,
       "star50": -0.94,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -18.61,
       "sse50": -126.56,
       "other": -0.77,
-      "total": -1152.4
+      "total": -1152.41
     },
     {
       "date": "20260123",
@@ -2670,11 +2670,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -137.54,
       "csi500": 24.68,
       "star50": 0.7,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 0.83,
       "sse50": -72.54,
-      "other": 0.6,
-      "total": -884.63
+      "other": 0.58,
+      "total": -884.65
     },
     {
       "date": "20260122",
@@ -2683,7 +2683,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -166.15,
       "csi500": -2.49,
       "star50": -7.06,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -30.83,
       "sse50": -52.58,
       "other": -0.63,
@@ -2696,11 +2696,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -287.79,
       "csi500": 8.62,
       "star50": -29.6,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -4.17,
       "sse50": -133.49,
-      "other": 0.21,
-      "total": -1029.2
+      "other": 0.23,
+      "total": -1029.19
     },
     {
       "date": "20260120",
@@ -2709,7 +2709,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -75.34,
       "csi500": -91.97,
       "star50": -34.79,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -28.98,
       "sse50": -57.98,
       "other": -0.37,
@@ -2722,11 +2722,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -122.69,
       "csi500": -27.18,
       "star50": -34.38,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -25.51,
       "sse50": -48.67,
       "other": -0.43,
-      "total": -565.39
+      "total": -565.4
     },
     {
       "date": "20260116",
@@ -2735,7 +2735,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -95.3,
       "csi500": -90.82,
       "star50": -121.35,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -84.71,
       "sse50": -78.81,
       "other": -1.38,
@@ -2748,11 +2748,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -13.55,
       "csi500": -66.0,
       "star50": -105.23,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -90.77,
       "sse50": -90.53,
       "other": -1.55,
-      "total": -718.06
+      "total": -718.07
     },
     {
       "date": "20260114",
@@ -2761,7 +2761,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -17.12,
       "csi500": 3.52,
       "star50": -17.63,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -35.97,
       "sse50": -1.75,
       "other": -0.55,
@@ -2774,7 +2774,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 11.29,
       "csi500": -2.03,
       "star50": -0.43,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -13.45,
       "sse50": -14.43,
       "other": -0.01,
@@ -2787,11 +2787,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 20.22,
       "csi500": 2.22,
       "star50": -11.28,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -15.4,
       "sse50": -5.21,
       "other": -2.24,
-      "total": -38.21
+      "total": -38.2
     },
     {
       "date": "20260109",
@@ -2800,11 +2800,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 36.45,
       "csi500": 15.48,
       "star50": -5.43,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -5.67,
       "sse50": 3.03,
-      "other": 0.23,
-      "total": 66.55
+      "other": 0.3,
+      "total": 66.61
     },
     {
       "date": "20260108",
@@ -2813,11 +2813,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -3.6,
       "csi500": -12.0,
       "star50": -6.52,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 10.88,
       "sse50": -0.14,
       "other": -0.2,
-      "total": -4.42
+      "total": -4.41
     },
     {
       "date": "20260107",
@@ -2826,11 +2826,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -20.09,
       "csi500": -6.76,
       "star50": -5.48,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -6.09,
       "sse50": -8.84,
       "other": -0.51,
-      "total": -71.97
+      "total": -71.96
     },
     {
       "date": "20260106",
@@ -2839,7 +2839,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 3.34,
       "csi500": 12.77,
       "star50": 2.37,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 4.58,
       "sse50": 3.06,
       "other": 0.42,
@@ -2852,11 +2852,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 10.77,
       "csi500": 30.51,
       "star50": 1.18,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 1.09,
       "sse50": -2.4,
       "other": -0.85,
-      "total": 61.18
+      "total": 61.19
     },
     {
       "date": "20251231",
@@ -2865,11 +2865,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -10.8,
       "csi500": -5.87,
       "star50": 2.45,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 0.61,
       "sse50": -18.22,
       "other": -0.35,
-      "total": -47.69
+      "total": -47.7
     },
     {
       "date": "20251230",
@@ -2878,11 +2878,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 8.55,
       "csi500": 5.63,
       "star50": -2.72,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -0.91,
       "sse50": -6.69,
-      "other": -0.29,
-      "total": 9.99
+      "other": -0.31,
+      "total": 9.97
     },
     {
       "date": "20251229",
@@ -2891,11 +2891,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -3.66,
       "csi500": -12.99,
       "star50": -0.7,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -11.48,
       "sse50": -5.74,
       "other": -2.15,
-      "total": -61.04
+      "total": -61.03
     },
     {
       "date": "20251226",
@@ -2904,7 +2904,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 30.55,
       "csi500": 28.63,
       "star50": -2.33,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -1.53,
       "sse50": 13.48,
       "other": -0.86,
@@ -2917,11 +2917,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 9.19,
       "csi500": 9.66,
       "star50": 2.88,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -1.43,
       "sse50": -1.62,
       "other": -1.04,
-      "total": 18.84
+      "total": 18.85
     },
     {
       "date": "20251224",
@@ -2930,11 +2930,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 9.42,
       "csi500": 12.03,
       "star50": -2.47,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 3.07,
       "sse50": 5.52,
-      "other": 1.73,
-      "total": 37.51
+      "other": 1.71,
+      "total": 37.49
     },
     {
       "date": "20251223",
@@ -2943,7 +2943,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -2.2,
       "csi500": -2.41,
       "star50": -2.67,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -6.42,
       "sse50": -12.88,
       "other": -0.56,
@@ -2956,7 +2956,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -6.59,
       "csi500": -7.12,
       "star50": -2.93,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -12.23,
       "sse50": 0.72,
       "other": -0.23,
@@ -2969,24 +2969,24 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 7.69,
       "csi500": 10.56,
       "star50": 1.82,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 6.84,
       "sse50": 11.55,
-      "other": 0.87,
-      "total": 28.21
+      "other": 0.91,
+      "total": 28.25
     },
     {
       "date": "20251218",
       "stale": false,
-      "hs300": 5.31,
+      "hs300": 5.27,
       "csi1000": -3.39,
       "csi500": 4.84,
       "star50": 1.72,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 19.97,
       "sse50": -1.6,
       "other": -0.04,
-      "total": 26.81
+      "total": 26.77
     },
     {
       "date": "20251217",
@@ -2995,7 +2995,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 11.71,
       "csi500": 12.87,
       "star50": -2.42,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -5.7,
       "sse50": -0.17,
       "other": 5.49,
@@ -3008,7 +3008,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 7.14,
       "csi500": 2.19,
       "star50": 6.21,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 8.06,
       "sse50": -10.39,
       "other": -4.1,
@@ -3021,7 +3021,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 0.15,
       "csi500": -0.5,
       "star50": 0.74,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 2.98,
       "sse50": -3.83,
       "other": 0.15,
@@ -3034,24 +3034,24 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 17.86,
       "csi500": 30.96,
       "star50": -1.13,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 6.76,
       "sse50": 8.88,
-      "other": 0.99,
-      "total": 98.57
+      "other": 0.98,
+      "total": 98.54
     },
     {
       "date": "20251211",
       "stale": false,
-      "hs300": -9.58,
+      "hs300": -9.62,
       "csi1000": -4.02,
       "csi500": -0.3,
       "star50": 5.33,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -5.42,
       "sse50": 6.07,
       "other": -0.23,
-      "total": -8.15
+      "total": -8.19
     },
     {
       "date": "20251210",
@@ -3060,7 +3060,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -9.73,
       "csi500": -15.89,
       "star50": 3.24,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -0.29,
       "sse50": -8.57,
       "other": 0.67,
@@ -3073,7 +3073,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -1.29,
       "csi500": -6.23,
       "star50": 3.7,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -12.56,
       "sse50": -3.99,
       "other": -0.37,
@@ -3086,11 +3086,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -3.71,
       "csi500": 0.95,
       "star50": -1.06,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -10.65,
       "sse50": 0.46,
       "other": -2.0,
-      "total": -2.96
+      "total": -2.95
     },
     {
       "date": "20251205",
@@ -3099,11 +3099,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 14.82,
       "csi500": 13.99,
       "star50": 0.88,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 2.04,
       "sse50": 5.29,
       "other": 1.87,
-      "total": 49.42
+      "total": 49.4
     },
     {
       "date": "20251204",
@@ -3112,11 +3112,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 4.94,
       "csi500": 2.52,
       "star50": -0.18,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -0.14,
       "sse50": 4.37,
-      "other": -0.27,
-      "total": 18.43
+      "other": -0.29,
+      "total": 18.4
     },
     {
       "date": "20251203",
@@ -3125,11 +3125,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 6.67,
       "csi500": -1.52,
       "star50": 1.17,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 0.45,
       "sse50": -5.31,
-      "other": 0.49,
-      "total": 4.9
+      "other": 0.47,
+      "total": 4.88
     },
     {
       "date": "20251202",
@@ -3138,11 +3138,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -1.23,
       "csi500": -6.49,
       "star50": -1.11,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -0.79,
       "sse50": -1.97,
-      "other": -0.04,
-      "total": -17.27
+      "other": 0.0,
+      "total": -17.23
     },
     {
       "date": "20251201",
@@ -3151,24 +3151,24 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -6.06,
       "csi500": 1.47,
       "star50": 0.03,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -8.73,
       "sse50": -15.44,
       "other": -0.62,
-      "total": -47.23
+      "total": -47.21
     },
     {
       "date": "20251128",
       "stale": false,
-      "hs300": -1.82,
+      "hs300": -1.86,
       "csi1000": -1.56,
       "csi500": 0.3,
       "star50": -2.57,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 0.97,
       "sse50": 4.17,
-      "other": -1.38,
-      "total": -1.89
+      "other": -1.36,
+      "total": -1.91
     },
     {
       "date": "20251127",
@@ -3177,24 +3177,24 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -5.75,
       "csi500": -5.95,
       "star50": -5.06,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -7.76,
       "sse50": 6.58,
       "other": -0.25,
-      "total": -23.26
+      "total": -23.25
     },
     {
       "date": "20251126",
       "stale": false,
       "hs300": -27.24,
       "csi1000": -8.05,
-      "csi500": -19.19,
+      "csi500": -19.22,
       "star50": -4.3,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -29.05,
       "sse50": -0.36,
       "other": -2.7,
-      "total": -90.89
+      "total": -90.92
     },
     {
       "date": "20251125",
@@ -3203,7 +3203,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -24.01,
       "csi500": -33.13,
       "star50": -0.06,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -26.6,
       "sse50": -2.32,
       "other": 0.19,
@@ -3216,11 +3216,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 3.16,
       "csi500": 11.38,
       "star50": -1.27,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -0.14,
       "sse50": 15.29,
       "other": 1.22,
-      "total": 82.04
+      "total": 82.05
     },
     {
       "date": "20251121",
@@ -3229,7 +3229,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 32.39,
       "csi500": 38.42,
       "star50": 9.89,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 32.31,
       "sse50": 5.14,
       "other": 2.36,
@@ -3242,11 +3242,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 8.04,
       "csi500": 7.83,
       "star50": 2.59,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 3.28,
       "sse50": 1.79,
-      "other": -0.27,
-      "total": 12.59
+      "other": -0.23,
+      "total": 12.64
     },
     {
       "date": "20251119",
@@ -3255,7 +3255,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 7.82,
       "csi500": 11.31,
       "star50": 1.48,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 0.72,
       "sse50": -11.82,
       "other": 0.16,
@@ -3268,11 +3268,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 2.15,
       "csi500": 2.01,
       "star50": 0.46,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 11.86,
       "sse50": -3.71,
-      "other": 0.91,
-      "total": 18.91
+      "other": 0.93,
+      "total": 18.92
     },
     {
       "date": "20251117",
@@ -3281,11 +3281,11 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -4.09,
       "csi500": 3.89,
       "star50": 0.58,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 4.6,
       "sse50": 11.6,
       "other": 0.52,
-      "total": 33.4
+      "total": 33.39
     },
     {
       "date": "20251114",
@@ -3294,24 +3294,24 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -3.03,
       "csi500": 1.53,
       "star50": 3.18,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 4.67,
       "sse50": -1.03,
       "other": 0.6,
-      "total": 9.44
+      "total": 9.43
     },
     {
       "date": "20251113",
       "stale": false,
       "hs300": -9.67,
       "csi1000": 4.26,
-      "csi500": 2.87,
+      "csi500": 2.84,
       "star50": -2.01,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -14.74,
       "sse50": 3.22,
       "other": -0.66,
-      "total": -16.73
+      "total": -16.76
     },
     {
       "date": "20251112",
@@ -3320,7 +3320,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": 3.58,
       "csi500": 2.92,
       "star50": 2.07,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 3.86,
       "sse50": -8.37,
       "other": 0.15,
@@ -3333,7 +3333,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -1.75,
       "csi500": -2.25,
       "star50": -0.07,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -0.05,
       "sse50": -2.78,
       "other": 0.49,
@@ -3342,15 +3342,15 @@ window.WIDEBASE_NETFLOW = {
     {
       "date": "20251110",
       "stale": false,
-      "hs300": -2.63,
+      "hs300": -2.67,
       "csi1000": -0.52,
-      "csi500": -0.92,
+      "csi500": -0.95,
       "star50": 1.08,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 9.82,
       "sse50": -0.29,
       "other": -0.5,
-      "total": 6.04
+      "total": 5.97
     },
     {
       "date": "20251107",
@@ -3359,7 +3359,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -0.38,
       "csi500": -2.55,
       "star50": -0.14,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -3.23,
       "sse50": -0.97,
       "other": -0.62,
@@ -3372,24 +3372,24 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -1.01,
       "csi500": 1.56,
       "star50": -5.87,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": -13.2,
       "sse50": -9.88,
       "other": -0.39,
-      "total": -40.94
+      "total": -40.95
     },
     {
       "date": "20251105",
       "stale": false,
       "hs300": -8.42,
       "csi1000": 1.91,
-      "csi500": -0.07,
+      "csi500": -0.04,
       "star50": 1.62,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 0.8,
       "sse50": 2.61,
       "other": -0.21,
-      "total": -1.77
+      "total": -1.73
     },
     {
       "date": "20251104",
@@ -3398,7 +3398,7 @@ window.WIDEBASE_NETFLOW = {
       "csi1000": -1.55,
       "csi500": -15.48,
       "star50": 0.3,
-      "csia500": 0.0,
+      "csia500": null,
       "chinext": 2.96,
       "sse50": -18.75,
       "other": 0.05,
@@ -3406,5 +3406,14 @@ window.WIDEBASE_NETFLOW = {
     }
   ],
   "count": 259,
-  "notes": "净流入 = 当日份额 − 上一交易日份额（亿份）× 当日收盘价（元）；份额源为 snapshot.shares_history，收盘价源为新浪日线；某日 ≥70% 标的份额无变化时判定份额源未日更，该行数值置空并标 stale=true；“其他宽基”含上证180、上证180金融、中证800、深证100；中证A500 等 watch 标的纳入份额序列较晚，其历史行可能为空，属数据可得性限制而非 0 流入。"
+  "column_start": {
+    "hs300": "20251104",
+    "csi1000": "20251104",
+    "csi500": "20251104",
+    "star50": "20251104",
+    "chinext": "20251104",
+    "sse50": "20251104",
+    "other": "20251104"
+  },
+  "notes": "净流入 = 当日份额 − 上一交易日份额（亿份）× 当日收盘价（元）；份额源为 snapshot.shares_history，收盘价源为新浪日线；某日 ≥70% 标的份额变动不足 0.01 亿份时判定份额源未日更，该行数值置空并标 stale=true；某列当日无任何可比标的时该单元格为 null（前端显示「—」）；“其他宽基”含上证180、上证180金融、中证800、深证100；中证A500 等观察池标的纳入份额序列较晚，其历史单元格为 null，属数据可得性限制而非 0 流入。"
 };
