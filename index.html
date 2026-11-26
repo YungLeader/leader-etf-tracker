@@ -1230,8 +1230,8 @@ function bootSnapshot(){
     });
     // 合计行
     var core = S.items.filter(function(i){return i.group==='core';});
-    var sa=0,sb=0,sn=0; core.forEach(function(it){var c=calcAdj(it,st);sa+=it.amount_yi;sb+=(it.avg20_yi||0)*c.done;sn+=c.net;});
-    html += '<tr class="total"><td data-l="合计">汪汪队合计</td><td data-l="只数" class="muted">'+core.length+' 只</td><td class="muted">—</td>'+
+    var sa=0,sb=0,sn=0,sc=0; core.forEach(function(it){var c=calcAdj(it,st);sa+=it.amount_yi;sb+=(it.avg20_yi||0)*c.done;sn+=c.net;sc+=(it.mktcap_yi||0);});
+    html += '<tr class="total"><td data-l="合计">汪汪队合计</td><td data-l="只数" class="muted">'+core.length+' 只</td><td data-l="规模合计" class="num">'+fmt(sc,1)+'</td>'+
       '<td data-l="成交额" class="num">'+fmt(sa,2)+(st.trading?'<div class="sub muted">截至 '+st.effHHMM+'</div>':'')+'</td>'+
       '<td data-l="较20日均" class="num hl">'+fmt(sb>0?sa/sb:0,2)+'×</td>'+
       '<td data-l="主动净买入" class="num '+cls(sn)+'">'+signed(sn)+'</td><td colspan="5" class="muted" style="text-align:right">合计口径与上方判断一致</td></tr>';
