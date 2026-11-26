@@ -102,6 +102,25 @@ button.primary:hover{background:#333}
 /* table */
 .tablewrap{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:auto}
 table{width:100%;border-collapse:collapse;min-width:1060px}
+/* 个股明细表：固定列宽铺满容器，单屏可读、不产生横向滚动 */
+.tablewrap.fit{overflow-x:hidden}
+table.dt{min-width:0;table-layout:fixed}
+table.dt thead th{white-space:normal;line-height:1.25;padding:9px 6px;font-size:10.5px;letter-spacing:0;vertical-align:bottom}
+table.dt tbody td{padding:9px 6px;font-size:12.5px;white-space:normal;overflow-wrap:anywhere}
+table.dt tbody td.num{white-space:nowrap}
+table.dt tbody td:nth-child(1){vertical-align:top}
+table.dt tbody td:nth-child(2){line-height:1.35;font-size:11.5px}
+table.dt tbody td:nth-child(10),table.dt tbody td:nth-child(9){text-align:center}
+/* 中等宽度（平板/窄窗口）收紧字号与内边距，保证 11 列仍单屏可读不被裁字 */
+@media(max-width:1150px) and (min-width:761px){
+  table.dt thead th{padding:7px 4px;font-size:9.5px}
+  table.dt tbody td{padding:7px 4px;font-size:11.5px}
+  table.dt tbody td:nth-child(2){font-size:10.5px}
+  table.dt tbody td:nth-child(5){font-size:10.5px}
+  table.dt .spark{max-width:100%}
+}
+table.dt svg.spark{max-width:100%;height:auto;display:inline-block}
+table.dt tbody td:nth-child(11){color:var(--ink);font-weight:700}
 thead th{position:sticky;top:0;background:#fafafa;text-align:right;font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.4px;padding:12px 12px;border-bottom:1px solid var(--line);white-space:nowrap;z-index:2}
 thead th:nth-child(1),thead th:nth-child(2){text-align:left}
 tbody td{padding:11px 12px;border-bottom:1px solid var(--line2);text-align:right;white-space:nowrap;font-size:13px}
@@ -275,6 +294,29 @@ table.mtx th:last-child{border-left:1px solid var(--line)}
   .tabs .tab{padding:9px 11px;font-size:13px}
   .mthead h3{font-size:16px}
   table.mtx{min-width:700px;font-size:12px}
+  /* 个股明细：移动端转卡片式（无横向滚动，全字段可见） */
+  .tablewrap.fit{overflow:visible;background:transparent;border:none;box-shadow:none;border-radius:0}
+  table.dt{display:block;min-width:0}
+  table.dt colgroup{display:none}
+  table.dt thead{display:none}
+  table.dt tbody{display:block}
+  table.dt tbody tr{display:grid;grid-template-columns:1fr 1fr;gap:5px 12px;background:var(--card);
+    border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px}
+  table.dt tbody tr:hover{background:var(--card)}
+  table.dt tbody td{border:none;padding:0;display:flex;justify-content:space-between;align-items:baseline;
+    gap:8px;text-align:right;font-size:12px;line-height:1.4}
+  table.dt tbody td::before{content:attr(data-l);color:var(--ink3);font-size:10px;font-weight:700;
+    flex:none;text-align:left;letter-spacing:.2px}
+  table.dt tbody td:nth-child(1),table.dt tbody td:nth-child(2),table.dt tbody td:nth-child(9),
+  table.dt tbody td:nth-child(10),table.dt tbody td:nth-child(11){grid-column:1/-1}
+  table.dt tbody td:nth-child(1){display:block;text-align:left;border-bottom:1px dashed var(--line2);padding-bottom:6px}
+  table.dt tbody td:nth-child(1)::before,table.dt tbody td:nth-child(2)::before{content:''}
+  table.dt tbody td:nth-child(2){display:block;text-align:left;font-size:11px;margin-top:-3px}
+  table.dt tbody td:nth-child(9),table.dt tbody td:nth-child(10){justify-content:flex-start;align-items:center}
+  table.dt tbody td:nth-child(11){border-top:1px dashed var(--line2);padding-top:6px}
+  table.dt tbody tr.grouphead,table.dt tbody tr.total{display:block;background:#f7f7f7;padding:9px 12px}
+  table.dt tbody tr.grouphead td,table.dt tbody tr.total td{display:block;text-align:left;padding:2px 0;font-size:11.5px}
+  table.dt tbody tr.total td::before{content:attr(data-l) '：';display:inline} 
   .mwrap{max-height:none}
   .statusbar .sb-btn{padding:4px 9px;font-size:11.5px}
 }
@@ -548,8 +590,13 @@ table.mtx th:last-child{border-left:1px solid var(--line)}
   <div class="meta" id="meta">—</div>
 </div>
 
-<div class="tablewrap">
-  <table>
+<div class="tablewrap fit">
+  <table class="dt">
+    <colgroup>
+      <col style="width:15.5%"><col style="width:9%"><col style="width:6%"><col style="width:6.5%">
+      <col style="width:10%"><col style="width:8%"><col style="width:6.5%"><col style="width:7.5%">
+      <col style="width:9.5%"><col style="width:10.5%"><col style="width:11%">
+    </colgroup>
     <thead><tr>
       <th>ETF</th><th>跟踪指数</th><th>规模(亿)</th><th>成交额(亿)</th>
       <th id="thRatio">较20日均</th>
@@ -1165,28 +1212,28 @@ function bootSnapshot(){
       var amtSub = st.trading ? '<div class="sub muted">截至 '+st.effHHMM+'</div>' : '';
       var ratioSub = st.trading ? '<div class="sub muted">已达成日均 '+fmt(c.raw,2)+'×</div>' : '';
       html += '<tr>'+
-        '<td><div class="name">'+it.name+'<span class="chip '+it.group+'">'+(it.group==='core'?'汪汪队':'观察')+'</span></div>'+
+        '<td data-l="ETF"><div class="name">'+it.name+'<span class="chip '+it.group+'">'+(it.group==='core'?'汪汪队':'观察')+'</span></div>'+
              '<div class="code num">'+it.code+'</div></td>'+
-        '<td class="muted">'+it.index+'</td>'+
-        '<td class="num">'+fmt(it.mktcap_yi,1)+'</td>'+
-        '<td class="num" style="font-weight:700">'+fmt(it.amount_yi,2)+amtSub+'</td>'+
-        '<td><div class="ratio num '+rCls+'">'+fmt(c.ratio,2)+'<b>×</b></div>'+ratioSub+
+        '<td data-l="跟踪指数" class="muted">'+it.index+'</td>'+
+        '<td data-l="规模(亿)" class="num">'+fmt(it.mktcap_yi,1)+'</td>'+
+        '<td data-l="成交额(亿)" class="num" style="font-weight:700">'+fmt(it.amount_yi,2)+amtSub+'</td>'+
+        '<td data-l="较20日均"><div class="ratio num '+rCls+'">'+fmt(c.ratio,2)+'<b>×</b></div>'+ratioSub+
              '<div class="mini"><span style="width:'+hb.toFixed(1)+'%"></span></div></td>'+
-        '<td class="num '+netCls+'" style="font-weight:700">'+signed(c.net)+'</td>'+
-        '<td class="num '+pctCls+' '+heatCls(it.pct)+'" style="font-weight:700">'+signed(it.pct)+'%</td>'+
-        '<td><div class="num">'+fmt(it.shares_yi,1)+'</div>'+subscrCell(it)+'</td>'+
-        '<td>'+spark(it.hist, it.amount_yi, S.trade_date)+'</td>'+
-        '<td>'+sparkShape(it.shape, st)+'</td>'+
-        '<td class="num '+(it.huijin_yi?'':'muted')+'">'+(it.huijin_yi?fmt(it.huijin_yi,1):'—')+'</td>'+
+        '<td data-l="主动净买入" class="num '+netCls+'" style="font-weight:700">'+signed(c.net)+'</td>'+
+        '<td data-l="涨跌" class="num '+pctCls+' '+heatCls(it.pct)+'" style="font-weight:700">'+signed(it.pct)+'%</td>'+
+        '<td data-l="份额(亿份)"><div class="num">'+fmt(it.shares_yi,1)+'</div>'+subscrCell(it)+'</td>'+
+        '<td data-l="近30日成交额">'+spark(it.hist, it.amount_yi, S.trade_date)+'</td>'+
+        '<td data-l="日内成交额分布">'+sparkShape(it.shape, st)+'</td>'+
+        '<td data-l="汇金持仓(25年报·亿份)" class="num '+(it.huijin_yi?'':'muted')+'">'+(it.huijin_yi?fmt(it.huijin_yi,1):'—')+'</td>'+
       '</tr>';
     });
     // 合计行
     var core = S.items.filter(function(i){return i.group==='core';});
     var sa=0,sb=0,sn=0; core.forEach(function(it){var c=calcAdj(it,st);sa+=it.amount_yi;sb+=(it.avg20_yi||0)*c.done;sn+=c.net;});
-    html += '<tr class="total"><td>汪汪队合计</td><td class="muted">'+core.length+' 只</td><td class="muted">—</td>'+
-      '<td class="num">'+fmt(sa,2)+(st.trading?'<div class="sub muted">截至 '+st.effHHMM+'</div>':'')+'</td>'+
-      '<td class="num hl">'+fmt(sb>0?sa/sb:0,2)+'×</td>'+
-      '<td class="num '+cls(sn)+'">'+signed(sn)+'</td><td colspan="5" class="muted" style="text-align:right">合计口径与上方判断一致</td></tr>';
+    html += '<tr class="total"><td data-l="合计">汪汪队合计</td><td data-l="只数" class="muted">'+core.length+' 只</td><td class="muted">—</td>'+
+      '<td data-l="成交额" class="num">'+fmt(sa,2)+(st.trading?'<div class="sub muted">截至 '+st.effHHMM+'</div>':'')+'</td>'+
+      '<td data-l="较20日均" class="num hl">'+fmt(sb>0?sa/sb:0,2)+'×</td>'+
+      '<td data-l="主动净买入" class="num '+cls(sn)+'">'+signed(sn)+'</td><td colspan="5" class="muted" style="text-align:right">合计口径与上方判断一致</td></tr>';
 
     document.getElementById('tbody').innerHTML=html;
   }

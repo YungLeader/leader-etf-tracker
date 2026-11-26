@@ -95,8 +95,10 @@ def compute_and_push():
     hh = now.hour * 60 + now.minute
 
     # 交易时段外直接退出（设置 FORCE_RUN=1 可绕过）
+    # 收盘后延至 15:34 继续补采：数据源 15:00 竞价K线若延迟发布，仍会在随后每分钟重试中被写入；
+    # 与 15:35 的 EOD 全量重建形成双保险（EOD 异常时也不会丢尾盘分时）。
     import os
-    if not os.environ.get('FORCE_RUN') and not ((9*60+30 <= hh <= 11*60+30) or (13*60 <= hh <= 15*60+10)):
+    if not os.environ.get('FORCE_RUN') and not ((9*60+30 <= hh <= 11*60+30) or (13*60 <= hh <= 15*60+34)):
         print(f"[{now.strftime('%H:%M')}] 非交易时段，跳过")
         return
 
@@ -247,8 +249,9 @@ def compute_and_push():
         if cnt and html2 != html:
             atomic_write_text(HTML_PATH, html2)
             print('[OK] index.html 内嵌分时块已同步')
-        else:
+        elif 'window.INTRADAY_MIN = {' in html:
             print('[WARN] index.html 内嵌分时块未匹配，跳过同步')
+        # 内嵌块不存在时无需处理：页面启动会 fetch data/intraday_min.json 覆盖首屏数据
     except Exception as e:
         print(f'[WARN] 同步 index.html 内嵌分时块失败: {e}')
 
