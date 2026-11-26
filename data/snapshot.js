@@ -1,6 +1,6 @@
 window.SNAPSHOT = {
-  "generated_at": "2026-11-25 23:38:30",
-  "trade_date": "20261125",
+  "generated_at": "2026-11-26 15:35:01",
+  "trade_date": "20261126",
   "source": "腾讯行情公开接口 qt.gtimg.cn / web.ifzq.gtimg.cn；日内成交额分布曲线来自新浪 5 分钟 K 线 quotes.sina.cn",
   "huijin_basis": "Wind 统计 2025 年报中央汇金前十大持有人口径持仓份额（亿份，2026-03 披露）。这是最后一次公开实名披露：证监会 2026-03-13 发布《公开募集证券投资基金信息披露内容与格式准则第2号—定期报告的内容与格式》，2026-05-01 起施行，删除上市基金列示前十名持有人的强制条款；2026 年中报、三季报均不再披露，仅保留匿名的「单一投资者≥20%」风险提示。此后公开渠道无法验证汇金当前持仓，本名单仅为历史标签。",
   "prev_share_date": "20261104",
@@ -12,22 +12,22 @@ window.SNAPSHOT = {
       "index": "沪深300",
       "group": "core",
       "huijin_yi": 735.13,
-      "price": 3.97,
-      "prev_close": 4.033,
-      "pct": -1.56,
-      "amount_yi": 79.1178,
-      "amount_wan": 791178.0,
-      "mktcap_yi": 2220.21,
+      "price": 3.959,
+      "prev_close": 3.97,
+      "pct": -0.28,
+      "amount_yi": 34.1945,
+      "amount_wan": 341945.0,
+      "mktcap_yi": 2214.06,
       "shares": 46640287700.0,
-      "shares_yi": 559.2469,
+      "shares_yi": 560.8543,
       "subscr_net_yi": 11.45,
       "prev_shares": 46363087700,
-      "outer_lots": 8586346.0,
-      "inner_lots": 11244400.0,
-      "turnover": 3.55,
-      "ts": "20261125161445",
-      "date": "20261125",
-      "avg20_yi": 84.17,
+      "outer_lots": 3711742.0,
+      "inner_lots": 4894659.0,
+      "turnover": 1.54,
+      "ts": "20261126153436",
+      "date": "20261126",
+      "avg20_yi": 81.42,
       "tail_ratio": 0.1426,
       "tail_ratio_base": 0.287,
       "shape": [
@@ -226,11 +226,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 66.7977,
-          "volume_lots": 15787695.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 161.2226,
           "volume_lots": 37995085.0
@@ -374,6 +369,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 79.1178,
           "volume_lots": 19830746.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 34.1945,
+          "volume_lots": 8606401.0
         }
       ]
     },
@@ -384,22 +384,22 @@ window.SNAPSHOT = {
       "index": "沪深300",
       "group": "core",
       "huijin_yi": 558.94,
-      "price": 3.858,
-      "prev_close": 3.92,
-      "pct": -1.58,
-      "amount_yi": 95.451,
-      "amount_wan": 954510.0,
-      "mktcap_yi": 1189.05,
+      "price": 3.849,
+      "prev_close": 3.858,
+      "pct": -0.23,
+      "amount_yi": 26.7543,
+      "amount_wan": 267543.0,
+      "mktcap_yi": 1186.27,
       "shares": 26160944000.0,
-      "shares_yi": 308.2024,
+      "shares_yi": 308.9322,
       "subscr_net_yi": 11.6,
       "prev_shares": 25872044000,
-      "outer_lots": 17270145.0,
-      "inner_lots": 7365034.0,
-      "turnover": 7.99,
-      "ts": "20261125161448",
-      "date": "20261125",
-      "avg20_yi": 26.94,
+      "outer_lots": 4614905.0,
+      "inner_lots": 2314209.0,
+      "turnover": 2.25,
+      "ts": "20261126153439",
+      "date": "20261126",
+      "avg20_yi": 27.35,
       "tail_ratio": 0.1217,
       "tail_ratio_base": 0.2884,
       "shape": [
@@ -598,11 +598,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 193.6645,
-          "volume_lots": 47174841.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 16.412,
           "volume_lots": 3978434.0
@@ -746,6 +741,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 95.451,
           "volume_lots": 24635179.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 26.7543,
+          "volume_lots": 6929115.0
         }
       ]
     },
@@ -756,22 +756,22 @@ window.SNAPSHOT = {
       "index": "上证50",
       "group": "core",
       "huijin_yi": 487.59,
-      "price": 2.857,
-      "prev_close": 2.888,
-      "pct": -1.07,
-      "amount_yi": 72.9571,
-      "amount_wan": 729571.0,
-      "mktcap_yi": 726.18,
+      "price": 2.864,
+      "prev_close": 2.857,
+      "pct": 0.25,
+      "amount_yi": 25.0287,
+      "amount_wan": 250287.0,
+      "mktcap_yi": 727.96,
       "shares": 16326666800.0,
-      "shares_yi": 254.1757,
+      "shares_yi": 254.7834,
       "subscr_net_yi": -0.21,
       "prev_shares": 16333866800,
-      "outer_lots": 13514537.0,
-      "inner_lots": 11859996.0,
-      "turnover": 9.98,
-      "ts": "20261125161456",
-      "date": "20261125",
-      "avg20_yi": 40.75,
+      "outer_lots": 3555706.0,
+      "inner_lots": 5174791.0,
+      "turnover": 3.43,
+      "ts": "20261126153447",
+      "date": "20261126",
+      "avg20_yi": 40.82,
       "tail_ratio": 0.1782,
       "tail_ratio_base": 0.2602,
       "shape": [
@@ -970,11 +970,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 24.6951,
-          "volume_lots": 8633139.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 53.9965,
           "volume_lots": 18804281.0
@@ -1118,6 +1113,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 72.9571,
           "volume_lots": 25374533.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 25.0287,
+          "volume_lots": 8730497.0
         }
       ]
     },
@@ -1128,22 +1128,22 @@ window.SNAPSHOT = {
       "index": "沪深300",
       "group": "core",
       "huijin_yi": 420.28,
-      "price": 4.136,
-      "prev_close": 4.202,
-      "pct": -1.57,
-      "amount_yi": 125.7506,
-      "amount_wan": 1257506.0,
-      "mktcap_yi": 969.4,
+      "price": 4.132,
+      "prev_close": 4.136,
+      "pct": -0.1,
+      "amount_yi": 5.0708,
+      "amount_wan": 50708.0,
+      "mktcap_yi": 968.46,
       "shares": 15669249800.0,
-      "shares_yi": 234.3805,
+      "shares_yi": 236.0004,
       "subscr_net_yi": 6.82,
       "prev_shares": 15510849800,
-      "outer_lots": 22903498.0,
-      "inner_lots": 7341888.0,
-      "turnover": 12.9,
-      "ts": "20261125161458",
-      "date": "20261125",
-      "avg20_yi": 27.42,
+      "outer_lots": 557378.0,
+      "inner_lots": 666125.0,
+      "turnover": 0.52,
+      "ts": "20261126153453",
+      "date": "20261126",
+      "avg20_yi": 27.48,
       "tail_ratio": 0.1768,
       "tail_ratio_base": 0.3103,
       "shape": [
@@ -1342,11 +1342,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 6.3809,
-          "volume_lots": 1447089.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 5.3248,
           "volume_lots": 1202662.0
@@ -1490,6 +1485,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 125.7506,
           "volume_lots": 30245386.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 5.0708,
+          "volume_lots": 1223503.0
         }
       ]
     },
@@ -1500,22 +1500,22 @@ window.SNAPSHOT = {
       "index": "沪深300",
       "group": "core",
       "huijin_yi": 354.98,
-      "price": 4.142,
-      "prev_close": 4.21,
-      "pct": -1.62,
-      "amount_yi": 7.9151,
-      "amount_wan": 79151.0,
-      "mktcap_yi": 883.61,
+      "price": 4.136,
+      "prev_close": 4.142,
+      "pct": -0.14,
+      "amount_yi": 4.7422,
+      "amount_wan": 47422.0,
+      "mktcap_yi": 882.29,
       "shares": 14054616676.0,
-      "shares_yi": 214.712,
+      "shares_yi": 213.3202,
       "subscr_net_yi": -0.19,
       "prev_shares": 14059116676,
-      "outer_lots": 909033.0,
-      "inner_lots": 993387.0,
-      "turnover": 0.89,
-      "ts": "20261125161445",
-      "date": "20261125",
-      "avg20_yi": 34.89,
+      "outer_lots": 515001.0,
+      "inner_lots": 628037.0,
+      "turnover": 0.54,
+      "ts": "20261126153448",
+      "date": "20261126",
+      "avg20_yi": 33.0,
       "tail_ratio": 0.1187,
       "tail_ratio_base": 0.3289,
       "shape": [
@@ -1714,11 +1714,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 9.9419,
-          "volume_lots": 2254015.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 9.353,
           "volume_lots": 2111639.0
@@ -1862,6 +1857,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 7.9151,
           "volume_lots": 1902420.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 4.7422,
+          "volume_lots": 1143038.0
         }
       ]
     },
@@ -1872,22 +1872,22 @@ window.SNAPSHOT = {
       "index": "中证1000",
       "group": "core",
       "huijin_yi": 221.69,
-      "price": 2.254,
-      "prev_close": 2.354,
-      "pct": -4.25,
-      "amount_yi": 57.4462,
-      "amount_wan": 574462.0,
-      "mktcap_yi": 590.26,
+      "price": 2.249,
+      "prev_close": 2.254,
+      "pct": -0.22,
+      "amount_yi": 79.0811,
+      "amount_wan": 790811.0,
+      "mktcap_yi": 588.95,
       "shares": 19595217600.0,
-      "shares_yi": 261.8722,
+      "shares_yi": 262.2132,
       "subscr_net_yi": -4.34,
       "prev_shares": 19759217600,
-      "outer_lots": 16142931.0,
-      "inner_lots": 8877124.0,
-      "turnover": 9.55,
-      "ts": "20261125161458",
-      "date": "20261125",
-      "avg20_yi": 63.01,
+      "outer_lots": 24000332.0,
+      "inner_lots": 11123063.0,
+      "turnover": 13.41,
+      "ts": "20261126153448",
+      "date": "20261126",
+      "avg20_yi": 64.95,
       "tail_ratio": 0.1089,
       "tail_ratio_base": 0.1386,
       "shape": [
@@ -2086,11 +2086,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 33.1781,
-          "volume_lots": 12153154.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 35.5166,
           "volume_lots": 12988340.0
@@ -2234,6 +2229,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 57.4462,
           "volume_lots": 25020056.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 79.0811,
+          "volume_lots": 35123395.0
         }
       ]
     },
@@ -2244,22 +2244,22 @@ window.SNAPSHOT = {
       "index": "科创50",
       "group": "core",
       "huijin_yi": 216.07,
-      "price": 1.212,
-      "prev_close": 1.276,
-      "pct": -5.02,
-      "amount_yi": 78.6059,
-      "amount_wan": 786059.0,
-      "mktcap_yi": 611.56,
+      "price": 1.194,
+      "prev_close": 1.212,
+      "pct": -1.49,
+      "amount_yi": 22.418,
+      "amount_wan": 224180.0,
+      "mktcap_yi": 602.48,
       "shares": 33607628100.0,
-      "shares_yi": 504.5863,
+      "shares_yi": 510.205,
       "subscr_net_yi": 19.38,
       "prev_shares": 32101628100,
-      "outer_lots": 46463332.0,
-      "inner_lots": 16844394.0,
-      "turnover": 12.55,
-      "ts": "20261125161455",
-      "date": "20261125",
-      "avg20_yi": 38.27,
+      "outer_lots": 8691263.0,
+      "inner_lots": 9893688.0,
+      "turnover": 3.68,
+      "ts": "20261126153458",
+      "date": "20261126",
+      "avg20_yi": 38.35,
       "tail_ratio": 0.105,
       "tail_ratio_base": 0.1352,
       "shape": [
@@ -2458,11 +2458,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 26.0429,
-          "volume_lots": 18857969.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 19.1684,
           "volume_lots": 13694129.0
@@ -2606,6 +2601,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 78.6059,
           "volume_lots": 63307726.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 22.418,
+          "volume_lots": 18584951.0
         }
       ]
     },
@@ -2616,22 +2616,22 @@ window.SNAPSHOT = {
       "index": "创业板指",
       "group": "core",
       "huijin_yi": 170.2,
-      "price": 2.199,
-      "prev_close": 2.292,
-      "pct": -4.06,
-      "amount_yi": 122.0818,
-      "amount_wan": 1220818.0,
-      "mktcap_yi": 1175.66,
+      "price": 2.217,
+      "prev_close": 2.199,
+      "pct": 0.82,
+      "amount_yi": 129.4241,
+      "amount_wan": 1294241.0,
+      "mktcap_yi": 1216.83,
       "shares": 45372454936.0,
-      "shares_yi": 544.2839,
+      "shares_yi": 548.8645,
       "subscr_net_yi": 11.45,
       "prev_shares": 44909454936,
-      "outer_lots": 22976457.0,
-      "inner_lots": 31532977.0,
-      "turnover": 10.2,
-      "ts": "20261125161418",
-      "date": "20261125",
-      "avg20_yi": 131.83,
+      "outer_lots": 33346684.0,
+      "inner_lots": 25318680.0,
+      "turnover": 10.69,
+      "ts": "20261126153415",
+      "date": "20261126",
+      "avg20_yi": 131.91,
       "tail_ratio": 0.1257,
       "tail_ratio_base": 0.1308,
       "shape": [
@@ -2830,11 +2830,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 121.7415,
-          "volume_lots": 43401615.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 81.4241,
           "volume_lots": 28973984.0
@@ -2978,6 +2973,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 122.0818,
           "volume_lots": 54509434.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 129.4241,
+          "volume_lots": 58665364.0
         }
       ]
     },
@@ -2988,22 +2988,22 @@ window.SNAPSHOT = {
       "index": "中证500",
       "group": "core",
       "huijin_yi": 142.17,
-      "price": 5.922,
-      "prev_close": 6.126,
-      "pct": -3.33,
-      "amount_yi": 95.1088,
-      "amount_wan": 951088.0,
-      "mktcap_yi": 809.52,
+      "price": 5.888,
+      "prev_close": 5.922,
+      "pct": -0.57,
+      "amount_yi": 24.4356,
+      "amount_wan": 244356.0,
+      "mktcap_yi": 804.88,
       "shares": 9892168600.0,
-      "shares_yi": 136.6977,
+      "shares_yi": 137.876,
       "subscr_net_yi": -4.71,
       "prev_shares": 9963368600,
-      "outer_lots": 10660891.0,
-      "inner_lots": 5164233.0,
-      "turnover": 11.58,
-      "ts": "20261125161445",
-      "date": "20261125",
-      "avg20_yi": 57.72,
+      "outer_lots": 2298747.0,
+      "inner_lots": 1820912.0,
+      "turnover": 3.01,
+      "ts": "20261126153456",
+      "date": "20261126",
+      "avg20_yi": 56.57,
       "tail_ratio": 0.1666,
       "tail_ratio_base": 0.1274,
       "shape": [
@@ -3202,11 +3202,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 31.587,
-          "volume_lots": 4620006.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 33.7153,
           "volume_lots": 4923565.0
@@ -3350,6 +3345,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 95.1088,
           "volume_lots": 15825124.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 24.4356,
+          "volume_lots": 4119659.0
         }
       ]
     },
@@ -3360,22 +3360,22 @@ window.SNAPSHOT = {
       "index": "中证1000",
       "group": "core",
       "huijin_yi": 137.26,
-      "price": 2.311,
-      "prev_close": 2.415,
-      "pct": -4.31,
-      "amount_yi": 14.7151,
-      "amount_wan": 147151.0,
-      "mktcap_yi": 56.17,
+      "price": 2.305,
+      "prev_close": 2.311,
+      "pct": -0.26,
+      "amount_yi": 14.4485,
+      "amount_wan": 144485.0,
+      "mktcap_yi": 54.85,
       "shares": 3960425606.0,
-      "shares_yi": 25.0095,
+      "shares_yi": 23.7943,
       "subscr_net_yi": -8.39,
       "prev_shares": 4269425606,
-      "outer_lots": 2903223.0,
-      "inner_lots": 3285540.0,
-      "turnover": 25.46,
-      "ts": "20261125161445",
-      "date": "20261125",
-      "avg20_yi": 24.1,
+      "outer_lots": 3141896.0,
+      "inner_lots": 3087195.0,
+      "turnover": 26.18,
+      "ts": "20261126153448",
+      "date": "20261126",
+      "avg20_yi": 23.54,
       "tail_ratio": 0.0991,
       "tail_ratio_base": 0.1022,
       "shape": [
@@ -3574,11 +3574,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 22.3861,
-          "volume_lots": 7990747.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 23.5141,
           "volume_lots": 8381437.0
@@ -3722,6 +3717,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 14.7151,
           "volume_lots": 6188763.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 14.4485,
+          "volume_lots": 6229091.0
         }
       ]
     },
@@ -3732,22 +3732,22 @@ window.SNAPSHOT = {
       "index": "中证1000",
       "group": "core",
       "huijin_yi": 105.5,
-      "price": 2.304,
-      "prev_close": 2.417,
-      "pct": -4.68,
-      "amount_yi": 10.4067,
-      "amount_wan": 104067.0,
-      "mktcap_yi": 58.77,
+      "price": 2.308,
+      "prev_close": 2.304,
+      "pct": 0.17,
+      "amount_yi": 12.491,
+      "amount_wan": 124910.0,
+      "mktcap_yi": 58.87,
       "shares": 4008621700.0,
-      "shares_yi": 25.5062,
+      "shares_yi": 25.6374,
       "subscr_net_yi": 0.11,
       "prev_shares": 4004621700,
-      "outer_lots": 2256202.0,
-      "inner_lots": 2118338.0,
-      "turnover": 17.15,
-      "ts": "20261125161446",
-      "date": "20261125",
-      "avg20_yi": 17.37,
+      "outer_lots": 1839659.0,
+      "inner_lots": 3544375.0,
+      "turnover": 21.11,
+      "ts": "20261126153438",
+      "date": "20261126",
+      "avg20_yi": 17.25,
       "tail_ratio": 0.0716,
       "tail_ratio_base": 0.0934,
       "shape": [
@@ -3946,11 +3946,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 10.5619,
-          "volume_lots": 3775832.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 12.7614,
           "volume_lots": 4553974.0
@@ -4094,6 +4089,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 10.4067,
           "volume_lots": 4374540.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 12.491,
+          "volume_lots": 5384034.0
         }
       ]
     },
@@ -4104,22 +4104,22 @@ window.SNAPSHOT = {
       "index": "上证180",
       "group": "core",
       "huijin_yi": 52.32,
-      "price": 3.577,
-      "prev_close": 3.626,
-      "pct": -1.35,
-      "amount_yi": 0.761,
-      "amount_wan": 7610.0,
-      "mktcap_yi": 159.43,
+      "price": 3.565,
+      "prev_close": 3.577,
+      "pct": -0.34,
+      "amount_yi": 0.8708,
+      "amount_wan": 8708.0,
+      "mktcap_yi": 158.89,
       "shares": 4449557700.0,
-      "shares_yi": 44.3225,
+      "shares_yi": 44.5706,
       "subscr_net_yi": 0.09,
       "prev_shares": 4447057700,
-      "outer_lots": 92131.0,
-      "inner_lots": 120167.0,
-      "turnover": 0.48,
-      "ts": "20261125161453",
-      "date": "20261125",
-      "avg20_yi": 0.7,
+      "outer_lots": 110861.0,
+      "inner_lots": 132796.0,
+      "turnover": 0.55,
+      "ts": "20261126153445",
+      "date": "20261126",
+      "avg20_yi": 0.71,
       "tail_ratio": 0.0793,
       "tail_ratio_base": 0.0728,
       "shape": [
@@ -4318,11 +4318,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 1.0565,
-          "volume_lots": 285172.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 0.6916,
           "volume_lots": 185930.0
@@ -4466,6 +4461,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 0.761,
           "volume_lots": 212298.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 0.8708,
+          "volume_lots": 243657.0
         }
       ]
     },
@@ -4476,22 +4476,22 @@ window.SNAPSHOT = {
       "index": "中证1000",
       "group": "core",
       "huijin_yi": 36.34,
-      "price": 2.316,
-      "prev_close": 2.43,
-      "pct": -4.69,
-      "amount_yi": 3.8465,
-      "amount_wan": 38465.0,
-      "mktcap_yi": 18.05,
+      "price": 2.312,
+      "prev_close": 2.316,
+      "pct": -0.17,
+      "amount_yi": 4.2031,
+      "amount_wan": 42031.0,
+      "mktcap_yi": 18.71,
       "shares": 1179252663.0,
-      "shares_yi": 8.0702,
+      "shares_yi": 8.0925,
       "subscr_net_yi": -0.65,
       "prev_shares": 1203252663,
-      "outer_lots": 725500.0,
-      "inner_lots": 878469.0,
-      "turnover": 20.58,
-      "ts": "20261125161415",
-      "date": "20261125",
-      "avg20_yi": 6.26,
+      "outer_lots": 775439.0,
+      "inner_lots": 1029049.0,
+      "turnover": 22.3,
+      "ts": "20261126153430",
+      "date": "20261126",
+      "avg20_yi": 6.07,
       "tail_ratio": 0.061,
       "tail_ratio_base": 0.0859,
       "shape": [
@@ -4690,11 +4690,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 6.7772,
-          "volume_lots": 2408598.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 6.5359,
           "volume_lots": 2321816.0
@@ -4838,6 +4833,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 3.8465,
           "volume_lots": 1603969.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 4.2031,
+          "volume_lots": 1804488.0
         }
       ]
     },
@@ -4849,21 +4849,21 @@ window.SNAPSHOT = {
       "group": "core",
       "huijin_yi": 25.64,
       "price": 1.393,
-      "prev_close": 1.399,
-      "pct": -0.43,
-      "amount_yi": 1.3378,
-      "amount_wan": 13378.0,
+      "prev_close": 1.393,
+      "pct": 0.0,
+      "amount_yi": 0.7736,
+      "amount_wan": 7736.0,
       "mktcap_yi": 7.59,
       "shares": 549808000.0,
-      "shares_yi": 5.4481,
+      "shares_yi": 5.4446,
       "subscr_net_yi": -0.38,
       "prev_shares": 577808000,
-      "outer_lots": 534455.0,
-      "inner_lots": 427291.0,
-      "turnover": 17.65,
-      "ts": "20261125161449",
-      "date": "20261125",
-      "avg20_yi": 1.12,
+      "outer_lots": 270543.0,
+      "inner_lots": 284920.0,
+      "turnover": 10.2,
+      "ts": "20261126153457",
+      "date": "20261126",
+      "avg20_yi": 1.1,
       "tail_ratio": 0.0796,
       "tail_ratio_base": 0.1299,
       "shape": [
@@ -5062,11 +5062,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 0.9223,
-          "volume_lots": 691731.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 1.1276,
           "volume_lots": 845616.0
@@ -5210,6 +5205,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 1.3378,
           "volume_lots": 961746.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 0.7736,
+          "volume_lots": 555463.0
         }
       ]
     },
@@ -5220,22 +5220,22 @@ window.SNAPSHOT = {
       "index": "中证500",
       "group": "core",
       "huijin_yi": 23.11,
-      "price": 2.403,
-      "prev_close": 2.489,
-      "pct": -3.46,
-      "amount_yi": 4.4114,
-      "amount_wan": 44114.0,
-      "mktcap_yi": 75.49,
+      "price": 2.39,
+      "prev_close": 2.403,
+      "pct": -0.54,
+      "amount_yi": 4.1592,
+      "amount_wan": 41592.0,
+      "mktcap_yi": 74.78,
       "shares": 3609676765.0,
-      "shares_yi": 31.8161,
+      "shares_yi": 31.2868,
       "subscr_net_yi": 1.34,
       "prev_shares": 3559676765,
-      "outer_lots": 909588.0,
-      "inner_lots": 901635.0,
-      "turnover": 5.77,
-      "ts": "20261125161442",
-      "date": "20261125",
-      "avg20_yi": 5.8,
+      "outer_lots": 772983.0,
+      "inner_lots": 956807.0,
+      "turnover": 5.53,
+      "ts": "20261126153451",
+      "date": "20261126",
+      "avg20_yi": 5.73,
       "tail_ratio": 0.1067,
       "tail_ratio_base": 0.1573,
       "shape": [
@@ -5434,11 +5434,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 4.0086,
-          "volume_lots": 1449489.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 3.3557,
           "volume_lots": 1209369.0
@@ -5582,6 +5577,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 4.4114,
           "volume_lots": 1811223.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 4.1592,
+          "volume_lots": 1729790.0
         }
       ]
     },
@@ -5592,22 +5592,22 @@ window.SNAPSHOT = {
       "index": "中证500",
       "group": "core",
       "huijin_yi": 20.51,
-      "price": 3.354,
-      "prev_close": 3.474,
-      "pct": -3.45,
-      "amount_yi": 3.4544,
-      "amount_wan": 34544.0,
-      "mktcap_yi": 67.35,
+      "price": 3.333,
+      "prev_close": 3.354,
+      "pct": -0.63,
+      "amount_yi": 3.8169,
+      "amount_wan": 38169.0,
+      "mktcap_yi": 66.93,
       "shares": 2072808800.0,
-      "shares_yi": 20.0801,
+      "shares_yi": 20.2329,
       "subscr_net_yi": 0.75,
       "prev_shares": 2052808800,
-      "outer_lots": 459909.0,
-      "inner_lots": 550163.0,
-      "turnover": 5.03,
-      "ts": "20261125161445",
-      "date": "20261125",
-      "avg20_yi": 4.77,
+      "outer_lots": 600643.0,
+      "inner_lots": 535716.0,
+      "turnover": 5.66,
+      "ts": "20261126153438",
+      "date": "20261126",
+      "avg20_yi": 4.65,
       "tail_ratio": 0.0874,
       "tail_ratio_base": 0.1013,
       "shape": [
@@ -5806,11 +5806,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 5.8838,
-          "volume_lots": 1523814.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 4.0304,
           "volume_lots": 1040908.0
@@ -5954,6 +5949,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 3.4544,
           "volume_lots": 1010071.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 3.8169,
+          "volume_lots": 1136359.0
         }
       ]
     },
@@ -5964,22 +5964,22 @@ window.SNAPSHOT = {
       "index": "中证800",
       "group": "core",
       "huijin_yi": 13.08,
-      "price": 1.063,
-      "prev_close": 1.084,
-      "pct": -1.94,
-      "amount_yi": 1.0063,
-      "amount_wan": 10063.0,
-      "mktcap_yi": 43.26,
+      "price": 1.059,
+      "prev_close": 1.063,
+      "pct": -0.38,
+      "amount_yi": 2.5042,
+      "amount_wan": 25042.0,
+      "mktcap_yi": 43.1,
       "shares": 4011437200.0,
-      "shares_yi": 40.6994,
+      "shares_yi": 40.7704,
       "subscr_net_yi": 0.3,
       "prev_shares": 3984437200,
-      "outer_lots": 279821.0,
-      "inner_lots": 663790.0,
-      "turnover": 2.32,
-      "ts": "20261125161456",
-      "date": "20261125",
-      "avg20_yi": 1.34,
+      "outer_lots": 718896.0,
+      "inner_lots": 1640647.0,
+      "turnover": 5.8,
+      "ts": "20261126153448",
+      "date": "20261126",
+      "avg20_yi": 1.42,
       "tail_ratio": 0.1638,
       "tail_ratio_base": 0.1268,
       "shape": [
@@ -6178,11 +6178,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 1.2506,
-          "volume_lots": 1085869.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 0.7543,
           "volume_lots": 653255.0
@@ -6326,6 +6321,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 1.0063,
           "volume_lots": 943611.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 2.5042,
+          "volume_lots": 2359543.0
         }
       ]
     },
@@ -6336,22 +6336,22 @@ window.SNAPSHOT = {
       "index": "创业板指",
       "group": "core",
       "huijin_yi": 10.91,
-      "price": 1.336,
-      "prev_close": 1.392,
-      "pct": -4.02,
-      "amount_yi": 23.5757,
-      "amount_wan": 235757.0,
-      "mktcap_yi": 192.18,
+      "price": 1.339,
+      "prev_close": 1.336,
+      "pct": 0.22,
+      "amount_yi": 22.9695,
+      "amount_wan": 229695.0,
+      "mktcap_yi": 199.78,
       "shares": 10619384929.0,
-      "shares_yi": 146.0801,
+      "shares_yi": 149.2038,
       "subscr_net_yi": 3.91,
       "prev_shares": 10359284929,
-      "outer_lots": 7659936.0,
-      "inner_lots": 9719001.0,
-      "turnover": 12.08,
-      "ts": "20261125161430",
-      "date": "20261125",
-      "avg20_yi": 21.89,
+      "outer_lots": 8150614.0,
+      "inner_lots": 8985805.0,
+      "turnover": 11.49,
+      "ts": "20261126153445",
+      "date": "20261126",
+      "avg20_yi": 22.02,
       "tail_ratio": 0.0762,
       "tail_ratio_base": 0.12,
       "shape": [
@@ -6550,11 +6550,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 19.5181,
-          "volume_lots": 11466075.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 14.1979,
           "volume_lots": 8319919.0
@@ -6698,6 +6693,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 23.5757,
           "volume_lots": 17378937.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 22.9695,
+          "volume_lots": 17136419.0
         }
       ]
     },
@@ -6708,21 +6708,21 @@ window.SNAPSHOT = {
       "index": "科创50",
       "group": "core",
       "huijin_yi": 9.7,
-      "price": 1.218,
-      "prev_close": 1.28,
-      "pct": -4.84,
-      "amount_yi": 6.2588,
-      "amount_wan": 62588.0,
-      "mktcap_yi": 83.76,
+      "price": 1.196,
+      "prev_close": 1.218,
+      "pct": -1.81,
+      "amount_yi": 3.3463,
+      "amount_wan": 33463.0,
+      "mktcap_yi": 82.25,
       "shares": 6837241300.0,
-      "shares_yi": 68.7724,
+      "shares_yi": 69.427,
       "subscr_net_yi": -4.75,
       "prev_shares": 7205241300,
-      "outer_lots": 2079059.0,
-      "inner_lots": 2953378.0,
-      "turnover": 7.32,
-      "ts": "20261125161457",
-      "date": "20261125",
+      "outer_lots": 1315870.0,
+      "inner_lots": 1455665.0,
+      "turnover": 4.03,
+      "ts": "20261126153449",
+      "date": "20261126",
       "avg20_yi": 5.05,
       "tail_ratio": 0.1432,
       "tail_ratio_base": 0.1408,
@@ -6922,11 +6922,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 4.1888,
-          "volume_lots": 3030997.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 3.7645,
           "volume_lots": 2685591.0
@@ -7070,6 +7065,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 6.2588,
           "volume_lots": 5032438.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 3.3463,
+          "volume_lots": 2771535.0
         }
       ]
     },
@@ -7080,22 +7080,22 @@ window.SNAPSHOT = {
       "index": "深证100",
       "group": "core",
       "huijin_yi": 7.19,
-      "price": 2.644,
-      "prev_close": 2.71,
-      "pct": -2.44,
-      "amount_yi": 3.4099,
-      "amount_wan": 34099.0,
-      "mktcap_yi": 33.87,
+      "price": 2.635,
+      "prev_close": 2.644,
+      "pct": -0.34,
+      "amount_yi": 3.7547,
+      "amount_wan": 37547.0,
+      "mktcap_yi": 34.56,
       "shares": 1245234930.0,
-      "shares_yi": 12.9226,
+      "shares_yi": 13.1173,
       "subscr_net_yi": 0.36,
       "prev_shares": 1232634930,
-      "outer_lots": 531317.0,
-      "inner_lots": 746518.0,
-      "turnover": 9.98,
-      "ts": "20261125161445",
-      "date": "20261125",
-      "avg20_yi": 3.59,
+      "outer_lots": 746211.0,
+      "inner_lots": 675178.0,
+      "turnover": 10.84,
+      "ts": "20261126153439",
+      "date": "20261126",
+      "avg20_yi": 3.6,
       "tail_ratio": 0.07,
       "tail_ratio_base": 0.0808,
       "shape": [
@@ -7294,11 +7294,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 4.5973,
-          "volume_lots": 1506938.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 3.6192,
           "volume_lots": 1183134.0
@@ -7442,6 +7437,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 3.4099,
           "volume_lots": 1277835.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 3.7547,
+          "volume_lots": 1421389.0
         }
       ]
     },
@@ -7452,22 +7452,22 @@ window.SNAPSHOT = {
       "index": "科创50",
       "group": "watch",
       "huijin_yi": 0.0,
-      "price": 1.254,
-      "prev_close": 1.319,
-      "pct": -4.93,
-      "amount_yi": 98.7846,
-      "amount_wan": 987846.0,
-      "mktcap_yi": 1320.83,
+      "price": 1.233,
+      "prev_close": 1.254,
+      "pct": -1.67,
+      "amount_yi": 75.6034,
+      "amount_wan": 756034.0,
+      "mktcap_yi": 1298.71,
       "shares": 107723668200.0,
-      "shares_yi": 1053.2967,
+      "shares_yi": 1064.5248,
       "subscr_net_yi": null,
       "prev_shares": 0,
-      "outer_lots": 33896009.0,
-      "inner_lots": 43313013.0,
-      "turnover": 7.33,
-      "ts": "20261125161452",
-      "date": "20261125",
-      "avg20_yi": 122.97,
+      "outer_lots": 28146885.0,
+      "inner_lots": 32559638.0,
+      "turnover": 5.76,
+      "ts": "20261126153443",
+      "date": "20261126",
+      "avg20_yi": 120.96,
       "tail_ratio": 0.1087,
       "tail_ratio_base": 0.1734,
       "shape": [
@@ -7666,11 +7666,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 140.4905,
-          "volume_lots": 98659036.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 89.1701,
           "volume_lots": 61848517.0
@@ -7814,6 +7809,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 98.7846,
           "volume_lots": 77209022.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 75.6034,
+          "volume_lots": 60706524.0
         }
       ]
     },
@@ -7824,22 +7824,22 @@ window.SNAPSHOT = {
       "index": "中证A500",
       "group": "watch",
       "huijin_yi": 0.0,
-      "price": 0.986,
-      "prev_close": 1.008,
-      "pct": -2.18,
-      "amount_yi": 8.7933,
-      "amount_wan": 87933.0,
-      "mktcap_yi": 171.79,
+      "price": 0.984,
+      "prev_close": 0.986,
+      "pct": -0.2,
+      "amount_yi": 10.334,
+      "amount_wan": 103340.0,
+      "mktcap_yi": 171.44,
       "shares": 18751992200.0,
-      "shares_yi": 174.2299,
+      "shares_yi": 175.0339,
       "subscr_net_yi": null,
       "prev_shares": 0,
-      "outer_lots": 4208864.0,
-      "inner_lots": 4617920.0,
-      "turnover": 5.07,
-      "ts": "20261125161440",
-      "date": "20261125",
-      "avg20_yi": 12.19,
+      "outer_lots": 5456606.0,
+      "inner_lots": 4994969.0,
+      "turnover": 6.0,
+      "ts": "20261126153431",
+      "date": "20261126",
+      "avg20_yi": 12.13,
       "tail_ratio": 0.0434,
       "tail_ratio_base": 0.0897,
       "shape": [
@@ -8038,11 +8038,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 12.9365,
-          "volume_lots": 12003280.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 10.9745,
           "volume_lots": 10140440.0
@@ -8186,6 +8181,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 8.7933,
           "volume_lots": 8826784.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 10.334,
+          "volume_lots": 10451575.0
         }
       ]
     },
@@ -8196,22 +8196,22 @@ window.SNAPSHOT = {
       "index": "中证A500",
       "group": "watch",
       "huijin_yi": 0.0,
-      "price": 0.991,
-      "prev_close": 1.011,
-      "pct": -1.98,
-      "amount_yi": 51.1543,
-      "amount_wan": 511543.0,
-      "mktcap_yi": 274.7,
+      "price": 0.987,
+      "prev_close": 0.991,
+      "pct": -0.4,
+      "amount_yi": 46.5459,
+      "amount_wan": 465459.0,
+      "mktcap_yi": 268.17,
       "shares": 30623086664.0,
-      "shares_yi": 279.4741,
+      "shares_yi": 271.7009,
       "subscr_net_yi": null,
       "prev_shares": 0,
-      "outer_lots": 22905167.0,
-      "inner_lots": 28302885.0,
-      "turnover": 18.47,
-      "ts": "20261125161436",
-      "date": "20261125",
-      "avg20_yi": 61.46,
+      "outer_lots": 19957459.0,
+      "inner_lots": 26986954.0,
+      "turnover": 17.28,
+      "ts": "20261126153430",
+      "date": "20261126",
+      "avg20_yi": 61.02,
       "tail_ratio": 0.1203,
       "tail_ratio_base": 0.079,
       "shape": [
@@ -8410,11 +8410,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 32.8591,
-          "volume_lots": 30361885.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 31.058,
           "volume_lots": 28591965.0
@@ -8558,6 +8553,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 51.1543,
           "volume_lots": 51208053.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 46.5459,
+          "volume_lots": 46944413.0
         }
       ]
     },
@@ -8568,21 +8568,21 @@ window.SNAPSHOT = {
       "index": "中证A500",
       "group": "watch",
       "huijin_yi": 0.0,
-      "price": 1.001,
-      "prev_close": 1.023,
-      "pct": -2.15,
-      "amount_yi": 0.4787,
-      "amount_wan": 4787.0,
-      "mktcap_yi": 18.31,
+      "price": 1.0,
+      "prev_close": 1.001,
+      "pct": -0.1,
+      "amount_yi": 0.4729,
+      "amount_wan": 4729.0,
+      "mktcap_yi": 18.38,
       "shares": 1901086841.0,
-      "shares_yi": 18.4642,
+      "shares_yi": 18.3809,
       "subscr_net_yi": null,
       "prev_shares": 0,
-      "outer_lots": 231880.0,
-      "inner_lots": 242298.0,
-      "turnover": 2.59,
-      "ts": "20261125161442",
-      "date": "20261125",
+      "outer_lots": 242513.0,
+      "inner_lots": 228807.0,
+      "turnover": 2.56,
+      "ts": "20261126153445",
+      "date": "20261126",
       "avg20_yi": 0.58,
       "tail_ratio": 0.2246,
       "tail_ratio_base": 0.1073,
@@ -8782,11 +8782,6 @@ window.SNAPSHOT = {
       ],
       "hist": [
         {
-          "date": "2026-10-15",
-          "amount_yi": 0.5011,
-          "volume_lots": 457622.0
-        },
-        {
           "date": "2026-10-16",
           "amount_yi": 0.354,
           "volume_lots": 322518.0
@@ -8930,6 +8925,11 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 0.4787,
           "volume_lots": 474178.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 0.4729,
+          "volume_lots": 471320.0
         }
       ]
     },
@@ -8939,19 +8939,19 @@ window.SNAPSHOT = {
       "name": "沪深300ETF天弘",
       "index": "沪深300",
       "group": "watch",
-      "price": 1.142,
-      "prev_close": 1.16,
-      "pct": -1.55,
-      "outer_lots": 118423.0,
-      "inner_lots": 905182.0,
-      "amount_wan": 11753.0,
-      "amount_yi": 1.1753,
-      "turnover": 1.03,
-      "mktcap_yi": 113.16,
-      "shares_yi": 99.0871,
+      "price": 1.138,
+      "prev_close": 1.142,
+      "pct": -0.35,
+      "outer_lots": 39520.0,
+      "inner_lots": 62172.0,
+      "amount_wan": 1161.0,
+      "amount_yi": 0.1161,
+      "turnover": 0.1,
+      "mktcap_yi": 112.76,
+      "shares_yi": 102.0211,
       "shares": 9668370000,
       "shares_date": "20261113",
-      "avg20_yi": 1.36,
+      "avg20_yi": 1.35,
       "hist": [
         {
           "date": "2026-10-16",
@@ -9097,10 +9097,15 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 1.1753,
           "volume_lots": 1023605.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 0.1161,
+          "volume_lots": 101692.0
         }
       ],
-      "date": "20261125",
-      "ts": "20261125161458",
+      "date": "20261126",
+      "ts": "20261126153449",
       "tail_ratio": 0.973,
       "tail_ratio_base": 0.15
     },
@@ -9111,18 +9116,18 @@ window.SNAPSHOT = {
       "index": "沪深300",
       "group": "watch",
       "price": 1.518,
-      "prev_close": 1.544,
-      "pct": -1.68,
-      "outer_lots": 188235.0,
-      "inner_lots": 818151.0,
-      "amount_wan": 15371.0,
-      "amount_yi": 1.5371,
-      "turnover": 3.4,
+      "prev_close": 1.518,
+      "pct": 0.0,
+      "outer_lots": 1284403.0,
+      "inner_lots": 426926.0,
+      "amount_wan": 25989.0,
+      "amount_yi": 2.5989,
+      "turnover": 5.79,
       "mktcap_yi": 44.89,
-      "shares_yi": 29.5738,
+      "shares_yi": 29.5692,
       "shares": 2939300000,
       "shares_date": "20261113",
-      "avg20_yi": 1.53,
+      "avg20_yi": 1.61,
       "hist": [
         {
           "date": "2026-10-16",
@@ -9268,10 +9273,15 @@ window.SNAPSHOT = {
           "date": "2026-11-25",
           "amount_yi": 1.5371,
           "volume_lots": 1006386.0
+        },
+        {
+          "date": "2026-11-26",
+          "amount_yi": 2.5989,
+          "volume_lots": 1711329.0
         }
       ],
-      "date": "20261125",
-      "ts": "20261125161500",
+      "date": "20261126",
+      "ts": "20261126153451",
       "tail_ratio": 0.849,
       "tail_ratio_base": 0.15
     }
@@ -14969,6 +14979,28 @@ window.SNAPSHOT = {
       "159952": 146.0801,
       "588050": 68.7724,
       "159901": 12.9226
+    },
+    "20261126": {
+      "510300": 560.8543,
+      "510310": 308.9322,
+      "510050": 254.7834,
+      "510330": 236.0004,
+      "159919": 213.3202,
+      "512100": 262.2132,
+      "588080": 510.205,
+      "159915": 548.8645,
+      "510500": 137.876,
+      "159845": 23.7943,
+      "560010": 25.6374,
+      "510180": 44.5706,
+      "159629": 8.0925,
+      "510230": 5.4446,
+      "159922": 31.2868,
+      "512500": 20.2329,
+      "515800": 40.7704,
+      "159952": 149.2038,
+      "588050": 69.427,
+      "159901": 13.1173
     }
   }
 };
