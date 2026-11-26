@@ -102,6 +102,78 @@ def fetch_daily_closes(tcode, datalen=400):
     return out
 
 
+def _shape_buckets():
+    """日内成交额分布的时间桶：09:35-11:30 与 13:05-15:00，5 分钟一格，共 48 点"""
+    out = []
+    for start, end in ((575, 690), (785, 900)):
+        t = start
+        while t <= end:
+            out.append(f"{t // 60:02d}:{t % 60:02d}")
+            t += 5
+    return out
+
+
+def fetch_tx_minute_cum(tcode):
+    """腾讯分时接口：返回 [(hhmm, 累计成交额), ...]，最后一行为收盘集合竞价后的全天累计额"""
+    url = f'https://web.ifzq.gtimg.cn/appstock/app/minute/query?code={tcode}'
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+    with urllib.request.urlopen(req, timeout=8) as resp:
+        j = json.loads(resp.read().decode('utf-8', 'ignore'))
+    node = (j.get('data') or {}).get(tcode) or {}
+    rows = (node.get('data') or {}).get('data') or []
+    out = []
+    for r in rows:
+        p = str(r).split()
+        if len(p) < 4:
+            continue
+        try:
+            out.append((p[0], float(p[3])))
+        except Exception:
+            continue
+    return out
+
+
+def refresh_item_shapes(items):
+    """重算每只 ETF 的当日累计成交额占比序列 items[].shape（48 点）
+
+    原 shape 为早期静态样本、长期未随交易日更新，且新纳入观察池的标的直接没有该字段，
+    前端「日内成交额分布」列会显示陈旧图形或「无日内分布」。此处改为每日收盘后按
+    腾讯分时接口的累计成交额重算，保证该列与当日真实分时一致。
+    """
+    buckets = _shape_buckets()
+    ok, fail = 0, []
+    for it in items:
+        code, tc = it.get('code'), it.get('tcode')
+        if not code or not tc:
+            continue
+        try:
+            rows = fetch_tx_minute_cum(tc)
+            if len(rows) < 10:
+                fail.append(code)
+                continue
+            total = rows[-1][1]
+            if total <= 0:
+                fail.append(code)
+                continue
+            seq, j, last = [], 0, 0.0
+            for b in buckets:
+                key = b.replace(':', '')
+                while j < len(rows) and rows[j][0] <= key:
+                    last = rows[j][1]
+                    j += 1
+                if b == '15:00':
+                    last = total   # 收盘集合竞价并入 15:00
+                ratio = min(1.0, max(0.0, last / total))
+                seq.append([b, round(ratio, 5)])
+            it['shape'] = seq
+            ok += 1
+        except Exception:
+            fail.append(code)
+        time.sleep(0.02)
+    print(f"✅ 日内成交额分布(shape) 刷新: 成功 {ok} 只" + (f"，失败 {len(fail)} 只 {fail}" if fail else ""))
+    return ok, fail
+
+
 def build_widebase_netflow(items, shares_history, today_str):
     """生成 交易日 × 大类宽基 的净流入矩阵（净流入 = 份额变化(亿份) × 当日收盘价(元)，单位亿元）"""
     code_col = {}
@@ -182,8 +254,8 @@ def build_widebase_netflow(items, shares_history, today_str):
         'notes': ('净流入 = 当日份额 − 上一交易日份额（亿份）× 当日收盘价（元）；份额源为 snapshot.shares_history，'
                   '收盘价源为新浪日线；某日 ≥70% 标的份额变动不足 0.01 亿份时判定份额源未日更，该行数值置空并标 stale=true；'
                   '某列当日无任何可比标的时该单元格为 null（前端显示「—」）；'
-                  '“其他宽基”含上证180、上证180金融、中证800、深证100；中证A500 等观察池标的纳入份额序列较晚，'
-                  '其历史单元格为 null，属数据可得性限制而非 0 流入。'),
+                  '“其他宽基”含上证180、上证180金融、中证800、深证100；中证A500 由观察池 512050/159338/159339 聚合，'
+                  '其份额序列已尽量回溯补齐，仍无前值可比的交易日为 null（前端显示「—」），属数据可得性限制而非 0 流入。'),
     }
     atomic_write_json(WIDEBASE_JSON, payload)
     atomic_write_js(WIDEBASE_JS, 'WIDEBASE_NETFLOW', payload)
@@ -728,6 +800,25 @@ def main():
                 core_day_shares[c] = round(s_yi, 4)
             else:
                 watch_day_shares[c] = round(s_yi, 4)
+    # 份额延续：个别标的当日抓取失败（shares_yi<=0）时沿用上一交易日份额，
+    # 避免 shares_history 序列出现断档——断档会让宽基净流入矩阵按「同日可比」规则
+    # 丢掉该标的，表现为某宽基列的当日值凭空变成 null
+    prev_dates = sorted([d for d in sh_hist.keys() if d < today_str])
+    if prev_dates:
+        prev_shares = sh_hist.get(prev_dates[-1]) or {}
+        carried = 0
+        for it in items:
+            c = it['code']
+            if c in core_day_shares or c in watch_day_shares:
+                continue
+            if prev_shares.get(c):
+                if it.get('group') == 'core':
+                    core_day_shares[c] = prev_shares[c]
+                else:
+                    watch_day_shares[c] = prev_shares[c]
+                carried += 1
+        if carried:
+            print(f"ℹ️ 份额延续: {carried} 只标的当日无新抓取份额，按上一交易日 ({prev_dates[-1]}) 值延续")
     if core_day_shares:
         sh_hist[today_str] = core_day_shares
     if watch_day_shares:
@@ -737,6 +828,9 @@ def main():
     if core_day_shares:
         snapshot['shares_history'] = sh_hist
         print(f"✅ shares_history 自动追加今日 ({today_str}) 最新份额 (核心 {len(core_day_shares)} 只 + 观察 {len(watch_day_shares)} 只)！")
+
+    # 重算每只标的的当日日内成交额分布（items[].shape），修复陈旧样本与观察池标的缺失
+    refresh_item_shapes(items)
 
     snapshot['trade_date'] = today_str
     snapshot['generated_at'] = now_str

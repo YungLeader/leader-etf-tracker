@@ -187,6 +187,8 @@ footer code{background:#f5f5f5;padding:2px 6px;border-radius:3px;font-size:11px;
   .meta{margin-left:0;width:100%;text-align:left}
 }
 
+.nodist{display:inline-block;min-width:38px;text-align:center;color:var(--ink3);font-size:11px;letter-spacing:1px;border-bottom:1px dashed #c9ced6;cursor:help}
+
 /* 立即刷新按钮交互体系 */
 .header-refresh-btn {
   display: inline-flex;
@@ -345,7 +347,6 @@ table.mtx th:last-child{border-left:1px solid var(--line)}
 <div class="statusbar" id="statusBar">
   <span class="sb-item"><b>更新于</b><span class="num" id="sbUpdated">—</span></span>
   <span class="sb-item"><b>下次更新</b><span class="num" id="sbNext">—</span></span>
-  <button class="sb-btn" id="sbRefresh" onclick="forceReloadAll(this)">立即刷新</button>
   <button class="sb-btn" id="sbPause" type="button">暂停自动刷新</button>
   <span class="sb-market" id="sbMarket">状态检测中</span>
 </div>
@@ -585,7 +586,6 @@ table.mtx th:last-child{border-left:1px solid var(--line)}
     </select>
   </div>
   <input type="text" id="q" placeholder="搜代码 / 名称 / 指数">
-  <button class="primary js-refresh-trigger" id="refresh" onclick="forceReloadAll(this)">立即刷新</button>
   <label class="toggle"><input type="checkbox" id="auto" checked>自动刷新</label>
   <div class="meta" id="meta">—</div>
 </div>
@@ -613,6 +613,7 @@ table.mtx th:last-child{border-left:1px solid var(--line)}
   <div><b>① 主动净买入</b> = (外盘 − 内盘) ÷ (外盘 + 内盘) × 成交额。外盘是主动买（成交在卖价）、内盘是主动卖（成交在买价），所以这只是<b>逐笔成交方向的推算</b>：<b>不是资金净流入，不是基金申赎净流入，也不含大宗交易与协议转让</b>。 ETF 有一二级市场套利对冲，同一笔申赎会在二级市场产生反向成交，会稀释该信号；机构调仓、做市双边报价同样会干扰。别把它当「国家队买了多少钱」。</div>
   <div><b>② 份额 / 申赎</b> = 腾讯行情披露的场内份额；下方申赎 = (本次快照份额 − 上一份快照份额) × 现价，<b>是份额变化的市值估算，不是基金公司公布的申赎数据</b>，需要连续两日各跑一次 <code>update_data.py</code> 才有值。<br>
   <b>为什么有的是 0：</b>2026-11-03 实测，沪市 15 只 ETF 份额全部与上一快照一模一样，深市 9 只里 8 只有变化——这种「整片市场同时不动」不可能反映真实申赎，是行情商的份额字段对沪市未按日更新。页面因此加了自检：<b>同一市场 ≥70% 标的两日份额完全相同时，该市场一律标「份额源未日更」而不给数字</b>，避免把数据源滞后说成「没有申赎」。只有差异化的市场才显示具体申赎值。任何情况下都以基金公司公告为准。</div>
+  <div><b>③ 日内成交额分布</b> = 当日分时的成交额累计曲线（每 5 分钟一格，共 48 点），每个交易日收盘后按腾讯分时接口重新计算。该列显示「<b>—</b>」表示<b>该标的当日没有分钟级成交额数据来源</b>（行情接口未返回它的分时序列），<b>仅此列留空，不影响成交额、份额、主动净买入、净流入等其它列</b>；鼠标悬停可看到具体说明。</div>
 </div>
 
 </div>
@@ -798,7 +799,7 @@ function bootSnapshot(){
   // 日内成交额分布迷你柱（48 点）：用 items[].shape 的累计占比序列反解每分钟成交额，
   // 尾盘 14:30-15:00 时段用主色高亮，便于一眼看出资金是否尾盘发力。
   function sparkShape(shape, st){
-    if(!shape || !shape.length) return '<span class="muted" style="font-size:11px">无日内分布</span>';
+    if(!shape || !shape.length) return '<span class="nodist" title="该标的当日无分钟级成交额数据（行情接口未返回其分时），仅此列留空，不影响其它列">—</span>';
     var n=shape.length, w=112, h=26, times=[], cum=[];
     for(var i=0;i<n;i++){
       var it2=shape[i];
@@ -1304,7 +1305,7 @@ function bootSnapshot(){
   function refresh(){
     if(refreshing) return;
     refreshing=true;
-    var btn=document.getElementById('refresh'); btn.textContent='更新中…';
+    var btn=document.querySelector('#btnHeaderRefresh span'); if(btn) btn.textContent='更新中…';
     var url='https://qt.gtimg.cn/q='+tcodes.join(',')+'&r='+Date.now();
     var s=document.createElement('script');
     s.src=url; s.async=true;
@@ -1314,7 +1315,7 @@ function bootSnapshot(){
       clearTimeout(timer);
       if(ok){ var n=applyLive(); if(n>0){ liveOK=true; lastLiveAt=Date.now(); if(mergeLiveSharesToHistory()){ shareSynced=true; if(typeof window.__rerenderShareCharts === 'function') window.__rerenderShareCharts(); } } }
       else { liveOK=false; }
-      refreshing=false; btn.textContent='立即刷新';
+      refreshing=false; if(btn) btn.textContent='立即刷新';
       renderAll();
       try{ s.parentNode && s.parentNode.removeChild(s); }catch(e){}
     }
@@ -1361,7 +1362,6 @@ function bootSnapshot(){
     var handler = (id === 'scope') ? function(){ renderTable(); (window.__renderIntradayCurrent||function(){renderIntradayCharts(window.INTRADAY_MIN);})(); } : renderTable;
     document.getElementById(id).addEventListener(id==='q'?'input':'change', handler);
   });
-  document.getElementById('refresh').addEventListener('click',refresh);
   document.getElementById('auto').addEventListener('change',function(){
     if(this.checked) schedule(); else clearTimeout(window.__t);
   });
@@ -2620,7 +2620,8 @@ window.fetchLiveIntraday = function() {
       var latest=(D.rows&&D.rows[0])?String(D.rows[0].date).replace(/(\d{4})(\d{2})(\d{2})/,'$1-$2-$3'):'—';
       meta.innerHTML='共 '+(D.count||D.rows.length)+' 个交易日 · 当前展示近 '+rows.length+' 日（截取至 '+latest+'） · '+c0+' 个大类宽基 + 合计列'+
         ' · 生成于 '+(D.generated_at||'—')+
-        ' · 最早可比起点：'+(cs.hs300? String(cs.hs300).replace(/(\d{4})(\d{2})(\d{2})/,'$1-$2-$3'):'—');
+        ' · 最早可比起点：'+(cs.hs300? String(cs.hs300).replace(/(\d{4})(\d{2})(\d{2})/,'$1-$2-$3'):'—')+
+        ' · 中证A500 起点：'+(cs.csia500? String(cs.csia500).replace(/(\d{4})(\d{2})(\d{2})/,'$1-$2-$3'):'未积累出可比前值');
     }
   }
   window.__renderMatrix=renderMatrix;
