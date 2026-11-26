@@ -323,18 +323,26 @@ def compute_and_save_intraday_min(items, today_dash):
     sh_today = [x for x in sh_raw if x['day'].startswith(today_dash)]
     if not sh_today:
         sh_today = sh_raw[-240:]
-    # 过滤 15:00+ 的场外竞价时段异常行，保留完整交易时段（含 14:57-14:59）
-    sh_today = [x for x in sh_today if x['day'][11:16] < '15:00']
+    # 保留完整交易时段，含收盘集合竞价三分钟（14:57-15:00，新浪只在 15:00 返回竞价成交量）
+    sh_today = [x for x in sh_today if x['day'][11:16] <= '15:00']
     sh_times_raw = [x['day'][11:16] for x in sh_today]
     # 新浪1分K时间戳为K线结束时间，减1分钟转为开始时间展示
-    # 注意：14:58 shift后=14:57，会与已有14:57冲突，只对原始时间 <= '14:57' 做shift
+    # 14:58/14:59/15:00 属收盘集合竞价，统一聚合到 '15:00' 一个时点
     def _shift_m1(t):
         try:
             from datetime import datetime as _dt, timedelta as _td
             return (_dt.strptime(t, '%H:%M') - _td(minutes=1)).strftime('%H:%M')
         except Exception:
             return t
-    sh_times = [_shift_m1(t) if t <= '14:57' else t for t in sh_times_raw]
+
+    CLOSE_SLOT = '15:00'
+
+    def _norm_slot(t):
+        if t <= '14:57':
+            return _shift_m1(t)
+        return CLOSE_SLOT
+
+    sh_times = [_norm_slot(t) for t in sh_times_raw]
     # 去重：shift后如有重复时间槽，保留最后一条（时间更晚的那根K线）
     seen, dedup_idx = set(), []
     for i in range(len(sh_times) - 1, -1, -1):
@@ -353,7 +361,13 @@ def compute_and_save_intraday_min(items, today_dash):
         try:
             with urllib.request.urlopen(req, timeout=4) as resp:
                 raw = json.loads(resp.read().decode('gbk'))
-                m_map = {x['day'][11:16]: float(x['amount']) / 1e8 for x in raw if x['day'].startswith(today_dash)}
+                # 时间槽与指数对齐，收盘竞价 14:58/15:00 累加到 15:00，防止成交额被丢弃
+                m_map = {}
+                for x in raw:
+                    if not x['day'].startswith(today_dash):
+                        continue
+                    slot = _norm_slot(x['day'][11:16])
+                    m_map[slot] = m_map.get(slot, 0.0) + float(x['amount']) / 1e8
                 return [m_map.get(t, 0.0) for t in sh_times]
         except Exception:
             return [0.0] * n_pts
@@ -401,8 +415,8 @@ def compute_and_save_intraday_min(items, today_dash):
     try:
         with urllib.request.urlopen(req_cy, timeout=4) as resp:
             cy_raw = json.loads(resp.read().decode('gbk'))
-            cy_today = [x for x in cy_raw if x['day'].startswith(today_dash) and x['day'][11:16] < '15:00']
-            cy_map = {x['day'][11:16]: float(x['close']) for x in cy_today}
+            cy_today = [x for x in cy_raw if x['day'].startswith(today_dash) and x['day'][11:16] <= '15:00']
+            cy_map = {_norm_slot(x['day'][11:16]): float(x['close']) for x in cy_today}
             cy_pts = [cy_map.get(t, float(cy_today[-1]['close']) if cy_today else 2426.08) for t in sh_times]
             prev_close_cy = float(cy_today[0]['open']) if cy_today else 2509.43
     except Exception as e:
@@ -413,10 +427,13 @@ def compute_and_save_intraday_min(items, today_dash):
     scope_20 = compute_scope(core_items)
     scope_26 = compute_scope(items)
 
-    # 裁剪尾部指数有、ETF成交额为0的空柱（指数返回14:58、ETF新1分K只到14:57）
+    # 裁剪尾部指数有、ETF成交额为0的空柱（收盘集合竞价 15:00 时点永不裁剪，防丢最后一分钟）
     # 从尾部反向扫，连续裁掉 scope_26.min_amount == 0 的条目
     tail_cut = 0
-    while (tail_cut < len(scope_26['min_amount'])
+    cut_limit = len(scope_26['min_amount'])
+    if sh_times and sh_times[-1] == CLOSE_SLOT:
+        cut_limit -= 1
+    while (tail_cut < cut_limit
            and scope_26['min_amount'][-(tail_cut+1)] == 0.0):
         tail_cut += 1
     if tail_cut > 0:

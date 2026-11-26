@@ -73,6 +73,22 @@ def _shift_m1(t):
     except Exception:
         return t
 
+
+CLOSE_SLOT = '15:00'
+
+
+def _norm_slot(t):
+    """把新浪1分K的结束时间戳规整为看板时间槽。
+
+    - <=14:57 的连续竞价分钟：-1 分钟对齐为开始时间（09:30..14:56）
+    - 14:58 / 14:59 / 15:00：属收盘集合竞价（14:57-15:00）时段，新浪不返回 14:59，
+      竞价成交量集中落在 15:00 这根K线上。统一聚合到 '15:00' 一个时点展示，
+      避免因 14:58 空槽被尾部裁剪而丢掉最后几分钟（含收盘竞价）的成交额。
+    """
+    if t <= '14:57':
+        return _shift_m1(t)
+    return CLOSE_SLOT
+
 def compute_and_push():
     now = datetime.now()
     today_dash = now.strftime('%Y-%m-%d')
@@ -104,13 +120,13 @@ def compute_and_push():
     # 1. 上证指数分时
     sh_raw = fetch_min_kline('sh000001')
     sh_today = [x for x in sh_raw if x['day'].startswith(today_dash)
-                and x['day'][11:16] < '15:00']
+                and x['day'][11:16] <= '15:00']
     if not sh_today:
         sh_today = sh_raw[-240:]
 
     sh_times_raw = [x['day'][11:16] for x in sh_today]
-    # 只对 <= 14:57 的原始时间做 shift，14:58 保持原样防止与14:57冲突
-    sh_times = [_shift_m1(t) if t <= '14:57' else t for t in sh_times_raw]
+    # 统一时间槽：<=14:57 前移1分钟；收盘集合竞价（14:58/15:00）合并为 15:00 一点
+    sh_times = [_norm_slot(t) for t in sh_times_raw]
     # 去重：保留每个时间槽最后一条K线
     seen, dedup_idx = set(), []
     for i in range(len(sh_times) - 1, -1, -1):
@@ -133,8 +149,8 @@ def compute_and_push():
     try:
         cy_raw   = fetch_min_kline('sz399006')
         cy_today = [x for x in cy_raw if x['day'].startswith(today_dash)
-                    and x['day'][11:16] < '15:00']
-        cy_map   = {_shift_m1(x['day'][11:16]): float(x['close']) for x in cy_today}
+                    and x['day'][11:16] <= '15:00']
+        cy_map   = {_norm_slot(x['day'][11:16]): float(x['close']) for x in cy_today}
         cy_pts   = [cy_map.get(t, float(cy_today[-1]['close']) if cy_today else 2426.08) for t in sh_times]
         prev_close_cy = float(cy_today[0]['open']) if cy_today else 2509.43
     except Exception as e:
@@ -148,8 +164,13 @@ def compute_and_push():
         tc = it['tcode']
         try:
             raw = fetch_min_kline(tc)
-            m_map = {_shift_m1(x['day'][11:16]): float(x['amount'])/1e8
-                     for x in raw if x['day'].startswith(today_dash)}
+            # 同一时间槽可能有多根K线（收盘竞价 14:58/15:00 均归入 15:00），成交额累加不丢量
+            m_map = {}
+            for x in raw:
+                if not x['day'].startswith(today_dash):
+                    continue
+                slot = _norm_slot(x['day'][11:16])
+                m_map[slot] = m_map.get(slot, 0.0) + float(x['amount'])/1e8
             etf_series[tc] = [m_map.get(t, 0.0) for t in sh_times]
         except Exception:
             etf_series[tc] = [0.0] * n_pts
@@ -182,9 +203,12 @@ def compute_and_push():
     scope_20 = compute_scope(core_items)
     scope_26 = compute_scope(items)
 
-    # 裁剪尾部指数有、ETF成交额为0的空柱
+    # 裁剪尾部指数有、ETF成交额为0的空柱（收盘集合竞价 15:00 时点永不裁剪，防丢最后一分钟）
     tail_cut = 0
-    while (tail_cut < len(scope_26['min_amount'])
+    cut_limit = len(scope_26['min_amount'])
+    if sh_times and sh_times[-1] == CLOSE_SLOT:
+        cut_limit -= 1
+    while (tail_cut < cut_limit
            and scope_26['min_amount'][-(tail_cut+1)] == 0.0):
         tail_cut += 1
     if tail_cut > 0:
@@ -211,6 +235,23 @@ def compute_and_push():
     # 4. 写 JSON 文件（原子写 + 与 EOD 统一 indent=2 口径）
     atomic_write_json(INTRADAY_JSON, intraday_data)
     atomic_write_js(INTRADAY_JS, 'INTRADAY_MIN', intraday_data)
+
+    # 4a. 同步刷新 index.html 内嵌 window.INTRADAY_MIN（2026-11-26 新增）
+    # 页面首屏直接读内嵌块，若内嵌块长期不更新会与 data/intraday_min.json 出现
+    # times / min_amount 长度不一致，前端按 ETF 序列截断后会把最后几分钟（含 15:00 收盘竞价）整段丢掉。
+    try:
+        with open(HTML_PATH, 'r', encoding='utf-8') as _f:
+            html = _f.read()
+        new_block = 'window.INTRADAY_MIN = ' + json.dumps(intraday_data, ensure_ascii=False) + ';\nwindow.__curScope'
+        html2, cnt = re.subn(r'window\.INTRADAY_MIN\s*=\s*\{.*?\};\nwindow\.__curScope', lambda _m: new_block, html, flags=re.DOTALL)
+        if cnt and html2 != html:
+            atomic_write_text(HTML_PATH, html2)
+            print('[OK] index.html 内嵌分时块已同步')
+        else:
+            print('[WARN] index.html 内嵌分时块未匹配，跳过同步')
+    except Exception as e:
+        print(f'[WARN] 同步 index.html 内嵌分时块失败: {e}')
+
 
     # 4b. 归档当日盘中分时（本地滚动 20 交易日；不随盘中 push 上传，由 EOD 统一提交）
     try:
