@@ -4,7 +4,7 @@
 功能：每次运行时重新采集今日 ETF + 指数分钟 K 线，更新 intraday_min.json / intraday_min.js
       同步写入 index.html 内嵌的 window.INTRADAY_MIN，并 git push 到 GitHub Pages
 用法：
-  - 由 cron 在交易时段（9:35~15:10）每 2 分钟调用一次
+  - 由 cron 在交易时段（9:35~15:10）每 1 分钟调用一次
   - 或者用户点击「立即刷新」时手动触发
 """
 import os, sys, json, urllib.request, time, re, subprocess
