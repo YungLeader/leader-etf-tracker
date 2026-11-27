@@ -657,24 +657,27 @@ table.mtx th:last-child{border-left:1px solid var(--line)}
 </div>
 
 <script>
+  // 统一时间口径：只回答「数据更新到什么时候」，不展示快照文件生成时间（跨闭包共享）
+  window.freshText = function(){
+    try{
+      var IM = window.INTRADAY_MIN || (typeof INTRADAY_MIN!=='undefined'?INTRADAY_MIN:null);
+      if(IM && IM.date && IM.times && IM.times.length){
+        var t=String(IM.times[IM.times.length-1]||'');
+        if(t) return String(IM.date).slice(5)+' '+t.slice(0,5);
+      }
+    }catch(e){}
+    return '暂无盘中数据';
+  };
 function bootSnapshot(){
 (function(){
   "use strict";
   var S = window.SNAPSHOT;
   if(!S){ document.getElementById('vtitle').textContent='数据快照未加载'; return; }
 
-  // 更新最后数据时间戳显示
+  // 更新「数据更新至」显示（只反映数据时刻，不展示快照文件生成时间）
   function updateLastUpdateTime() {
-    var genAt = S.generated_at; // "2026-11-16 19:08:27"
-    if (genAt) {
-      var parts = genAt.split(' ');
-      if (parts.length === 2) {
-        var datePart = parts[0].split('-'); // ["2026", "11", "16"]
-        var timePart = parts[1].substring(0, 5); // "19:08"
-        var display = datePart[1] + '-' + datePart[2] + ' ' + timePart; // "11-16 19:08"
-        document.getElementById('stamp').innerHTML = '<span style="color:var(--ink3);font-weight:400;">最后更新：</span>' + display;
-      }
-    }
+    var el = document.getElementById('stamp');
+    if (el) el.textContent = '数据更新至 ' + window.freshText();
   }
   updateLastUpdateTime();
 
@@ -1342,7 +1345,7 @@ function bootSnapshot(){
     } else {
       badge.className='badge'; txt.textContent='休市 · 最近交易日收盘数据';
     }
-    document.getElementById('stamp').textContent = '数据更新至 '+freshText();
+    document.getElementById('stamp').textContent = '数据更新至 '+window.freshText();
     var newest = S.items[0] && S.items[0].date ? S.items[0].date : S.trade_date;
     var stale = newest && newest!==st.date && (st.trading||st.after);
     document.getElementById('meta').innerHTML =
@@ -1350,7 +1353,7 @@ function bootSnapshot(){
       (liveOK?(st.lunch?' · 通道正常，13:00 继续刷新':' · 实时已连接'):'')+
       (stale?' <span style="color:var(--orange)">· 基准快照非今日，建议收盘后运行 update_data.py</span>':'');
     document.getElementById('footerSign').textContent =
-      '数据来源：腾讯行情 + 新浪 5 分钟 K 线（日内分布）· 汇金名单：Wind 2025年报前十大持有人口径（2026-05-01 起停止披露，此后不可验证） · 数据更新至 '+freshText()+' · 仅供内部研究，不构成投资建议';
+      '数据来源：腾讯行情 + 新浪 5 分钟 K 线（日内分布）· 汇金名单：Wind 2025年报前十大持有人口径（2026-05-01 起停止披露，此后不可验证） · 数据更新至 '+window.freshText()+' · 仅供内部研究，不构成投资建议';
   }
 
   function renderAll(){ renderVerdict(verdict()); renderCharts(); renderTable(); renderStatus(); }
@@ -1835,7 +1838,7 @@ window.forceReloadAll = function(triggerBtn) {
   Promise.all([pMacro, pSnap, pIntraday, (typeof window.__reloadDashData === 'function' ? window.__reloadDashData() : Promise.resolve())]).then(function(){
     // 3. 更新最后更新时间显示
     // 3. 更新「数据更新至」显示（只反映数据时刻，不展示快照文件生成时间）
-    document.getElementById('stamp').textContent = '数据更新至 ' + freshText();
+    document.getElementById('stamp').textContent = '数据更新至 ' + window.freshText();
     // 4. 触发实时行情更新
     if (typeof window.__triggerLiveRefresh === 'function') {
       window.__triggerLiveRefresh();
@@ -2696,30 +2699,21 @@ window.fetchLiveIntraday = function() {
     if(m<570) return {live:false,label:'休市 · 等待开盘'};
     return {live:false,label:'已收盘'};
   }
-  // 统一时间口径：只回答「数据更新到什么时候」，不展示快照文件生成时间
-  function freshText(){
-    var IM = window.INTRADAY_MIN || (typeof INTRADAY_MIN!=='undefined'?INTRADAY_MIN:null);
-    if(IM && IM.date && IM.times && IM.times.length){
-      var t=String(IM.times[IM.times.length-1]||'');
-      if(t) return String(IM.date).slice(5)+' '+t.slice(0,5);
-    }
-    return '暂无盘中数据';
-  }
   function tickSb(){
     // 每秒同步「数据更新至」到标题旁与页脚，保证点刷新后无需重跑整页渲染
     (function(){
-      var txt='数据更新至 '+freshText();
+      var txt='数据更新至 '+window.freshText();
       var se=document.getElementById('stamp');
       if(se && se.textContent!==txt) se.textContent=txt;
       var fs=document.getElementById('footerSign');
       if(fs && fs.textContent.indexOf('数据来源')===0){
-        var n=fs.textContent.replace(/数据更新至[^·]*/, '数据更新至 '+freshText()+' ');
+        var n=fs.textContent.replace(/数据更新至[^·]*/, '数据更新至 '+window.freshText()+' ');
         if(n!==fs.textContent) fs.textContent=n;
       }
     })();
     // 时间口径：优先取盘中分钟线的最新时刻（盘中脚本只更新 intraday_min.json，
     // 不更新 snapshot.js；若只读 snapshot.generated_at，刷新后时间会一直停在上一交易日）
-    if(sbU) sbU.textContent = freshText();
+    if(sbU) sbU.textContent = window.freshText();
     var info=marketInfo();
     if(sbM){ sbM.textContent=info.label; sbM.className='sb-market '+(info.live?'live':'closed'); }
     var chk=document.getElementById('auto');
