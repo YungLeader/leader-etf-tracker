@@ -2768,7 +2768,7 @@ window.fetchLiveIntraday = function() {
     if(d.ratio_26!==null&&d.ratio_26!==undefined){
       sum='<div class="idxsum">26只ETF合计占全A流通市值 <b>'+(d.ratio_26).toFixed(3)+'%</b>'
         +(d.all_a&&d.all_a.float_mktcap?'；中证全指流通市值 '+fmtYi(d.all_a.float_mktcap):'')
-        +'；口径：ETF总市值 ÷ 指数总市值（腾讯实时取数，截至 '+(d.asof||'—')+'）'
+        +'；口径：26只ETF总市值 ÷ 中证全指流通市值（腾讯实时取数，截至 '+(d.asof||'—')+'）'
         +(d.base_date?'；近两月变动按份额变动折算（基准 '+d.base_date+'）':'')
         +'。仅统计本表跟踪标的，与外部面板存在篮子差异。</div>';
     }
