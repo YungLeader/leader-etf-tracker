@@ -2,8 +2,15 @@
 # 每日交易日 15:35 自动更新国家队旺旺队 ETF 看板数据并推送到 GitHub Pages
 
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
-export https_proxy="http://127.0.0.1:2080"
-export http_proxy="http://127.0.0.1:2080"
+# 代理改为可选：仅当 127.0.0.1:2080 存活时启用，否则直连
+# （历史坑：代理未启动时 export 死代理会让采集请求全部失败）
+if (exec 3<>/dev/tcp/127.0.0.1/2080) 2>/dev/null; then
+  exec 3>&- 2>/dev/null
+  export https_proxy="http://127.0.0.1:2080"
+  export http_proxy="http://127.0.0.1:2080"
+else
+  unset https_proxy http_proxy HTTPS_PROXY HTTP_PROXY
+fi
 
 LOG_DIR="/Users/leader/.openclaw/workspace-stock-agent/tools/leader-etf-tracker-repo/logs"
 mkdir -p "$LOG_DIR"

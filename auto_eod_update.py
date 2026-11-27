@@ -898,9 +898,7 @@ def main():
 
     # 5. Git 提交与推送
     try:
-        env = os.environ.copy()
-        env['https_proxy'] = 'http://127.0.0.1:2080'
-        env['http_proxy'] = 'http://127.0.0.1:2080'
+        env = apply_proxy(os.environ.copy())
         env['PATH'] = f"/opt/homebrew/bin:/usr/local/bin:{env.get('PATH', '')}"
         
         subprocess.run(['git', 'add', 'data/', 'index.html'], cwd=REPO_DIR, check=True)
