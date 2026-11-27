@@ -276,15 +276,26 @@ def compute_and_push():
     # 页面首屏直接读内嵌块，若内嵌块长期不更新会与 data/intraday_min.json 出现
     # times / min_amount 长度不一致，前端按 ETF 序列截断后会把最后几分钟（含 15:00 收盘竞价）整段丢掉。
     try:
-        with open(HTML_PATH, 'r', encoding='utf-8') as _f:
-            html = _f.read()
-        new_block = 'window.INTRADAY_MIN = ' + json.dumps(intraday_data, ensure_ascii=False) + ';\nwindow.__curScope'
-        html2, cnt = re.subn(r'window\.INTRADAY_MIN\s*=\s*\{.*?\};\nwindow\.__curScope', lambda _m: new_block, html, flags=re.DOTALL)
-        if cnt and html2 != html:
+        for _attempt in range(3):
+            st0 = os.stat(HTML_PATH)
+            with open(HTML_PATH, 'r', encoding='utf-8') as _f:
+                html = _f.read()
+            new_block = 'window.INTRADAY_MIN = ' + json.dumps(intraday_data, ensure_ascii=False) + ';\nwindow.__curScope'
+            html2, cnt = re.subn(r'window\.INTRADAY_MIN\s*=\s*\{.*?\};\nwindow\.__curScope', lambda _m: new_block, html, flags=re.DOTALL)
+            if not cnt:
+                if 'window.INTRADAY_MIN = {' in html:
+                    print('[WARN] index.html 内嵌分时块未匹配，跳过同步')
+                break
+            if html2 == html:
+                print('[OK] index.html 内嵌分时块已是最新')
+                break
+            st1 = os.stat(HTML_PATH)
+            if st1.st_mtime_ns != st0.st_mtime_ns or st1.st_size != st0.st_size:
+                print('[WARN] index.html 在同步期间被外部修改，重读后重试')
+                continue
             atomic_write_text(HTML_PATH, html2)
             print('[OK] index.html 内嵌分时块已同步')
-        elif 'window.INTRADAY_MIN = {' in html:
-            print('[WARN] index.html 内嵌分时块未匹配，跳过同步')
+            break
         # 内嵌块不存在时无需处理：页面启动会 fetch data/intraday_min.json 覆盖首屏数据
     except Exception as e:
         print(f'[WARN] 同步 index.html 内嵌分时块失败: {e}')
