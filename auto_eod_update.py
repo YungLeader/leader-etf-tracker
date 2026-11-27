@@ -70,6 +70,19 @@ INTRADAY_HIST_JSON = os.path.join(DATA_DIR, 'intraday_history.json')
 INTRADAY_HIST_JS = os.path.join(DATA_DIR, 'intraday_history.js')
 INTRADAY_HIST_KEEP_DAYS = 20
 
+# ================= 指数托底强度卡片（P0：指数总市值实时取数，替代硬编码基准） =================
+# 五大指数腾讯行情代码（顺序即前端次级排序依据，实际按占比降序渲染）
+INDEX_QUOTE_CODES = {
+    '沪深300': 'sh000300',
+    '上证50': 'sh000016',
+    '中证500': 'sh000905',
+    '中证1000': 'sh000852',
+    '创业板指': 'sz399006',
+}
+ALL_A_QUOTE_CODE = 'sh000985'          # 中证全指，作全A市值代理口径
+INDEX_HOLDINGS_JSON = os.path.join(DATA_DIR, 'index_holdings.json')
+INDEX_2M_LOOKBACK_DAYS = 60            # 近两月变动的回溯自然日数
+
 # 大类宽基列定义（顺序即前端展示顺序）
 WIDEBASE_COLUMNS = [
     ('hs300', '沪深300'),
@@ -404,20 +417,134 @@ def fetch_avg_price():
         return None
 
 
-def calc_all26_ratio(items):
-    """计算26只ETF当日总市值占全A流通市值比重(%)
-    全A流通市值通过4只头部沪深300ETF市值反推"""
+def fetch_index_mktcaps(codes=None):
+    """实时抓取指数收盘点位与总市值/流通市值（亿元）。
+
+    返回 {code: {'close':float,'total_mktcap':float,'float_mktcap':float}}
+    取数失败仅在结果中缺项并告警，绝不返回伪造值。
+    """
+    if codes is None:
+        codes = [ALL_A_QUOTE_CODE] + list(INDEX_QUOTE_CODES.values())
+    out = {}
+    for code in codes:
+        try:
+            req = urllib.request.Request(
+                f'http://qt.gtimg.cn/q={code}',
+                headers={'User-Agent': 'Mozilla/5.0', 'Referer': 'http://finance.qq.com/'})
+            with urllib.request.urlopen(req, timeout=8) as resp:
+                parts = resp.read().decode('gbk', 'ignore').split('~')
+            if len(parts) < 46:
+                print(f'[WARN] 指数行情字段不完整 {code} (len={len(parts)})')
+                continue
+            total_mk = float(parts[45] or 0)
+            float_mk = float(parts[44] or 0)
+            if total_mk <= 0 or float_mk <= 0:
+                print(f'[WARN] 指数市值非正数 {code}: total={total_mk} float={float_mk}')
+                continue
+            out[code] = {
+                'close': float(parts[3] or 0),
+                'total_mktcap': total_mk,
+                'float_mktcap': float_mk,
+            }
+        except Exception as e:
+            print(f'[WARN] 指数市值抓取异常 {code}: {type(e).__name__}: {e}')
+    return out
+
+
+def calc_all26_ratio(items, all_a_float_mktcap):
+    """26只ETF合计市值 与 头部4只沪深300ETF 占全A流通市值比重(%)。
+
+    分母 all_a_float_mktcap 由 fetch_index_mktcaps 实时取中证全指(000985)流通市值，
+    不再以固定 0.783% 反推（该常数已漂移，实测真实值约 0.646%，会使26只占比系统性虚高约21%）。
+    取数缺失时返回 (None, None)，由调用方沿用上一有效值，严禁回退硬编码常数。
+    """
+    if not all_a_float_mktcap or all_a_float_mktcap <= 0:
+        return None, None
     top4_codes = {'510300', '510310', '510330', '159919'}
     top4_mktcap = sum(it.get('mktcap_yi', 0) for it in items if it['code'] in top4_codes)
     total_26_mktcap = sum(it.get('mktcap_yi', 0) for it in items)
-    if top4_mktcap > 0:
-        # 4只ETF占比基准: 0.783% (每日使用头部4只/全A流通市值反推)
-        # 由于ratios_4固定为0.783，全A流通市值 = top4_mktcap/0.00783
-        all_a_mktcap = top4_mktcap / 0.00783
-        ratio_26 = round(total_26_mktcap / all_a_mktcap * 100, 3)
+    if top4_mktcap <= 0 or total_26_mktcap <= 0:
+        return None, None
+    ratio_26 = round(total_26_mktcap / all_a_float_mktcap * 100, 3)
+    ratio_top4 = round(top4_mktcap / all_a_float_mktcap * 100, 3)
+    return ratio_26, ratio_top4
+
+
+def build_index_holdings(items, shares_history, index_mk, ratio_26, ratio_top4, today_str):
+    """生成五大指数托底持仓强度卡片数据 data/index_holdings.json。
+
+    口径：占比 = 该指数下本表跟踪ETF总市值 / 该指数总市值（腾讯实时，总市值口径）。
+    近两月变动：净值与指数点位近似同比例变动，且分子分母同步缩放，
+    故占比 ∝ 份额，两月前占比 = 当前占比 × (两月前份额 / 当前份额)。
+    """
+    hist_dates = sorted(shares_history.keys())
+    base_date = None
+    try:
+        cutoff = (datetime.datetime.strptime(today_str, '%Y%m%d')
+                  - datetime.timedelta(days=INDEX_2M_LOOKBACK_DAYS)).strftime('%Y%m%d')
+    except Exception:
+        cutoff = today_str
+    for d in hist_dates:
+        if d <= cutoff:
+            base_date = d
+    if base_date is None and hist_dates:
+        base_date = hist_dates[0]
+
+    rows = []
+    for name, code in INDEX_QUOTE_CODES.items():
+        q = index_mk.get(code)
+        if not q or q.get('total_mktcap', 0) <= 0:
+            continue
+        members = [it for it in items if it.get('index') == name]
+        if not members:
+            continue
+        etf_mk = sum(m.get('mktcap_yi', 0) or 0 for m in members)
+        if etf_mk <= 0:
+            continue
+        ratio = etf_mk / q['total_mktcap'] * 100
+
+        ratio_2m, chg_bp = None, None
+        if base_date:
+            sh_then = shares_history.get(base_date) or {}
+            cur_sh = sum(m.get('shares_yi', 0) or 0 for m in members)
+            then_sh = sum((sh_then.get(m['code']) or 0) for m in members)
+            if cur_sh > 0 and then_sh > 0:
+                ratio_2m = ratio * then_sh / cur_sh
+                chg_bp = (ratio - ratio_2m) * 100
+
+        rows.append({
+            'name': name,
+            'code': code,
+            'etf_count': len(members),
+            'etf_mktcap': round(etf_mk, 1),
+            'index_mktcap': round(q['total_mktcap'], 1),
+            'close': q['close'],
+            'ratio': round(ratio, 3),
+            'ratio_2m': round(ratio_2m, 3) if ratio_2m is not None else None,
+            'chg_bp': round(chg_bp, 1) if chg_bp is not None else None,
+        })
+
+    rows.sort(key=lambda r: -r['ratio'])
+    payload = {
+        'asof': today_str,
+        'basis': 'total_mktcap',
+        'source': 'qt.gtimg.cn',
+        'base_date': base_date,
+        'all_a': {
+            'code': ALL_A_QUOTE_CODE,
+            'name': '中证全指',
+            'float_mktcap': round(index_mk.get(ALL_A_QUOTE_CODE, {}).get('float_mktcap', 0), 1),
+        },
+        'ratio_26': ratio_26,
+        'ratio_top4': ratio_top4,
+        'items': rows,
+    }
+    atomic_write_json(INDEX_HOLDINGS_JSON, payload)
+    if rows:
+        print('✅ 指数托底卡片: ' + ' / '.join(f"{r['name']} {r['ratio']:.3f}%" for r in rows))
     else:
-        ratio_26 = 0.0
-    return ratio_26
+        print('[WARN] 指数托底卡片无有效行（指数市值或ETF市值缺失）')
+    return payload
 
 def compute_and_save_intraday_min(items, today_dash):
     core_items = [it for it in items if it.get('group') == 'core']
@@ -617,12 +744,15 @@ def rebuild_index_html(macro_data, intraday_data, today_dash):
     svgInner.append(f'<path d="{pathPt}" fill="none" stroke="#005eb8" stroke-width="2.0" stroke-linejoin="round"/>')
     svgInner.append(f'<path d="{pathRt}" fill="none" stroke="#ff4713" stroke-width="2.6" stroke-linejoin="round"/>')
 
-    peakIdx = ratios.index(2.51) if 2.51 in ratios else 1147
+    # 峰值标记：动态取全序列最大值，避免硬编码历史峰值（此前写死 2.51/1147 兜底）
+    _valid = [v for v in ratios if isinstance(v, (int, float))]
+    peakVal = max(_valid) if _valid else 0.0
+    peakIdx = ratios.index(peakVal) if _valid else 0
     peakX = getX(peakIdx)
-    peakY = getYRt(2.51)
+    peakY = getYRt(peakVal)
     svgInner.append(f'<circle cx="{peakX:.1f}" cy="{peakY:.1f}" r="5" fill="#ff4713"/>')
     svgInner.append(f'<rect x="{peakX - 25:.1f}" y="{peakY - 26:.1f}" width="50" height="20" rx="4" fill="#ff4713"/>')
-    svgInner.append(f'<text x="{peakX:.1f}" y="{peakY - 12:.1f}" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">2.51%</text>')
+    svgInner.append(f'<text x="{peakX:.1f}" y="{peakY - 12:.1f}" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">{peakVal:.2f}%</text>')
 
     lastX = getX(n - 1)
     lastY = getYRt(ratios[-1])
@@ -723,7 +853,7 @@ def rebuild_index_html(macro_data, intraday_data, today_dash):
         new_svg26 = f'<svg id="macro26Svg" viewBox="0 0 {w} {h}" style="width:100%;height:{h}px;display:block;">' + ''.join(si26) + '</svg>'
         html = re.sub(r'<svg id="macro26Svg"[^>]*>.*?</svg>', new_svg26, html, flags=re.DOTALL)
 
-        badge26_html = f'<div id="macro26-badge" style="background:#f0fff4;color:#28a745;padding:6px 16px;border-radius:20px;font-weight:800;font-size:14px;border:1px solid #c3e6cb;">\n        当前比重: {ratios_all26[-1]:.3f}% (分散持仓全口径)\n      </div>'
+        badge26_html = f'<div id="macro26-badge" style="background:#f0fff4;color:#28a745;padding:6px 16px;border-radius:20px;font-weight:800;font-size:14px;border:1px solid #c3e6cb;">\n        当前比重: {ratios_all26[-1]:.3f}% (26只ETF总市值 ÷ 中证全指流通市值)\n      </div>'
         html = re.sub(r'<div id="macro26-badge"[^>]*>.*?</div>', badge26_html, html, flags=re.DOTALL)
 
         # 更新左轴说明文字
@@ -883,13 +1013,24 @@ def main():
 
     hs300_close = fetch_hs300_close()
     avg_price = fetch_avg_price()
-    ratio_26 = calc_all26_ratio(items)
+
+    # 指数市值实时取数（信封：一次请求覆盖全A + 五大指数）
+    index_mk = fetch_index_mktcaps()
+    all_a_float = index_mk.get(ALL_A_QUOTE_CODE, {}).get('float_mktcap', 0.0)
+    ratio_26, ratio_top4 = calc_all26_ratio(items, all_a_float)
+    if ratio_26 is None:
+        # 取数失败：沿用上一有效真实值，严禁回退硬编码常数
+        _prev26 = [v for v in macro.get('ratios_all26', []) if v]
+        _prev4 = [v for v in macro.get('ratios', []) if v]
+        ratio_26 = _prev26[-1] if _prev26 else 0.0
+        ratio_top4 = _prev4[-1] if _prev4 else 0.0
+        print('[WARN] 全A流通市值取数失败，26只占比与头部4只占比沿用上一有效值')
 
     if hs300_close:
         dates = macro['dates']
         pts = macro['hs300_points']
         ratios = macro['ratios']
-        approx_ratio = round(0.783, 3)
+        approx_ratio = round(ratio_top4, 3)
 
         # 确保扩展字段存在（avg_price_points 替换原 zs985_points）
         avg_price_pts = macro.setdefault('avg_price_points', [0.0] * len(dates))
@@ -921,6 +1062,19 @@ def main():
         macro['count'] = len(dates)
         atomic_write_json(MACRO_PATH, macro)
         print(f"✅ 宏观大底更新: 沪深300={hs300_close} A股平均股价={avg_price} 26只ETF占比={ratio_26}%")
+
+    # 2.5 生成五大指数托底强度卡片数据（独立于沪深300收盘取数是否成功）
+    try:
+        build_index_holdings(
+            items,
+            snapshot.get('shares_history') or {},
+            index_mk,
+            ratio_26,
+            ratio_top4,
+            today_str,
+        )
+    except Exception as e:
+        print(f"[ERROR] 指数托底卡片生成失败: {type(e).__name__}: {e}")
 
     # 3. 物理抓取并生成分时双口径数据
     print("⏳ 正在采集与核算今日上证指数与 24 只 ETF 分时数据...")
