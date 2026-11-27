@@ -399,7 +399,7 @@ window.INTRADAY_MIN = {
     3588.704,
     3587.617,
     3584.681,
-    3585.613
+    3587.078
   ],
   "cy_points": [
     2206.313,
@@ -599,12 +599,12 @@ window.INTRADAY_MIN = {
     2407.485,
     2403.935,
     2398.813,
-    2400.934
+    2405.867
   ],
   "prev_close_cy": 2202.822,
   "scope_20": {
     "count": 20,
-    "total_today_amount": 710.83,
+    "total_today_amount": 712.78,
     "total_avg20_amount": 592.99,
     "ratio": 1.2,
     "peak_time": "13:00",
@@ -807,7 +807,7 @@ window.INTRADAY_MIN = {
       3.06,
       2.93,
       3.18,
-      1.16
+      3.11
     ],
     "cum_amount": [
       8.19,
@@ -1007,7 +1007,7 @@ window.INTRADAY_MIN = {
       703.56,
       706.49,
       709.67,
-      710.83
+      712.78
     ],
     "base_cum_amount": [
       2.99,
@@ -1212,7 +1212,7 @@ window.INTRADAY_MIN = {
   },
   "scope_26": {
     "count": 26,
-    "total_today_amount": 931.96,
+    "total_today_amount": 934.2,
     "total_avg20_amount": 790.64,
     "ratio": 1.18,
     "peak_time": "13:00",
@@ -1415,7 +1415,7 @@ window.INTRADAY_MIN = {
       3.68,
       3.51,
       4.06,
-      1.47
+      3.71
     ],
     "cum_amount": [
       10.59,
@@ -1615,7 +1615,7 @@ window.INTRADAY_MIN = {
       922.92,
       926.43,
       930.49,
-      931.96
+      934.2
     ],
     "base_cum_amount": [
       3.99,
