@@ -1350,7 +1350,7 @@ function bootSnapshot(){
       (liveOK?(st.lunch?' · 通道正常，13:00 继续刷新':' · 实时已连接'):'')+
       (stale?' <span style="color:var(--orange)">· 基准快照非今日，建议收盘后运行 update_data.py</span>':'');
     document.getElementById('footerSign').textContent =
-      '数据来源：腾讯行情 + 新浪 5 分钟 K 线（日内分布）· 汇金名单：Wind 2025年报前十大持有人口径（2026-05-01 起停止披露，此后不可验证） · 快照生成 '+S.generated_at+' · 仅供内部研究，不构成投资建议';
+      '数据来源：腾讯行情 + 新浪 5 分钟 K 线（日内分布）· 汇金名单：Wind 2025年报前十大持有人口径（2026-05-01 起停止披露，此后不可验证） · 数据更新至 '+freshText+' · 仅供内部研究，不构成投资建议';
   }
 
   function renderAll(){ renderVerdict(verdict()); renderCharts(); renderTable(); renderStatus(); }
@@ -2705,6 +2705,21 @@ window.fetchLiveIntraday = function() {
     return {live:false,label:'已收盘'};
   }
   function tickSb(){
+    // 每秒同步「数据更新至」到标题旁与页脚，保证点刷新后无需重跑整页渲染
+    (function(){
+      var IM = window.INTRADAY_MIN || (typeof INTRADAY_MIN!=='undefined'?INTRADAY_MIN:null);
+      var fresh=null;
+      if(IM && IM.date && IM.times && IM.times.length){
+        var t=String(IM.times[IM.times.length-1]||'');
+        if(t) fresh=String(IM.date)+' '+t;
+      }
+      if(!fresh && window.SNAPSHOT && window.SNAPSHOT.generated_at) fresh=String(window.SNAPSHOT.generated_at);
+      if(!fresh || window.__freshText===fresh) return;
+      window.__freshText=fresh;
+      var se=document.getElementById('stamp'); if(se) se.textContent='数据更新至 '+fresh;
+      var fs=document.getElementById('footerSign');
+      if(fs) fs.textContent=fs.textContent.replace(/数据更新至[^·]*/, '数据更新至 '+fresh+' ');
+    })();
     // 时间口径：优先取盘中分钟线的最新时刻（盘中脚本只更新 intraday_min.json，
     // 不更新 snapshot.js；若只读 snapshot.generated_at，刷新后时间会一直停在上一交易日）
     var shown=false;
