@@ -19,6 +19,40 @@ import subprocess
 import re
 import time
 
+# ---- 代理策略：存活探测 + 直连兜底 ----
+# 历史坑：本地代理(127.0.0.1:2080)未启动时环境变量仍指向死代理，
+# 导致 urllib 请求全部 Connection refused，采集静默 100% 失败。
+PROXY_URL = 'http://127.0.0.1:2080'
+
+
+def _proxy_alive(url=PROXY_URL, timeout=0.5):
+    try:
+        import socket
+        host, _, port = url.split('//')[-1].partition(':')
+        with socket.create_connection((host, int(port or 80)), timeout=timeout):
+            return True
+    except Exception:
+        return False
+
+
+PROXY_OK = _proxy_alive()
+
+
+def apply_proxy(env):
+    """代理存活则注入，否则彻底清除代理变量，保证直连。"""
+    if PROXY_OK:
+        env['https_proxy'] = PROXY_URL
+        env['http_proxy'] = PROXY_URL
+    else:
+        for k in ('https_proxy', 'http_proxy', 'HTTPS_PROXY', 'HTTP_PROXY',
+                  'all_proxy', 'ALL_PROXY'):
+            env.pop(k, None)
+    return env
+
+
+# 进程级生效：urllib 默认读取 os.environ
+apply_proxy(os.environ)
+
 REPO_DIR = '/Users/leader/.openclaw/workspace-stock-agent/tools/leader-etf-tracker-repo'
 SRC_DIR = '/Users/leader/.openclaw/workspace-stock-agent/tools/etf-tracker'
 SKILL_DIR = '/Users/leader/.openclaw/workspace-stock-agent/skills/national-team-etf-tracker'
