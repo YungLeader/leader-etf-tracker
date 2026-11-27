@@ -1,0 +1,70 @@
+{
+  "asof": "20261127",
+  "basis": "total_mktcap",
+  "source": "qt.gtimg.cn",
+  "base_date": "20260928",
+  "all_a": {
+    "code": "sh000985",
+    "name": "中证全指",
+    "float_mktcap": 858512.0
+  },
+  "ratio_26": 1.519,
+  "ratio_top4": 0.646,
+  "items": [
+    {
+      "name": "创业板指",
+      "code": "sz399006",
+      "etf_count": 2,
+      "etf_mktcap": 1638.3,
+      "index_mktcap": 143065.2,
+      "close": 2443.96,
+      "ratio": 1.145,
+      "ratio_2m": 0.447,
+      "chg_bp": 69.8
+    },
+    {
+      "name": "沪深300",
+      "code": "sh000300",
+      "etf_count": 6,
+      "etf_mktcap": 5712.3,
+      "index_mktcap": 515228.3,
+      "close": 4063.06,
+      "ratio": 1.109,
+      "ratio_2m": 0.465,
+      "chg_bp": 64.4
+    },
+    {
+      "name": "中证500",
+      "code": "sh000905",
+      "etf_count": 3,
+      "etf_mktcap": 1032.0,
+      "index_mktcap": 141313.5,
+      "close": 6313.63,
+      "ratio": 0.73,
+      "ratio_2m": 0.402,
+      "chg_bp": 32.8
+    },
+    {
+      "name": "中证1000",
+      "code": "sh000852",
+      "etf_count": 4,
+      "etf_mktcap": 832.3,
+      "index_mktcap": 115170.5,
+      "close": 5982.91,
+      "ratio": 0.723,
+      "ratio_2m": 0.28,
+      "chg_bp": 44.2
+    },
+    {
+      "name": "上证50",
+      "code": "sh000016",
+      "etf_count": 1,
+      "etf_mktcap": 753.8,
+      "index_mktcap": 245604.7,
+      "close": 2834.68,
+      "ratio": 0.307,
+      "ratio_2m": 0.09,
+      "chg_bp": 21.7
+    }
+  ]
+}

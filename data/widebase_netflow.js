@@ -1,5 +1,5 @@
 window.WIDEBASE_NETFLOW = {
-  "generated_at": "2026-11-27 17:29:04",
+  "generated_at": "2026-11-27 18:24:36",
   "trade_date": "20261127",
   "unit": "亿元",
   "columns": [
@@ -40,15 +40,15 @@ window.WIDEBASE_NETFLOW = {
     {
       "date": "20261127",
       "stale": false,
-      "hs300": -49.55,
-      "csi1000": 40.74,
-      "csi500": -6.2,
-      "star50": -20.4,
-      "csia500": -9.62,
-      "chinext": 57.33,
-      "sse50": -0.89,
-      "other": 0.62,
-      "total": 12.03
+      "hs300": -34.5,
+      "csi1000": 12.45,
+      "csi500": -32.33,
+      "star50": -191.79,
+      "csia500": -24.49,
+      "chinext": -22.67,
+      "sse50": -13.69,
+      "other": -6.31,
+      "total": -313.33
     },
     {
       "date": "20261126",
